@@ -1,0 +1,1 @@
+select employee.name from employee,dept;
