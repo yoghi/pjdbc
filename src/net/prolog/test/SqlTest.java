@@ -1,4 +1,4 @@
-package net.test;
+package net.prolog.test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

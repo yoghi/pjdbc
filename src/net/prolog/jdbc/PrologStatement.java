@@ -1,7 +1,5 @@
 package net.prolog.jdbc;
 
-import java.io.DataInputStream;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,9 +7,8 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
-import net.sql.prolog.ParseException;
-import net.sql.prolog.Psql;
-
+import net.prolog.sql.ParseException;
+import net.prolog.sql.Psql;
 import alice.tuprolog.Prolog;
 
 public class PrologStatement implements Statement {

@@ -4,11 +4,11 @@
  
 options {
   JDK_VERSION = "1.5";
-  OUTPUT_DIRECTORY = "prolog";
+  OUTPUT_DIRECTORY = ".";
   IGNORE_CASE=true ;
 }
 PARSER_BEGIN(Psql)
-package net.sql.prolog;
+package net.prolog.sql;
 
 import alice.tuprolog.Prolog;
 import java.io.DataInputStream;
