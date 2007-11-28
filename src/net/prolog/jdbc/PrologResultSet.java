@@ -1159,7 +1159,7 @@ public class PrologResultSet implements ResultSet {
 	@Override
 	public void updateString(int columnIndex, String x) throws SQLException {
 		// TODO Auto-generated method stub
-		
+		.. 
 	}
 
 	@Override

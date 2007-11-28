@@ -1,5 +1,8 @@
 package net.prolog.jdbc;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -29,16 +32,22 @@ public class PrologConnection implements Connection {
     public PrologConnection(String url, String filename) throws SQLException {
             
             try {
-                //devo caricare il db prolog
-                this.dbengine = new Prolog();
-                this.dbengine.setTheory( new Theory("") );
+            	this.dbengine = new Prolog();
+                
+            	Theory t = new Theory(new FileInputStream(filename));
+                this.dbengine.setTheory( t );
                     
             } catch (InvalidTheoryException e) {
                 throw new SQLException("Prolog database internal error : "+e.toString());
-            }
+            } catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             
             this.url = url;
-            
     }
     
     /**

@@ -1,5 +1,6 @@
 package net.prolog.test;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,18 +11,31 @@ import java.sql.Statement;
 
 public class SqlTest {
 
+	static String rootWin = "/Users/Yoghi/Workspace/Java/Pjdbc/";
+	static String rootMac = "C:\\Documents and Settings\\Administrator\\workspace\\Pjdbc\\";
+
+	static String fileName =  "database/test.db";
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		String fileName = "/tmp/databas.prolog";
-		
+	
 		try {
 			
-			Class.forName("net.prolog.PrologDriver");
+			Class.forName("net.prolog.jdbc.PrologDriver");
 			
-			Connection conn = DriverManager.getConnection("jdbc:prolog:"+fileName);
+			String systemOs = System.getProperty("os.name");
+			
+			System.out.println(System.getProperty("os.name"));
+			
+			Connection conn = null;
+			
+			if ( systemOs == "Windows XP" ) {
+				conn = DriverManager.getConnection("jdbc:prolog:"+rootWin+fileName);
+			} else {
+				conn = DriverManager.getConnection("jdbc:prolog:"+rootMac+fileName);
+			}
 			
 			Statement stmt = conn.createStatement();
 			

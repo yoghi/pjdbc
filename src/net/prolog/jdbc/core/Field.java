@@ -34,6 +34,4 @@ public class Field {
         this.positionInTable = positionInTable;
     }
     
-    
-    
 }
