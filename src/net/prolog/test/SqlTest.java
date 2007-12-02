@@ -14,7 +14,7 @@ public class SqlTest {
 	static String rootWin = "/Users/Yoghi/Workspace/Java/Pjdbc/";
 	static String rootMac = "C:\\Documents and Settings\\Administrator\\workspace\\Pjdbc\\";
 
-	static String fileName =  "database/test.db";
+	static String fileName =  "database/prolog.db";
 	
 	/**
 	 * @param args
@@ -33,12 +33,15 @@ public class SqlTest {
 			
 			if ( systemOs == "Windows XP" ) {
 				conn = DriverManager.getConnection("jdbc:prolog:"+rootWin+fileName);
-			} else {
+			}
+			
+			if ( systemOs == "Darwin" ) {
 				conn = DriverManager.getConnection("jdbc:prolog:"+rootMac+fileName);
 			}
 			
 			Statement stmt = conn.createStatement();
 			
+			/*
 			ResultSet rs = stmt.executeQuery("select employee.name from employee,dept;");
 			
 			while(rs.next()) {
@@ -47,7 +50,7 @@ public class SqlTest {
 			}
 			
 			//stmt.executeUpdate("set employee.name = 'pippo' to employee where employee.name = 'pippa' ");
-			
+			*/
 			conn.close();
 			
 			

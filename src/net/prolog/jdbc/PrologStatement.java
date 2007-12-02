@@ -16,9 +16,9 @@ public class PrologStatement implements Statement {
 	private PrologConnection conn = null;
 	private Prolog dbengine = null;
 	
-	public PrologStatement(PrologConnection connection) {
+	public PrologStatement(PrologConnection connection,Prolog db) {
 		this.conn = connection;
-		this.dbengine = this.conn.getEngine();
+		this.dbengine = db; //this.conn.getEngine();
 	}
 
 	public void addBatch(String sql) throws SQLException {

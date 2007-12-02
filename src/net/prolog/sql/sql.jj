@@ -21,7 +21,7 @@ public class Psql {
   	
   	try {
   		
-  		FileInputStream f = new FileInputStream("/home/workspace/Java/Parser/src/net/sql/prolog.sql");
+  		FileInputStream f = new FileInputStream("/home/workspace/Java/Pjdbc/database/prolog.sql");
   		DataInputStream d = new DataInputStream(f);    	Psql parser = new Psql(d);
     	    while (true){	      //System.out.println("Reading from standard input...");	      //System.out.println("Enter an expression like  'SELECT <campi> FROM <database>;' : ");	      try {	        Psql.start();	      }	      catch (Exception e){	        System.out.println("NOK.");	        System.out.println(e.getMessage());	        //Psql.ReInit(System.in);
 	        break;	      }	      catch (Error e){	        System.out.println("Oops.");	        System.out.println(e.getMessage());	        break ;	      }	    }

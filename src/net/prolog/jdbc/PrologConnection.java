@@ -27,6 +27,7 @@ import alice.tuprolog.Theory;
 public class PrologConnection implements Connection {
 
 	private Prolog dbengine = null; 
+	private PrologMetaData databaseMetaData = new PrologMetaData(); 
     private final String url;
     
     public PrologConnection(String url, String filename) throws SQLException {
@@ -53,6 +54,7 @@ public class PrologConnection implements Connection {
     /**
      * Get the prolog engine use from connection
      * @return Prolog engine
+     * @deprecated
      */
     public Prolog getEngine() {
             return this.dbengine;
@@ -109,8 +111,9 @@ public class PrologConnection implements Connection {
 
 	@Override
 	public Statement createStatement() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		
+		return new PrologStatement(this,this.dbengine);
+		
 	}
 
 	@Override
@@ -165,6 +168,10 @@ public class PrologConnection implements Connection {
 		return 0;
 	}
 
+	
+	/* (non javadoc)
+	 * Restituisce un wrapper per ottenere MetaDati 
+	 */
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
 		// TODO Auto-generated method stub
