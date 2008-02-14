@@ -1,0 +1,26 @@
+
+//// cavolate varie //////
+
+/* teoria  */
+
+nomeesame([123123213,23]).
+nomeesame([222222222,25]).
+nomeesame([12331312,17]).
+
+
+/* predicati */
+
+// Es. lookAll(10,[10,20,10,30,10],L) tutte le posizioni del 10
+lookAll(X,L,Ps):- findall(P,lookAny(X,L,P),Ps).
+
+
+
+
+/* da definire meglio ...*/
+
+max([H|T],M):-max([H|T],M,H). 
+max([H|T],M,Temp):-H>Temp, max(T,M,H). 
+max([H|T],M,Temp):-H<=Temp, max(T,M,Temp). 
+max([],M,M).
+
+maggiore([H|T],Paragone,Risultato) :-  true.

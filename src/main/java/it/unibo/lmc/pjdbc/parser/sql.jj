@@ -1,0 +1,181 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.5";
+  OUTPUT_DIRECTORY = ".";
+  IGNORE_CASE=true ;
+}
+PARSER_BEGIN(Psql)
+package it.unibo.lmc.pjdbc.parser;
+
+import alice.tuprolog.Prolog;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+public class Psql {
+	
+		public static void main(String args[])		throws ParseException{
+  	
+  	try {
+  		
+  		FileInputStream f = new FileInputStream("/home/workspace/Java/Pjdbc/database/prolog.sql");
+  		DataInputStream d = new DataInputStream(f);    	Psql parser = new Psql(d);
+    	    while (true){	      //System.out.println("Reading from standard input...");	      //System.out.println("Enter an expression like  'SELECT <campi> FROM <database>;' : ");	      try {	        Psql.start();	      }	      catch (Exception e){	        System.out.println("NOK.");	        System.out.println(e.getMessage());	        //Psql.ReInit(System.in);
+	        break;	      }	      catch (Error e){	        System.out.println("Oops.");	        System.out.println(e.getMessage());	        break ;	      }	    }
+    } catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+      }  
+  
+}
+PARSER_END(Psql)
+
+SKIP :
+{
+ 	" "
+	| "\r"
+	| "\t"
+	| "\n"
+}
+TOKEN : /* OPERATORS */
+{
+	<K_SELECT:"SELECT">
+	| <K_FROM:"FROM">
+}
+TOKEN :
+{
+	< S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
+	| < #LETTER: ["a"-"z","A"-"Z"]>
+	| < #SPECIAL_CHARS: "$" | "_">
+	| < S_BIND: ":" <S_IDENTIFIER> ("." <S_IDENTIFIER>)? >
+	| < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
+	| < S_QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])* "\"" >
+	| < #INTEGER: ( <DIGIT> )+ >
+	| < #DIGIT: ["0"-"9"]>
+}
+void start() : {}
+{
+	SqlSelectStatement() ";" {}
+	{ System.out.println("\n"); }
+}
+
+void SqlSelectStatement():
+{}
+{
+    SqlSelectWithoutOrder()
+
+}
+
+void SqlSelectWithoutOrder():
+{}
+{
+     "SELECT" SqlSelectList() SqlFromClause() //[ SqlWhereClause() ]
+}
+
+/* Checks for whatever follows  SELECT */
+void SqlSelectList():
+{}
+{
+	{ System.out.println("\nSELECT :"); }
+    SqlSelectItem() ("," SqlSelectItem())*
+}
+
+void SqlSelectItem():
+{}
+{
+    //    LOOKAHEAD(SqlSelectAllItems()) SqlSelectAllItems()
+    //|   SqlSimpleExpression()    // Column or Expression
+    //    [<S_IDENTIFIER>] // Column Alias
+    LOOKAHEAD(SqlSelectAll()) SqlSelectAll() // "*"
+    | LOOKAHEAD(SqlTableColumn()) SqlTableColumn() 
+}
+
+void SqlSelectAll():
+{}
+{
+    "*" { System.out.println("TUTTO"); }
+}
+
+void SqlTableColumn():
+{Token t=null; Token d=null;}
+{
+	{ System.out.println("COLONNE :"); }
+	t=RelObjectName() [ "." d=DotObjectName()]
+	
+	{
+    	if ( d == null  ) {
+    		System.out.println("tabella nome : "+t.image);
+    	} 
+    	if ( d != null && t != null ) {
+    		System.out.println("tabella : "+t.image+" campo : "+d.image);
+    	}
+    } 
+    		
+}
+
+void SqlFromClause():
+{}
+{
+	{ System.out.println("FROM : "); }
+    "FROM" SqlFromItem() ( "," SqlFromItem())* 
+}
+
+void SqlFromItem():
+{}
+{
+    //  TableReference()
+    //  [ <S_IDENTIFIER> ]        /** Alias Name **/
+	//( SqlTableReference() | "(" SqlFromItemExpression() ")"	| LOOKAHEAD("TABLE") SqlTableExpression() )
+	( SqlTableReference() )
+}
+
+void SqlFromItemExpression():
+{}
+{
+    ( SqlTableReference() | "(" SqlFromItemExpression() ")" ) 
+}
+
+void SqlTableReference():
+{Token t = null; Token d = null;}
+{
+    t=RelObjectName() ["." d=DotObjectName()]
+    
+    {
+    	if ( d == null  ) {
+    		System.out.println("tabella : "+t.image);
+    	} 
+    	// from tabella.qualcosa non è bello, devo dare un errore, ecezzione sintattica
+    	//if ( d != null && t != null ) {
+    	//	System.out.println("tabella : "+t.image+" campo : "+d.image);
+    	//}
+    } 
+    
+}
+
+Token RelObjectName():
+{Token t = null;}
+{
+    (t=<S_IDENTIFIER>  
+    	//{ jjtThis.jjtAddChild(new SqlValue(t.image), 0); }//SqlValue
+    	//{ System.out.println("IDENTIFIER = "+t.image); }
+	| t=<S_QUOTED_IDENTIFIER>  
+    	//{ jjtThis.jjtAddChild(new SqlValue(t.image), 0); }//SqlValue
+    	//{ System.out.println("QUOTED = "+t.image); }
+	| t=<S_CHAR_LITERAL>  
+    	//{ jjtThis.jjtAddChild(new SqlValue(t.image), 0); }//SqlValue
+    	//{ System.out.println("CHAR = "+t.image); }
+    )
+    { return t; }
+}
+
+Token DotObjectName() :  // only put after "." match
+{Token t = null;}                          // here we list some char-sequences that 
+{                                    // would be returned as a special token
+    (t=<S_IDENTIFIER>                // but they are not special here
+    | t=<S_QUOTED_IDENTIFIER>
+    | t=<S_CHAR_LITERAL> )
+    { return t; }
+}
