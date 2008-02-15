@@ -32,12 +32,11 @@ public class testSelect extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 
-		Class.forName("net.prolog.jdbc.PrologDriver");
+		Class.forName("it.unibo.lmc.pjdbc.PrologDriver");
 
 		//String systemOs = System.getProperty("os.name");
 		
 		//String userDir = System.getProperty("user.dir");
-
 		/*
 		if ( systemOs == "Windows XP" ) {
 		    conn = DriverManager.getConnection("jdbc:prolog:"+rootWin+fileName);

@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
 
-import it.unibo.lmc.pjdbc.parser.ParseException;
-import it.unibo.lmc.pjdbc.parser.Psql;
 import alice.tuprolog.Prolog;
 
 public class PrologStatement implements Statement {
@@ -79,20 +77,20 @@ public class PrologStatement implements Statement {
 		//devo fare il parsing della query sql (java.io.Reader)
 		
 		StringReader str = new StringReader(sql);
-		new Psql(str);
+		//new Psql(str);
 		
 		// dovro passargli il resultset
-		
+		/*
 		try {
 			Psql.start();
 		} catch (ParseException e) {
 			throw new SQLException(e.getMessage());
 		}
-		
+		*/
 		ResultSet res = new PrologResultSet();
 		//.. sono da implementare ..
 		res.moveToInsertRow();
-		res.updateString(columnIndex, x);
+		//res.updateString(columnIndex, x);
 		res.insertRow();
 		//..
 		return res;

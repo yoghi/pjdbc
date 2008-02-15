@@ -117,13 +117,17 @@
 				</configuration>
 			</plugin>
 
-			<!-- possibilita di compile JDK 1.5 -->
+			<!-- possibilita di compile JDK 1.6 -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>RELEASE</version>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<executable>/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Commands/javac</executable>
+					<compilerVersion>1.6</compilerVersion>
+					<verbose>true</verbose>
+          			<fork>true</fork>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>
 
