@@ -36,7 +36,6 @@ public class testSelect extends TestCase {
 
 		//String systemOs = System.getProperty("os.name");
 		
-		//String userDir = System.getProperty("user.dir");
 		/*
 		if ( systemOs == "Windows XP" ) {
 		    conn = DriverManager.getConnection("jdbc:prolog:"+rootWin+fileName);
@@ -47,14 +46,12 @@ public class testSelect extends TestCase {
 		}
 		*/
 		
-		//FileInputStream f1 = new FileInputStream(userDir + "/src/main/resources/config1.properties");
-		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:prolog.db");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
 		stmt = conn.createStatement();
 		
 		// CON METADATI
-		conn_meta = DriverManager.getConnection("jdbc:prolog:prolog_with_meta.db");
+		conn_meta = DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
 		stmt_meta = conn.createStatement();
 
 		super.setUp();
@@ -108,6 +105,10 @@ public class testSelect extends TestCase {
 		try {
 			
 			ResultSet rs = stmt.executeQuery("select name from employee;");
+			while(rs.next()) {
+                String name = rs.getString("name");
+                System.out.println("NAME: "+name.toString());
+			}
 			assertTrue(true);
 			
 		} catch (Exception e) {

@@ -62,15 +62,35 @@ public class PrologConnection implements Connection {
 	 */
 	private Logger log = null;
 
+	/**
+	 * Costruttore 
+	 * @param url url passato al factory
+	 * @param filename nome del file del database
+	 * @throws SQLException ...
+	 * TODO gestire le ecezzioni 
+	 */
 	public PrologConnection(String url, String filename) throws SQLException {
 
 		try {
 			
+			System.out.println(filename);
+			
 			properties = new Properties();
 			
-		    boolean exists = (new File(filename)).exists();
+			boolean exists = (new File(filename)).exists();
+		    boolean exists_prop = (new File(filename+".properties")).exists();
 		    
-		    if ( exists ) {
+		    if ( !exists ) {
+		    	String userDir = System.getProperty("user.dir");
+		    	if ( !(new File(userDir+File.separator+filename)).exists() ){
+		    		throw new FileNotFoundException("File "+filename+" and "+userDir+File.separator+filename+" doesn't exist");
+		    	} else {
+		    		filename = userDir + filename;
+		    	}
+		    }
+		    
+		    // carico eventuali opzioni
+		    if ( exists_prop ) {
 		    	properties.load(new FileInputStream(filename+".properties"));
 		    }
 		    
@@ -87,7 +107,6 @@ public class PrologConnection implements Connection {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
