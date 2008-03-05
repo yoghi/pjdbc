@@ -62,11 +62,35 @@ public class testSelect extends TestCase {
 	 */
 	public static Test suite() {
 		TestSuite ts = new TestSuite();
+		ts.addTest(new testSelect("testExecuteQuery"));
 		ts.addTest(new testSelect("testSimpleSelect"));
 		ts.addTest(new testSelect("testSimpleSelectWithoutMeta"));
 		ts.addTest(new testSelect("testGenericCampSelect"));
 		ts.addTest(new testSelect("testWhereSelect"));
 		return ts;
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testExecuteQuery() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testExecuteQuery      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt_meta.executeQuery("select name from employee;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
 	}
 
 	/**

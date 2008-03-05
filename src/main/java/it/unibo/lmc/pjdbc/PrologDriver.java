@@ -46,12 +46,10 @@ public class PrologDriver implements Driver {
 
 	public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
 			throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public boolean jdbcCompliant() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
