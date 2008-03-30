@@ -16,20 +16,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Psql {
-	
-		public static void main(String args[])		throws ParseException{
-  	
-  	try {
-  		
-  		FileInputStream f = new FileInputStream("/home/workspace/Java/Pjdbc/database/prolog.sql");
-  		DataInputStream d = new DataInputStream(f);    	Psql parser = new Psql(d);
-    	    while (true){	      //System.out.println("Reading from standard input...");	      //System.out.println("Enter an expression like  'SELECT <campi> FROM <database>;' : ");	      try {	        Psql.start();	      }	      catch (Exception e){	        System.out.println("NOK.");	        System.out.println(e.getMessage());	        //Psql.ReInit(System.in);
-	        break;	      }	      catch (Error e){	        System.out.println("Oops.");	        System.out.println(e.getMessage());	        break ;	      }	    }
-    } catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-      }  
-  
+	public static void main(String args[]) throws ParseException{		try {			FileInputStream f = new FileInputStream("/home/workspace/Java/Pjdbc/target/classes/prolog.sql");			DataInputStream d = new DataInputStream(f);			Psql parser = new Psql(d);			while (true){		        	//System.out.println("Reading from standard input...");					//System.out.println("Enter an expression like  'SELECT <campi> FROM <database>;' : ");					try {				          Psql.start();					}catch (Exception e){						System.out.println("NOK.");						System.out.println(e.getMessage());						//Psql.ReInit(System.in);
+						break ;					}catch (Error e){						System.out.println("Oops.");						System.out.println(e.getMessage());						break ;					}			}		} catch (FileNotFoundException e1){			e1.printStackTrace();		}	}
 }
 PARSER_END(Psql)
 

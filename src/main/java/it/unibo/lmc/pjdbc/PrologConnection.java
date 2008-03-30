@@ -124,7 +124,6 @@ public class PrologConnection implements Connection {
 	protected void logger_init() {
 
 		PropertyConfigurator.configure(properties);
-		
 		log = Logger.getLogger("PrologConnection");
 		
 	}
