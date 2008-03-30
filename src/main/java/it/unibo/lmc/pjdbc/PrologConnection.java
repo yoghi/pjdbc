@@ -34,6 +34,7 @@ import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 
 public class PrologConnection implements Connection {
 
@@ -75,16 +76,23 @@ public class PrologConnection implements Connection {
 			
 			properties = new Properties();
 			
-			boolean exists = (new File(filename)).exists();
+			File file = new File(filename);
+			
+			boolean exists = file.exists();
 		    boolean exists_prop = (new File(filename+".properties")).exists();
 		    
-		    if ( !exists ) {
+		    if ( exists ) {
 		    	String userDir = System.getProperty("user.dir");
 		    	if ( !(new File(userDir+File.separator+filename)).exists() ){
 		    		throw new FileNotFoundException("File "+filename+" and "+userDir+File.separator+filename+" doesn't exist");
 		    	} else {
-		    		filename = userDir + filename;
+		    		filename = userDir + File.separator + filename;
 		    	}
+		    } else {
+		    	System.out.println("Impossibile caricare il db: "+file.getAbsolutePath());
+		    	boolean success = file.createNewFile();
+		    	if ( success ) System.out.println("Creato database vuoto: "+file.getAbsolutePath());
+		    	else System.out.println("Impossibile creare: "+file.getAbsolutePath());
 		    }
 		    
 		    // carico eventuali opzioni
@@ -93,15 +101,17 @@ public class PrologConnection implements Connection {
 		    }
 		    
 			this.logger_init();
+			
+			this.log.info("Avvio prolog db engine");
 
 			this.dbengine = new Prolog();
-
 			Theory t = new Theory(new FileInputStream(filename));
+			
+			this.log.info("Setto la teoria prolog");
 			this.dbengine.setTheory(t);
 
 		} catch (InvalidTheoryException e) {
-			throw new SQLException("Prolog database internal error : "
-					+ e.toString());
+			throw new SQLException("Prolog database internal error : "+ e.toString());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -113,33 +123,10 @@ public class PrologConnection implements Connection {
 
 	protected void logger_init() {
 
+		PropertyConfigurator.configure(properties);
+		
 		log = Logger.getLogger("PrologConnection");
-
-		log.setLevel(Level.toLevel(properties.getProperty("log_level", "ERROR")));
-
-		PatternLayout p = new PatternLayout();
-		p.setConversionPattern("%-4r %p [%t] (%F:%L){%M} %m%n");
-
-		String log_output = properties.getProperty("log_output", "console");
-
-		if (log_output.equalsIgnoreCase("console")) {
-			log.addAppender(new ConsoleAppender(p));
-		} else if (log_output.equalsIgnoreCase("file")) {
-			try {
-				
-				String filename = properties.getProperty("filename","prologDB");
-				
-				log.addAppender(new DailyRollingFileAppender(p, properties
-						.getProperty("log_file_output", filename
-								+ ".log"), properties.getProperty(
-						"log_file_rotatedate", "'.'yyyy-MM")));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			log.addAppender(new ConsoleAppender(p));
-		}
-
+		
 	}
 
 	/**
@@ -184,18 +171,6 @@ public class PrologConnection implements Connection {
 
 	
 	public Clob createClob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public NClob createNClob() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public SQLXML createSQLXML() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -400,20 +375,6 @@ public class PrologConnection implements Connection {
 	}
 
 	
-	public void setClientInfo(Properties properties)
-			throws SQLClientInfoException {
-		
-
-	}
-
-	
-	public void setClientInfo(String name, String value)
-			throws SQLClientInfoException {
-		
-
-	}
-
-	
 	public void setHoldability(int holdability) throws SQLException {
 		
 
@@ -459,6 +420,32 @@ public class PrologConnection implements Connection {
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		
 		return null;
+	}
+
+	@Override
+	public NClob createNClob() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SQLXML createSQLXML() throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setClientInfo(Properties properties)
+			throws SQLClientInfoException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setClientInfo(String name, String value)
+			throws SQLClientInfoException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

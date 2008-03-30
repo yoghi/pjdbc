@@ -336,18 +336,6 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	
-	public NClob getNClob(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public NClob getNClob(String columnLabel) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
 	public String getNString(int columnIndex) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
@@ -402,31 +390,6 @@ public class PrologResultSet implements ResultSet {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
-	
-	public RowId getRowId(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public RowId getRowId(String columnLabel) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public SQLXML getSQLXML(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	public SQLXML getSQLXML(String columnLabel) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
 	public short getShort(int columnIndex) throws SQLException {
 		// TODO Auto-generated method stub
@@ -1008,18 +971,6 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	
-	public void updateNClob(int columnIndex, NClob clob) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	public void updateNClob(String columnLabel, NClob clob) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 	public void updateNClob(int columnIndex, Reader reader) throws SQLException {
 		// TODO Auto-generated method stub
 		
@@ -1117,32 +1068,6 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	
-	public void updateRowId(int columnIndex, RowId x) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	public void updateRowId(String columnLabel, RowId x) throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	public void updateSQLXML(int columnIndex, SQLXML xmlObject)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	public void updateSQLXML(String columnLabel, SQLXML xmlObject)
-			throws SQLException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 	public void updateShort(int columnIndex, short x) throws SQLException {
 		// TODO Auto-generated method stub
 		
@@ -1207,6 +1132,92 @@ public class PrologResultSet implements ResultSet {
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+	@Override
+	public NClob getNClob(int columnIndex) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public NClob getNClob(String columnLabel) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public RowId getRowId(int columnIndex) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public RowId getRowId(String columnLabel) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public SQLXML getSQLXML(int columnIndex) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public SQLXML getSQLXML(String columnLabel) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void updateNClob(int columnIndex, NClob clob) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void updateNClob(String columnLabel, NClob clob) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void updateRowId(int columnIndex, RowId x) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void updateRowId(String columnLabel, RowId x) throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void updateSQLXML(int columnIndex, SQLXML xmlObject)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void updateSQLXML(String columnLabel, SQLXML xmlObject)
+			throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

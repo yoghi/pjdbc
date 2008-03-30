@@ -581,14 +581,6 @@ public class PrologMetaData implements DatabaseMetaData {
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.DatabaseMetaData#getRowIdLifetime()
-	 */
-	
-	public RowIdLifetime getRowIdLifetime() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see java.sql.DatabaseMetaData#getSQLKeywords()
@@ -1604,6 +1596,12 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RowIdLifetime getRowIdLifetime() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
