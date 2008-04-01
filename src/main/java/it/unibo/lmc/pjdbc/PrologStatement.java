@@ -113,7 +113,7 @@ public class PrologStatement implements Statement {
 				//se ho i metadati allora considero il numero reale di campi
 				if ( null != pMeta ) {
 				
-					PrologResultSet r = pMeta.getColumns(pRequest.getTableNameByPosition(0), null, pRequest.getTableNameByPosition(0), null);
+					PrologResultSet r = (PrologResultSet) pMeta.getColumns(pRequest.getTableNameByPosition(0), null, pRequest.getTableNameByPosition(0), null);
 					
 					//quante colonne ho trovato
 					int max = r.getFetchSize();

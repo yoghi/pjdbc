@@ -574,7 +574,7 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public boolean next() throws SQLException {
-		boolean r = this.currentPosition < this.row_data.size();
+		boolean r = this.currentPosition < this.row_data.size()-1;
 		this.currentPosition++;
 		return r;
 	}
