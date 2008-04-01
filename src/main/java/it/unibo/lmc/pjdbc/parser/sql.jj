@@ -3,7 +3,7 @@
  */
  
 options {
-  JDK_VERSION = "1.5";
+  JDK_VERSION = "1.6";
   OUTPUT_DIRECTORY = ".";
   IGNORE_CASE=true ;
 }
@@ -11,11 +11,15 @@ PARSER_BEGIN(Psql)
 package it.unibo.lmc.pjdbc.parser;
 
 import alice.tuprolog.Prolog;
+import it.unibo.lmc.pjdbc.core.PrologRequest;
+import it.unibo.lmc.pjdbc.core.PrologRequestType;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Psql {
+	
+	static private PrologRequest request = null;
 	public static void main(String args[]) throws ParseException{		try {			FileInputStream f = new FileInputStream("/home/workspace/Java/Pjdbc/target/classes/prolog.sql");			DataInputStream d = new DataInputStream(f);			Psql parser = new Psql(d);			while (true){		        	//System.out.println("Reading from standard input...");					//System.out.println("Enter an expression like  'SELECT <campi> FROM <database>;' : ");					try {				          Psql.start();					}catch (Exception e){						System.out.println("NOK.");						System.out.println(e.getMessage());						//Psql.ReInit(System.in);
 						break ;					}catch (Error e){						System.out.println("Oops.");						System.out.println(e.getMessage());						break ;					}			}		} catch (FileNotFoundException e1){			e1.printStackTrace();		}	}
 }
@@ -35,7 +39,7 @@ TOKEN : /* OPERATORS */
 }
 TOKEN :
 {
-	< S_IDENTIFIER: ( <LETTER> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
+	< S_IDENTIFIER: ( <LETTER>|<SPECIAL_CHARS> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
 	| < #LETTER: ["a"-"z","A"-"Z"]>
 	| < #SPECIAL_CHARS: "$" | "_">
 	| < S_BIND: ":" <S_IDENTIFIER> ("." <S_IDENTIFIER>)? >
@@ -46,14 +50,22 @@ TOKEN :
 }
 void start() : {}
 {
+	{ request = new PrologRequest(); }
 	SqlSelectStatement() ";" {}
 	{ System.out.println("\n"); }
+}
+
+PrologRequest parseIt() : {}
+{
+	{ request = new PrologRequest(); }
+	SqlSelectStatement() ";" {}
+	{ System.out.println("\n"); return request; }
 }
 
 void SqlSelectStatement():
 {}
 {
-    SqlSelectWithoutOrder()
+    SqlSelectWithoutOrder() {}
 
 }
 
@@ -67,7 +79,10 @@ void SqlSelectWithoutOrder():
 void SqlSelectList():
 {}
 {
-	{ System.out.println("\nSELECT :"); }
+	{ 
+		request.setType(PrologRequestType.READ); 
+		//System.out.println("\nSELECT :"); 
+	}
     SqlSelectItem() ("," SqlSelectItem())*
 }
 
@@ -90,15 +105,19 @@ void SqlSelectAll():
 void SqlTableColumn():
 {Token t=null; Token d=null;}
 {
-	{ System.out.println("COLONNE :"); }
+	{ 
+		//System.out.println("COLONNE :"); 
+	}
 	t=RelObjectName() [ "." d=DotObjectName()]
 	
 	{
     	if ( d == null  ) {
-    		System.out.println("tabella nome : "+t.image);
+    		//System.out.println("campo nome : "+t.image);
+    		request.setField(t.image);
     	} 
     	if ( d != null && t != null ) {
-    		System.out.println("tabella : "+t.image+" campo : "+d.image);
+    		//System.out.println("tabella : "+t.image+" campo : "+d.image);
+    		request.setField(t.image,d.image);
     	}
     } 
     		
@@ -107,7 +126,9 @@ void SqlTableColumn():
 void SqlFromClause():
 {}
 {
-	{ System.out.println("FROM : "); }
+	{ 
+		//System.out.println("FROM : "); 
+	}
     "FROM" SqlFromItem() ( "," SqlFromItem())* 
 }
 
@@ -133,7 +154,8 @@ void SqlTableReference():
     
     {
     	if ( d == null  ) {
-    		System.out.println("tabella : "+t.image);
+    		//System.out.println("tabella : "+t.image);
+    		request.setTable(t.image);
     	} 
     	// from tabella.qualcosa non è bello, devo dare un errore, ecezzione sintattica
     	//if ( d != null && t != null ) {

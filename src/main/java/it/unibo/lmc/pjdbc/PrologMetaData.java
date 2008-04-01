@@ -3,22 +3,89 @@
  */
 package it.unibo.lmc.pjdbc;
 
+import it.unibo.lmc.pjdbc.core.Field;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import org.apache.log4j.Logger;
+
+import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
+
+import alice.tuprolog.MalformedGoalException;
+import alice.tuprolog.NoMoreSolutionException;
+import alice.tuprolog.NoSolutionException;
+import alice.tuprolog.Prolog;
+import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Term;
+import alice.tuprolog.UnknownVarException;
 
 /**
  * @author Yoghi
  *
  */
 public class PrologMetaData implements DatabaseMetaData {
+	
+	private Hashtable table = new Hashtable();
 
 	/**
 	 * Costruttore 
+	 * @throws SQLException , non posso creare un prologMetaData
 	 */
-	public PrologMetaData(){
+	public PrologMetaData(Prolog prolog) throws SQLException{
+		try {
+			
+			SolveInfo i = prolog.solve("metabase(TABLE,POSITION,NAME,TYPE).");
+			if ( !i.isSuccess()) throw new SQLException("metabase not present");
+			
+			while(i.isSuccess()){
+				
+				Term table_name = i.getTerm("TABLE");
+				Term field_position = i.getTerm("POSITION");
+				Term field_name = i.getTerm("NAME");
+				Term field_type = i.getTerm("TYPE");
+				
+				if ( table_name.isAtom() && field_name.isAtom() && field_position.isGround() && field_type.isAtom() ){ 
+					
+					ArrayList fields = null;
+					
+					if ( !this.table.containsKey(table_name.toString()) ) {
+						fields = new ArrayList();
+						this.table.put(table_name.toString(), fields);
+						Logger.getLogger("PrologConnection").info("trovati metadati tabella "+table_name.toString());
+					} else {	
+						fields = (ArrayList) this.table.get(table_name.toString());
+					}
+					
+					Field f = new Field(field_name.toString());
+					
+					f.setPositionInTable(Integer.parseInt(field_position.toString()));
+					if ( field_type.toString().equals("int") ) f.setType( java.sql.Types.INTEGER );
+					else if ( field_type.toString().equals("string") ) f.setType( java.sql.Types.NVARCHAR );
+					
+					fields.add(f);
+					
+				} else throw new SQLException("Malformed metabase");
+				
+				try {
+					i = prolog.solveNext();
+				} catch (NoMoreSolutionException e) {
+					break;
+				}
+			}
+			
+		} catch (MalformedGoalException e) {
+			e.printStackTrace();
+		} catch (NoSolutionException e) {
+			e.printStackTrace();
+		} catch (UnknownVarException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -148,14 +215,69 @@ public class PrologMetaData implements DatabaseMetaData {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.DatabaseMetaData#getColumns(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	/**
+	 * 
+	 *		1.  TABLE_CAT String => table catalog (may be null)
+	 *		2. TABLE_SCHEM String => table schema (may be null)
+	 *		3. TABLE_NAME String => table name
+	 *		4. COLUMN_NAME String => column name
+	 *		5. DATA_TYPE int => SQL type from java.sql.Types
+	 *		6. TYPE_NAME String => Data source dependent type name, for a UDT the type name is fully qualified
+	 *		7. COLUMN_SIZE int => column size. For char or date types this is the maximum number of characters, for numeric or decimal types this is precision.
+	 *		8. BUFFER_LENGTH is not used.
+	 *		9. DECIMAL_DIGITS int => the number of fractional digits
+	 *		10. NUM_PREC_RADIX int => Radix (typically either 10 or 2)
+	 *		11. NULLABLE int => is NULL allowed.
+	 *		        * columnNoNulls - might not allow NULL values
+	 *		        * columnNullable - definitely allows NULL values
+	 *		        * columnNullableUnknown - nullability unknown 
+	 *		12. REMARKS String => comment describing column (may be null)
+	 *		13. COLUMN_DEF String => default value (may be null)
+	 *		14. SQL_DATA_TYPE int => unused
+	 *		15. SQL_DATETIME_SUB int => unused
+	 *		16. CHAR_OCTET_LENGTH int => for char types the maximum number of bytes in the column
+	 *		17. ORDINAL_POSITION int => index of column in table (starting at 1)
+	 *		18. IS_NULLABLE String => "NO" means column definitely does not allow NULL values; "YES" means the column might allow NULL values. An empty string means nobody knows.
+	 *		19. SCOPE_CATLOG String => catalog of table that is the scope of a reference attribute (null if DATA_TYPE isn't REF)
+	 *		20. SCOPE_SCHEMA String => schema of table that is the scope of a reference attribute (null if the DATA_TYPE isn't REF)
+	 *		21. SCOPE_TABLE String => table name that this the scope of a reference attribure (null if the DATA_TYPE isn't REF)
+	 *		22. SOURCE_DATA_TYPE short => source type of a distinct type or user-generated Ref type, SQL type from java.sql.Types (null if DATA_TYPE isn't DISTINCT or user-generated REF) 
+	 * 
 	 */
-	
-	public ResultSet getColumns(String arg0, String arg1, String arg2,
-			String arg3) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public ResultSet getColumns(String catalog,String schemaPattern,String tableNamePattern,String columnNamePattern) throws SQLException {
+		
+		PrologResultSet res = new PrologResultSet();
+        
+        ArrayList t = (ArrayList) this.table.get(tableNamePattern);
+        
+        for (int i = 0; i < t.size(); i++) {
+        	
+        	res.moveToInsertRow();
+        	Field f = (Field) t.get(i);
+        	res.updateString(0, null);
+        	res.updateString(1, null);
+        	res.updateString(2, tableNamePattern);
+        	res.updateString(3,f.getColumnName());
+        	res.updateInt(4,f.getType());
+        	res.updateObject(5,null);
+        	res.updateObject(6,null);
+        	res.updateObject(7,null);
+        	res.updateObject(8,null);
+        	res.updateObject(9,null);
+        	res.updateObject(10,null);
+        	res.updateObject(11,null);
+        	res.updateObject(12,null);
+        	res.updateObject(13,null);
+        	res.updateObject(14,null);
+        	res.updateObject(15,null);
+        	res.updateInt(16,f.getPositionInTable());
+        	res.insertRow();
+        	
+		}
+         
+        res.moveToCurrentRow();
+        
+		return res;
 	}
 
 	/* (non-Javadoc)

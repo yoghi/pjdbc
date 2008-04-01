@@ -1,5 +1,7 @@
 package it.unibo.lmc.pjdbc;
 
+import it.unibo.lmc.pjdbc.core.Field;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -21,11 +23,14 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class PrologResultSet implements ResultSet {
 
-	//ArrayList<Field> result_interno = new ArrayList<Field>();
+	private LinkedList<ArrayList<Object>> row_data = new LinkedList<ArrayList<Object>>();
+	private int currentPosition = 0;
+	private int insertPosition = 0;
 	
 	
 	public boolean absolute(int row) throws SQLException {
@@ -76,14 +81,16 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	
+	/**
+	 * Torno al primo elemento
+	 */
 	public boolean first() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		this.currentPosition = -1;
+		return this.row_data.size() > 0;
 	}
 
 	
 	public Array getArray(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -270,9 +277,12 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	
+	/**
+	 * Quanti elementi ci sono nel ResultSet
+	 */
 	public int getFetchSize() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		// devo ricordarmi di togliere la riga che uso per gli inserimenti
+		return this.row_data.size()-1;
 	}
 
 	
@@ -295,7 +305,6 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public int getInt(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -410,8 +419,8 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public String getString(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Object> o = this.row_data.get(this.currentPosition);
+		return (String) o.get(columnIndex);
 	}
 
 	
@@ -507,9 +516,12 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	
+	/**
+	 * @todo aggiorno il db se questo resultset ne è legato
+	 */
 	public void insertRow() throws SQLException {
-		// TODO Auto-generated method stub
-		
+		//if ( )
+		this.insertPosition++;
 	}
 
 	
@@ -556,14 +568,15 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void moveToInsertRow() throws SQLException {
-		// TODO Auto-generated method stub
-		
+		this.row_data.add(this.insertPosition, new ArrayList<Object>());
+		this.currentPosition = this.insertPosition;
 	}
 
 	
 	public boolean next() throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		boolean r = this.currentPosition < this.row_data.size();
+		this.currentPosition++;
+		return r;
 	}
 
 	
@@ -920,8 +933,8 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void updateInt(int columnIndex, int x) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		ArrayList<Object> f = this.row_data.get(this.currentPosition);
+		f.add(columnIndex,x);
 	}
 
 	
@@ -1025,8 +1038,8 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void updateObject(int columnIndex, Object x) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		ArrayList<Object> f = this.row_data.get(this.currentPosition);
+		f.add(columnIndex,x);
 	}
 
 	
@@ -1081,7 +1094,8 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void updateString(int columnIndex, String x) throws SQLException {
-		// TODO Auto-generated method stub
+		ArrayList<Object> f = this.row_data.get(this.currentPosition);
+		f.add(columnIndex,x);
 	}
 
 	

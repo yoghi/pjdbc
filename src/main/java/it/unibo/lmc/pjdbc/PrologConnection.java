@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import alice.tuprolog.InvalidTheoryException;
+import alice.tuprolog.MalformedGoalException;
 import alice.tuprolog.Prolog;
+import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Theory;
 
 import org.apache.log4j.ConsoleAppender;
@@ -46,7 +48,7 @@ public class PrologConnection implements Connection {
 	/**
 	 * Metadati Database
 	 */
-	private PrologMetaData databaseMetaData = new PrologMetaData();
+	private PrologMetaData databaseMetaData = null;
 	
 	/**
 	 * Url
@@ -109,6 +111,13 @@ public class PrologConnection implements Connection {
 			
 			this.log.info("Setto la teoria prolog");
 			this.dbengine.setTheory(t);
+			
+			try {
+				this.databaseMetaData = new PrologMetaData(this.dbengine);
+			} catch (Exception e) {
+				this.log.warn(e);
+				//throw new SQLException("metabase not present");
+			}
 
 		} catch (InvalidTheoryException e) {
 			throw new SQLException("Prolog database internal error : "+ e.toString());
@@ -229,18 +238,15 @@ public class PrologConnection implements Connection {
 		return 0;
 	}
 
-	/* (non javadoc)
-	 * Restituisce un wrapper per ottenere MetaDati 
+	/**
+	 * Restituisce un wrapper per ottenere MetaDati
 	 */
-	
 	public DatabaseMetaData getMetaData() throws SQLException {
-		
-		return null;
+		return this.databaseMetaData;
 	}
 
 	
 	public int getTransactionIsolation() throws SQLException {
-		
 		return 0;
 	}
 

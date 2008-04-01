@@ -1,11 +1,18 @@
 package it.unibo.lmc.pjdbc;
 
+import it.unibo.lmc.pjdbc.core.Field;
+import it.unibo.lmc.pjdbc.core.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.PrologRequestType;
+import it.unibo.lmc.pjdbc.parser.ParseException;
+import it.unibo.lmc.pjdbc.parser.Psql;
+
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import alice.tuprolog.Prolog;
 
@@ -76,22 +83,65 @@ public class PrologStatement implements Statement {
 		//devo fare il parsing della query sql (java.io.Reader)
 		
 		StringReader str = new StringReader(sql);
-		//new Psql(str);
 		
-		// dovro passargli il resultset
-		/*
+		Psql parse = new Psql(str);
+		
+		ParsedRequest pRequest = null;
+		
 		try {
-			Psql.start();
+			pRequest = parse.parseIt();
 		} catch (ParseException e) {
 			throw new SQLException(e.getMessage());
 		}
-		*/
-		ResultSet res = new PrologResultSet();
-		//.. sono da implementare ..
-		res.moveToInsertRow();
-		//res.updateString(columnIndex, x);
-		res.insertRow();
-		//..
+		
+		if ( PrologRequestType.READ != pRequest.getType() ) throw new SQLException("Not Select Statement");
+		
+		// Verifico se c'è un JOIN
+		if ( pRequest.getNumTable() > 1 ) {
+			throw new SQLException("JOIN Not implement yet");
+		} else {
+			
+			// ho 1 sola tabella
+			//for (int i = 0; i < this.table.size(); i++) {
+
+				String req = pRequest.getTableNameByPosition(0)+"(";
+				
+				ArrayList<Field> af = pRequest.getTableField(0);
+				
+				PrologMetaData pMeta = (PrologMetaData) this.conn.getMetaData();
+				
+				//se ho i metadati allora considero il numero reale di campi
+				if ( null != pMeta ) {
+				
+					PrologResultSet r = pMeta.getColumns(pRequest.getTableNameByPosition(0), null, pRequest.getTableNameByPosition(0), null);
+					
+					//quante colonne ho trovato
+					int max = r.getFetchSize();
+					
+					r.first();
+					
+					while(r.next()){
+						
+						System.out.println(r.getString(0));
+						
+					}
+				
+				} else {
+					
+					for (int j = 0; j < af.size()-1; j++) {
+						req += "X"+j+",";
+					}
+					
+					req += "X"+(af.size()-1)+").";
+					
+				}
+				
+			//}
+			
+			System.out.println(req);
+			
+		}
+		
 		return null;
 	}
 
