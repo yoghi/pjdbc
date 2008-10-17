@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.Field;
+import it.unibo.lmc.pjdbc.core.MetaField;
 import it.unibo.lmc.pjdbc.core.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.PrologRequestType;
 import it.unibo.lmc.pjdbc.parser.ParseException;
@@ -14,16 +14,22 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 import alice.tuprolog.Prolog;
 
 public class PrologStatement implements Statement {
 
 	private PrologConnection conn = null;
 	private Prolog dbengine = null;
+	private Psql parse = null;
+	private StringReader currentQuery = null;
 	
 	public PrologStatement(PrologConnection connection,Prolog db) {
 		this.conn = connection;
 		this.dbengine = db;
+		this.currentQuery = new StringReader("");
+		this.parse = parse = new Psql(this.currentQuery);
 	}
 
 	public void addBatch(String sql) throws SQLException {
@@ -80,11 +86,11 @@ public class PrologStatement implements Statement {
 	 */
 	public ResultSet executeQuery(String sql) throws SQLException {
 		
-		//devo fare il parsing della query sql (java.io.Reader)
+		Logger.getLogger("it.unibo.lmc.pjdbc").debug("eseguo query: \""+sql+"\"");
 		
-		StringReader str = new StringReader(sql);
+		this.currentQuery = new StringReader(sql);
 		
-		Psql parse = new Psql(str);
+		this.parse.ReInit(this.currentQuery);
 		
 		ParsedRequest pRequest = null;
 		
@@ -100,44 +106,47 @@ public class PrologStatement implements Statement {
 		if ( pRequest.getNumTable() > 1 ) {
 			throw new SQLException("JOIN Not implement yet");
 		} else {
-			
-			// ho 1 sola tabella
-			//for (int i = 0; i < this.table.size(); i++) {
 
-				String req = pRequest.getTableNameByPosition(0)+"(";
+			String req = pRequest.getTableNameByPosition(0)+"(";
+			
+			ArrayList<MetaField> requestField = pRequest.getTableField(0);
+			
+			PrologMetaData pMeta = (PrologMetaData) this.conn.getMetaData();
+			
+			//se ho i metadati allora considero il numero reale di campi
+			if ( null != pMeta ) {
+			
+				PrologResultSet columnField = (PrologResultSet) pMeta.getColumns(pRequest.getTableNameByPosition(0), null, pRequest.getTableNameByPosition(0), null);
 				
-				ArrayList<Field> af = pRequest.getTableField(0);
+				//quante colonne ho trovato
+				int max = columnField.getFetchSize();
 				
-				PrologMetaData pMeta = (PrologMetaData) this.conn.getMetaData();
+				columnField.first();				
 				
-				//se ho i metadati allora considero il numero reale di campi
-				if ( null != pMeta ) {
+				while(columnField.next()){
+					
+					System.out.println(""+columnField.getString(2)+" "+columnField.getString(3)+" "+columnField.getInt(16));
+					
+					MetaField x = new MetaField(columnField.getString(3));
+					x.setTableName(columnField.getString(2));
+					x.setPositionInTable(columnField.getInt(16));
+					
+					if ( requestField.contains(x) ) System.out.println("c'e");
 				
-					PrologResultSet r = (PrologResultSet) pMeta.getColumns(pRequest.getTableNameByPosition(0), null, pRequest.getTableNameByPosition(0), null);
-					
-					//quante colonne ho trovato
-					int max = r.getFetchSize();
-					
-					r.first();
-					
-					while(r.next()){
-						
-						System.out.println(r.getString(0));
-						
-					}
-				
-				} else {
-					
-					for (int j = 0; j < af.size()-1; j++) {
-						req += "X"+j+",";
-					}
-					
-					req += "X"+(af.size()-1)+").";
-					
 				}
 				
-			//}
+				
 			
+			} else {	//provo con i campi che mi ha dato, magari bastano
+				
+				for (int j = 0; j < requestField.size()-1; j++) {
+					req += "X"+j+",";
+				}
+				
+				req += "X"+(requestField.size()-1)+").";
+				
+			}
+
 			System.out.println(req);
 			
 		}

@@ -3,7 +3,7 @@
  */
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.Field;
+import it.unibo.lmc.pjdbc.core.MetaField;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -11,11 +11,9 @@ import java.sql.ResultSet;
 import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-
-import com.sun.org.apache.xalan.internal.xsltc.runtime.Hashtable;
 
 import alice.tuprolog.MalformedGoalException;
 import alice.tuprolog.NoMoreSolutionException;
@@ -23,6 +21,7 @@ import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Term;
+import alice.tuprolog.Number;
 import alice.tuprolog.UnknownVarException;
 
 /**
@@ -31,10 +30,11 @@ import alice.tuprolog.UnknownVarException;
  */
 public class PrologMetaData implements DatabaseMetaData {
 	
-	private Hashtable table = new Hashtable();
+	private Hashtable<String,ArrayList<MetaField>> table = new Hashtable<String,ArrayList<MetaField>>();
 
 	/**
 	 * Costruttore 
+	 * 
 	 * @throws SQLException , non posso creare un prologMetaData
 	 */
 	public PrologMetaData(Prolog prolog) throws SQLException{
@@ -50,21 +50,21 @@ public class PrologMetaData implements DatabaseMetaData {
 				Term field_name = i.getTerm("NAME");
 				Term field_type = i.getTerm("TYPE");
 				
-				if ( table_name.isAtom() && field_name.isAtom() && field_position.isGround() && field_type.isAtom() ){ 
+				if ( table_name.isAtom() && field_name.isAtom() &&  (field_position instanceof Number)  && field_type.isAtom() ){ 
 					
-					ArrayList fields = null;
+					ArrayList<MetaField> fields = null;
 					
 					if ( !this.table.containsKey(table_name.toString()) ) {
-						fields = new ArrayList();
+						fields = new ArrayList<MetaField>();
 						this.table.put(table_name.toString(), fields);
-						Logger.getLogger("PrologConnection").info("trovati metadati tabella "+table_name.toString());
+						Logger.getLogger("it.unibo.lmc.pjdbc").debug("trovati metadati tabella "+table_name.toString());
 					} else {	
-						fields = (ArrayList) this.table.get(table_name.toString());
+						fields = (ArrayList<MetaField>) this.table.get(table_name.toString());
 					}
 					
-					Field f = new Field(field_name.toString());
+					MetaField f = new MetaField(field_name.toString());
+					f.setPositionInTable(((Number)field_position).intValue());
 					
-					f.setPositionInTable(Integer.parseInt(field_position.toString()));
 					if ( field_type.toString().equals("int") ) f.setType( java.sql.Types.INTEGER );
 					else if ( field_type.toString().equals("string") ) f.setType( java.sql.Types.NVARCHAR );
 					
@@ -84,6 +84,8 @@ public class PrologMetaData implements DatabaseMetaData {
 		} catch (NoSolutionException e) {
 			e.printStackTrace();
 		} catch (UnknownVarException e) {
+			e.printStackTrace();
+		} catch (IndexOutOfBoundsException e) {
 			e.printStackTrace();
 		}
 		
@@ -253,7 +255,7 @@ public class PrologMetaData implements DatabaseMetaData {
         for (int i = 0; i < t.size(); i++) {
         	
         	res.moveToInsertRow();
-        	Field f = (Field) t.get(i);
+        	MetaField f = (MetaField) t.get(i);
         	res.updateString(0, null);
         	res.updateString(1, null);
         	res.updateString(2, tableNamePattern);

@@ -104,12 +104,12 @@ public class PrologConnection implements Connection {
 		    
 			this.logger_init();
 			
-			this.log.info("Avvio prolog db engine");
+			this.log.debug("Avvio prolog db engine");
 
 			this.dbengine = new Prolog();
 			Theory t = new Theory(new FileInputStream(filename));
 			
-			this.log.info("Setto la teoria prolog");
+			this.log.debug("Setto la teoria prolog");
 			this.dbengine.setTheory(t);
 			
 			try {
@@ -133,7 +133,7 @@ public class PrologConnection implements Connection {
 	protected void logger_init() {
 
 		PropertyConfigurator.configure(properties);
-		log = Logger.getLogger("PrologConnection");
+		log = Logger.getLogger("it.unibo.lmc.pjdbc");
 		
 	}
 

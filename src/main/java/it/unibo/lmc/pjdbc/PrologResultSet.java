@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.Field;
+import it.unibo.lmc.pjdbc.core.MetaField;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -305,7 +305,8 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public int getInt(int columnIndex) throws SQLException {
-		return 0;
+		ArrayList<Object> o = this.row_data.get(this.currentPosition);
+		return Integer.parseInt(o.get(columnIndex).toString());
 	}
 
 	
@@ -514,7 +515,6 @@ public class PrologResultSet implements ResultSet {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	
 	/**
 	 * @todo aggiorno il db se questo resultset ne è legato
@@ -934,7 +934,8 @@ public class PrologResultSet implements ResultSet {
 	
 	public void updateInt(int columnIndex, int x) throws SQLException {
 		ArrayList<Object> f = this.row_data.get(this.currentPosition);
-		f.add(columnIndex,x);
+		if ( columnIndex < f.size() ) f.set(columnIndex,x);
+		else f.add(columnIndex,x);
 	}
 
 	
@@ -1095,7 +1096,8 @@ public class PrologResultSet implements ResultSet {
 	
 	public void updateString(int columnIndex, String x) throws SQLException {
 		ArrayList<Object> f = this.row_data.get(this.currentPosition);
-		f.add(columnIndex,x);
+		if (columnIndex < f.size()) f.set(columnIndex,x); 
+		else f.add(columnIndex,x);
 	}
 
 	
