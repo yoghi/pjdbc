@@ -8,7 +8,6 @@ import it.unibo.lmc.pjdbc.core.MetaField;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -18,10 +17,10 @@ import org.apache.log4j.Logger;
 import alice.tuprolog.MalformedGoalException;
 import alice.tuprolog.NoMoreSolutionException;
 import alice.tuprolog.NoSolutionException;
+import alice.tuprolog.Number;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Term;
-import alice.tuprolog.Number;
 import alice.tuprolog.UnknownVarException;
 
 /**
@@ -66,7 +65,7 @@ public class PrologMetaData implements DatabaseMetaData {
 					f.setPositionInTable(((Number)field_position).intValue());
 					
 					if ( field_type.toString().equals("int") ) f.setType( java.sql.Types.INTEGER );
-					else if ( field_type.toString().equals("string") ) f.setType( java.sql.Types.NVARCHAR );
+					else if ( field_type.toString().equals("string") ) f.setType( java.sql.Types.VARCHAR );
 					
 					fields.add(f);
 					
@@ -1720,12 +1719,6 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public RowIdLifetime getRowIdLifetime() throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}

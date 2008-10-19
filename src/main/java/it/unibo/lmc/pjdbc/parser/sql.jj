@@ -3,15 +3,17 @@
  */
  
 options {
-  JDK_VERSION = "1.6";
+  JDK_VERSION = "1.5";
+  STATIC = false;
   OUTPUT_DIRECTORY = ".";
   IGNORE_CASE=true ;
 }
+
 PARSER_BEGIN(Psql)
 package it.unibo.lmc.pjdbc.parser;
 
 import alice.tuprolog.Prolog;
-import it.unibo.lmc.pjdbc.core.PrologRequest;
+import it.unibo.lmc.pjdbc.core.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.PrologRequestType;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -19,10 +21,10 @@ import java.io.FileNotFoundException;
 
 public class Psql {
 	
-	static private PrologRequest request = null;
-	public static void main(String args[]) throws ParseException{		try {			FileInputStream f = new FileInputStream("/home/workspace/Java/Pjdbc/target/classes/prolog.sql");			DataInputStream d = new DataInputStream(f);			Psql parser = new Psql(d);			while (true){		        	//System.out.println("Reading from standard input...");					//System.out.println("Enter an expression like  'SELECT <campi> FROM <database>;' : ");					try {				          Psql.start();					}catch (Exception e){						System.out.println("NOK.");						System.out.println(e.getMessage());						//Psql.ReInit(System.in);
-						break ;					}catch (Error e){						System.out.println("Oops.");						System.out.println(e.getMessage());						break ;					}			}		} catch (FileNotFoundException e1){			e1.printStackTrace();		}	}
+	private ParsedRequest request = null;
+	
 }
+
 PARSER_END(Psql)
 
 SKIP :
@@ -34,8 +36,64 @@ SKIP :
 }
 TOKEN : /* OPERATORS */
 {
-	<K_SELECT:"SELECT">
-	| <K_FROM:"FROM">
+	<K_AS: "AS">
+	|   <K_BY:"BY">
+	|   <K_DO:"DO">
+	|   <K_IS:"IS">
+	|   <K_IN:"IN">
+	|   <K_OR:"OR">
+	|   <K_ON:"ON">
+	|   <K_ALL: "ALL">
+	|   <K_AND: "AND">
+	|   <K_ANY: "ANY">
+	|   <K_KEY: "KEY">
+	|   <K_NOT:"NOT">
+	|   <K_SET:"SET">
+	|   <K_ASC:"ASC">
+	|   <K_TOP:"TOP">
+	|   <K_END:"END">
+	|   <K_DESC:"DESC">
+	|   <K_INTO:"INTO">
+	|   <K_NULL:"NULL">
+	|   <K_LIKE:"LIKE">
+	|   <K_DROP:"DROP">
+	|   <K_JOIN:"JOIN">
+	|   <K_LEFT:"LEFT">
+	|   <K_FROM:"FROM">
+	|   <K_OPEN:"OPEN">
+	|   <K_CASE:"CASE">
+	|   <K_WHEN:"WHEN">
+	|   <K_THEN:"THEN">
+	|   <K_ELSE:"ELSE">
+	|   <K_SOME: "SOME">
+	|   <K_TABLE:"TABLE">
+	|   <K_WHERE:"WHERE">
+	|   <K_USING:"USING">
+	|   <K_UNION:"UNION">
+	|   <K_GROUP:"GROUP">
+	|   <K_BEGIN:"BEGIN">
+	|   <K_INDEX: "INDEX">
+	|   <K_INNER:"INNER">
+	|   <K_LIMIT:"LIMIT">
+	|   <K_OUTER:"OUTER">
+	|   <K_ORDER:"ORDER">
+	|   <K_DELETE:"DELETE">
+	|   <K_CREATE:"CREATE">
+	|   <K_SELECT:"SELECT">
+	|   <K_OFFSET:"OFFSET">
+	|   <K_EXISTS:"EXISTS">
+	|   <K_HAVING:"HAVING">
+	|   <K_INSERT:"INSERT">
+	|   <K_UPDATE:"UPDATE">
+	|   <K_VALUES:"VALUES">
+	|   <K_ESCAPE:"ESCAPE">
+	|   <K_PRIMARY:"PRIMARY">
+	|   <K_NATURAL:"NATURAL">
+	|   <K_REPLACE:"REPLACE">
+	|   <K_BETWEEN:"BETWEEN">
+	|   <K_TRUNCATE:"TRUNCATE">
+	|   <K_DISTINCT:"DISTINCT">
+	|   <K_INTERSECT:"INTERSECT">
 }
 TOKEN :
 {
@@ -48,21 +106,43 @@ TOKEN :
 	| < #INTEGER: ( <DIGIT> )+ >
 	| < #DIGIT: ["0"-"9"]>
 }
-void start() : {}
+
+//PARTO DA QUI!!!
+ParsedRequest parseIt() : {
+	request = new ParsedRequest();
+}
 {
-	{ request = new PrologRequest(); }
-	SqlSelectStatement() ";" {}
-	{ System.out.println("\n"); }
+	( 
+		Select() 
+		|
+		Insert()
+		|
+		Delete()
+		|
+		Update()
+	)
+	";"
+	{ return request; }
 }
 
-PrologRequest parseIt() : {}
+
+void Insert(): 
+{}
 {
-	{ request = new PrologRequest(); }
-	SqlSelectStatement() ";" {}
-	{ System.out.println("\n"); return request; }
+	"INSERT"
+}
+void Delete(): 
+{}
+{
+	"DELETE"
+}
+void Update(): 
+{}
+{
+	"UPDATE"
 }
 
-void SqlSelectStatement():
+void Select():
 {}
 {
     SqlSelectWithoutOrder() {}
@@ -72,11 +152,11 @@ void SqlSelectStatement():
 void SqlSelectWithoutOrder():
 {}
 {
-     "SELECT" SqlSelectList() SqlFromClause() //[ SqlWhereClause() ]
+     "SELECT" SelectList() From() [ Where() ]
 }
 
 /* Checks for whatever follows  SELECT */
-void SqlSelectList():
+void SelectList():
 {}
 {
 	{ 
@@ -123,12 +203,11 @@ void SqlTableColumn():
     		
 }
 
-void SqlFromClause():
-{}
+void From():
 {
-	{ 
-		//System.out.println("FROM : "); 
-	}
+//	System.out.println("FROM : ");
+}
+{
     "FROM" SqlFromItem() ( "," SqlFromItem())* 
 }
 
@@ -164,6 +243,56 @@ void SqlTableReference():
     } 
     
 }
+
+void Where():
+{}
+{
+	"WHERE" Expression()
+}
+
+void Expression():
+{}
+{
+	(
+		LOOKAHEAD(SQLCondition)
+		result = SQLCondition()
+	) 
+	|
+	result = RegularCondition()
+}
+
+Expression RegularCondition():
+{
+	Expression result = null;
+	Expression leftExpression;
+	Expression rightExpression;
+	boolean not = false;
+}
+{
+
+	[ <K_NOT> { not = true; } ] 
+	leftExpression=ComparisonItem() { result = leftExpression; }
+
+	(
+	">" { result = new GreaterThan(); }
+	| "<" { result = new MinorThan(); }
+	| "=" { result = new EqualsTo(); }
+	| ">=" { result = new GreaterThanEquals(); }
+	| "<=" { result = new MinorThanEquals(); }
+	| ("<>" | "!=") { result = new NotEqualsTo(); }
+	)
+	rightExpression=ComparisonItem()
+	{
+		BinaryExpression regCond = (BinaryExpression) result;
+		regCond.setLeftExpression(leftExpression);
+		regCond.setRightExpression(rightExpression);
+		if (not)
+			regCond.setNot();
+	}		
+	
+	{ return result; }
+}
+
 
 Token RelObjectName():
 {Token t = null;}

@@ -29,7 +29,7 @@ public class PrologStatement implements Statement {
 		this.conn = connection;
 		this.dbengine = db;
 		this.currentQuery = new StringReader("");
-		this.parse = parse = new Psql(this.currentQuery);
+		this.parse = new Psql(this.currentQuery);
 	}
 
 	public void addBatch(String sql) throws SQLException {
@@ -97,6 +97,7 @@ public class PrologStatement implements Statement {
 		try {
 			pRequest = parse.parseIt();
 		} catch (ParseException e) {
+			Logger.getLogger(PrologStatement.class).error(e.getLocalizedMessage());
 			throw new SQLException(e.getMessage());
 		}
 		
