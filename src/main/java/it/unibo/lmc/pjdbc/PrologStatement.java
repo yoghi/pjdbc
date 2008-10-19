@@ -2,7 +2,6 @@ package it.unibo.lmc.pjdbc;
 
 import it.unibo.lmc.pjdbc.core.MetaField;
 import it.unibo.lmc.pjdbc.core.ParsedRequest;
-import it.unibo.lmc.pjdbc.core.PrologRequestType;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 
@@ -101,7 +100,8 @@ public class PrologStatement implements Statement {
 			throw new SQLException(e.getMessage());
 		}
 		
-		if ( PrologRequestType.READ != pRequest.getType() ) throw new SQLException("Not Select Statement");
+		//FIXME: miglioare il controllo se è una select o meno...  
+//		if ( PrologRequestType.READ != pRequest.getType() ) throw new SQLException("Not Select Statement");
 		
 		// Verifico se c'è un JOIN
 		if ( pRequest.getNumTable() > 1 ) {

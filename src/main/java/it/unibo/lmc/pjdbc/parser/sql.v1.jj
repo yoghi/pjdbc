@@ -1,0 +1,320 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  OUTPUT_DIRECTORY = ".";
+  IGNORE_CASE=true ;
+}
+
+PARSER_BEGIN(Psql)
+package it.unibo.lmc.pjdbc.parser;
+
+import alice.tuprolog.Prolog;
+import it.unibo.lmc.pjdbc.core.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.PrologRequestType;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+public class Psql {
+	
+	private ParsedRequest request = null;
+	
+}
+
+PARSER_END(Psql)
+
+SKIP :
+{
+ 	" "
+	| "\r"
+	| "\t"
+	| "\n"
+}
+TOKEN : /* OPERATORS */
+{
+	<K_AS: "AS">
+	|   <K_BY:"BY">
+	|   <K_DO:"DO">
+	|   <K_IS:"IS">
+	|   <K_IN:"IN">
+	|   <K_OR:"OR">
+	|   <K_ON:"ON">
+	|   <K_ALL: "ALL">
+	|   <K_AND: "AND">
+	|   <K_ANY: "ANY">
+	|   <K_KEY: "KEY">
+	|   <K_NOT:"NOT">
+	|   <K_SET:"SET">
+	|   <K_ASC:"ASC">
+	|   <K_TOP:"TOP">
+	|   <K_END:"END">
+	|   <K_DESC:"DESC">
+	|   <K_INTO:"INTO">
+	|   <K_NULL:"NULL">
+	|   <K_LIKE:"LIKE">
+	|   <K_DROP:"DROP">
+	|   <K_JOIN:"JOIN">
+	|   <K_LEFT:"LEFT">
+	|   <K_FROM:"FROM">
+	|   <K_OPEN:"OPEN">
+	|   <K_CASE:"CASE">
+	|   <K_WHEN:"WHEN">
+	|   <K_THEN:"THEN">
+	|   <K_ELSE:"ELSE">
+	|   <K_SOME: "SOME">
+	|   <K_TABLE:"TABLE">
+	|   <K_WHERE:"WHERE">
+	|   <K_USING:"USING">
+	|   <K_UNION:"UNION">
+	|   <K_GROUP:"GROUP">
+	|   <K_BEGIN:"BEGIN">
+	|   <K_INDEX: "INDEX">
+	|   <K_INNER:"INNER">
+	|   <K_LIMIT:"LIMIT">
+	|   <K_OUTER:"OUTER">
+	|   <K_ORDER:"ORDER">
+	|   <K_DELETE:"DELETE">
+	|   <K_CREATE:"CREATE">
+	|   <K_SELECT:"SELECT">
+	|   <K_OFFSET:"OFFSET">
+	|   <K_EXISTS:"EXISTS">
+	|   <K_HAVING:"HAVING">
+	|   <K_INSERT:"INSERT">
+	|   <K_UPDATE:"UPDATE">
+	|   <K_VALUES:"VALUES">
+	|   <K_ESCAPE:"ESCAPE">
+	|   <K_PRIMARY:"PRIMARY">
+	|   <K_NATURAL:"NATURAL">
+	|   <K_REPLACE:"REPLACE">
+	|   <K_BETWEEN:"BETWEEN">
+	|   <K_TRUNCATE:"TRUNCATE">
+	|   <K_DISTINCT:"DISTINCT">
+	|   <K_INTERSECT:"INTERSECT">
+}
+TOKEN :
+{
+	< S_IDENTIFIER: ( <LETTER>|<SPECIAL_CHARS> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
+	| < #LETTER: ["a"-"z","A"-"Z"]>
+	| < #SPECIAL_CHARS: "$" | "_">
+	| < S_BIND: ":" <S_IDENTIFIER> ("." <S_IDENTIFIER>)? >
+	| < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
+	| < S_QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])* "\"" >
+	| < #INTEGER: ( <DIGIT> )+ >
+	| < #DIGIT: ["0"-"9"]>
+}
+
+//PARTO DA QUI!!!
+ParsedRequest parseIt() : {
+	request = new ParsedRequest();
+}
+{
+	( 
+		Select() 
+		|
+		Insert()
+		|
+		Delete()
+		|
+		Update()
+	)
+	";"
+	{ return request; }
+}
+
+
+void Insert(): 
+{}
+{
+	"INSERT"
+}
+void Delete(): 
+{}
+{
+	"DELETE"
+}
+void Update(): 
+{}
+{
+	"UPDATE"
+}
+
+void Select():
+{}
+{
+    SqlSelectWithoutOrder() {}
+
+}
+
+void SqlSelectWithoutOrder():
+{}
+{
+     "SELECT" SelectList() From() [ Where() ]
+}
+
+/* Checks for whatever follows  SELECT */
+void SelectList():
+{}
+{
+	{ 
+		request.setType(PrologRequestType.READ); 
+		//System.out.println("\nSELECT :"); 
+	}
+    SqlSelectItem() ("," SqlSelectItem())*
+}
+
+void SqlSelectItem():
+{}
+{
+    //    LOOKAHEAD(SqlSelectAllItems()) SqlSelectAllItems()
+    //|   SqlSimpleExpression()    // Column or Expression
+    //    [<S_IDENTIFIER>] // Column Alias
+    LOOKAHEAD(SqlSelectAll()) SqlSelectAll() // "*"
+    | LOOKAHEAD(SqlTableColumn()) SqlTableColumn() 
+}
+
+void SqlSelectAll():
+{}
+{
+    "*" { System.out.println("TUTTO"); }
+}
+
+void SqlTableColumn():
+{Token t=null; Token d=null;}
+{
+	{ 
+		//System.out.println("COLONNE :"); 
+	}
+	t=RelObjectName() [ "." d=DotObjectName()]
+	
+	{
+    	if ( d == null  ) {
+    		//System.out.println("campo nome : "+t.image);
+    		request.setField(t.image);
+    	} 
+    	if ( d != null && t != null ) {
+    		//System.out.println("tabella : "+t.image+" campo : "+d.image);
+    		request.setField(t.image,d.image);
+    	}
+    } 
+    		
+}
+
+void From():
+{
+//	System.out.println("FROM : ");
+}
+{
+    "FROM" SqlFromItem() ( "," SqlFromItem())* 
+}
+
+void SqlFromItem():
+{}
+{
+    //  TableReference()
+    //  [ <S_IDENTIFIER> ]        /** Alias Name **/
+	//( SqlTableReference() | "(" SqlFromItemExpression() ")"	| LOOKAHEAD("TABLE") SqlTableExpression() )
+	( SqlTableReference() )
+}
+
+void SqlFromItemExpression():
+{}
+{
+    ( SqlTableReference() | "(" SqlFromItemExpression() ")" ) 
+}
+
+void SqlTableReference():
+{Token t = null; Token d = null;}
+{
+    t=RelObjectName() ["." d=DotObjectName()]
+    
+    {
+    	if ( d == null  ) {
+    		//System.out.println("tabella : "+t.image);
+    		request.setTable(t.image);
+    	} 
+    	// from tabella.qualcosa non è bello, devo dare un errore, ecezzione sintattica
+    	//if ( d != null && t != null ) {
+    	//	System.out.println("tabella : "+t.image+" campo : "+d.image);
+    	//}
+    } 
+    
+}
+
+void Where():
+{}
+{
+	"WHERE" Expression()
+}
+
+void Expression():
+{}
+{
+	(
+		LOOKAHEAD(SQLCondition)
+		result = SQLCondition()
+	) 
+	|
+	result = RegularCondition()
+}
+
+Expression RegularCondition():
+{
+	Expression result = null;
+	Expression leftExpression;
+	Expression rightExpression;
+	boolean not = false;
+}
+{
+
+	[ <K_NOT> { not = true; } ] 
+	leftExpression=ComparisonItem() { result = leftExpression; }
+
+	(
+	">" { result = new GreaterThan(); }
+	| "<" { result = new MinorThan(); }
+	| "=" { result = new EqualsTo(); }
+	| ">=" { result = new GreaterThanEquals(); }
+	| "<=" { result = new MinorThanEquals(); }
+	| ("<>" | "!=") { result = new NotEqualsTo(); }
+	)
+	rightExpression=ComparisonItem()
+	{
+		BinaryExpression regCond = (BinaryExpression) result;
+		regCond.setLeftExpression(leftExpression);
+		regCond.setRightExpression(rightExpression);
+		if (not)
+			regCond.setNot();
+	}		
+	
+	{ return result; }
+}
+
+
+Token RelObjectName():
+{Token t = null;}
+{
+    (t=<S_IDENTIFIER>  
+    	//{ jjtThis.jjtAddChild(new SqlValue(t.image), 0); }//SqlValue
+    	//{ System.out.println("IDENTIFIER = "+t.image); }
+	| t=<S_QUOTED_IDENTIFIER>  
+    	//{ jjtThis.jjtAddChild(new SqlValue(t.image), 0); }//SqlValue
+    	//{ System.out.println("QUOTED = "+t.image); }
+	| t=<S_CHAR_LITERAL>  
+    	//{ jjtThis.jjtAddChild(new SqlValue(t.image), 0); }//SqlValue
+    	//{ System.out.println("CHAR = "+t.image); }
+    )
+    { return t; }
+}
+
+Token DotObjectName() :  // only put after "." match
+{Token t = null;}                          // here we list some char-sequences that 
+{                                    // would be returned as a special token
+    (t=<S_IDENTIFIER>                // but they are not special here
+    | t=<S_QUOTED_IDENTIFIER>
+    | t=<S_CHAR_LITERAL> )
+    { return t; }
+}

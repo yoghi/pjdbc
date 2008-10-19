@@ -8,11 +8,6 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 
 public class ParsedRequest {
-
-	/**
-	 * Tipo di richiesta
-	 */
-	private PrologRequestType type = null; 
 	
 	/**
 	 * Struttura tabella/campi
@@ -28,14 +23,6 @@ public class ParsedRequest {
 	 * Tabella corrente a cui associare i campi
 	 */
 	private int currentTableId = -1;
-	
-	/**
-	 * Tipo di operazione che vorrei eseguire 
-	 * @param t , C.R.U.D. specification
-	 */
-	public void setType(PrologRequestType t){
-		this.type = t;
-	}
 	
 	/**
 	 * Setto i nomi dei campi da selezionare
@@ -109,14 +96,6 @@ public class ParsedRequest {
 	 */
 	public int getCurrentTable(){
 		return this.currentTableId;
-	}
-
-	/**
-	 * Che tipo di richiesta deve essere eseguita
-	 * @return il tipo di richiesta
-	 */
-	public PrologRequestType getType() {
-		return this.type;
 	}
 	
 	/**
