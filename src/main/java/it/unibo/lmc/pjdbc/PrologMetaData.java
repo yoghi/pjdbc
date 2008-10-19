@@ -3,7 +3,7 @@
  */
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.MetaField;
+import it.unibo.lmc.pjdbc.core.schema.MetaField;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

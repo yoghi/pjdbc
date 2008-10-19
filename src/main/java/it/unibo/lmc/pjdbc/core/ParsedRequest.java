@@ -1,5 +1,7 @@
 package it.unibo.lmc.pjdbc.core;
 
+import it.unibo.lmc.pjdbc.core.schema.MetaField;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

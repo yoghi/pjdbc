@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.MetaField;
 import it.unibo.lmc.pjdbc.core.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.schema.MetaField;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 
