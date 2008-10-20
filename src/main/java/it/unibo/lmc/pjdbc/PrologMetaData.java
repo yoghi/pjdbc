@@ -3,7 +3,7 @@
  */
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.schema.MetaField;
+import it.unibo.lmc.pjdbc.core.schema.TableField;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,7 +29,7 @@ import alice.tuprolog.UnknownVarException;
  */
 public class PrologMetaData implements DatabaseMetaData {
 	
-	private Hashtable<String,ArrayList<MetaField>> table = new Hashtable<String,ArrayList<MetaField>>();
+	private Hashtable<String,ArrayList<TableField>> table = new Hashtable<String,ArrayList<TableField>>();
 
 	/**
 	 * Costruttore 
@@ -51,17 +51,17 @@ public class PrologMetaData implements DatabaseMetaData {
 				
 				if ( table_name.isAtom() && field_name.isAtom() &&  (field_position instanceof Number)  && field_type.isAtom() ){ 
 					
-					ArrayList<MetaField> fields = null;
+					ArrayList<TableField> fields = null;
 					
 					if ( !this.table.containsKey(table_name.toString()) ) {
-						fields = new ArrayList<MetaField>();
+						fields = new ArrayList<TableField>();
 						this.table.put(table_name.toString(), fields);
 						Logger.getLogger("it.unibo.lmc.pjdbc").debug("trovati metadati tabella "+table_name.toString());
 					} else {	
-						fields = (ArrayList<MetaField>) this.table.get(table_name.toString());
+						fields = (ArrayList<TableField>) this.table.get(table_name.toString());
 					}
 					
-					MetaField f = new MetaField(field_name.toString());
+					TableField f = new TableField(field_name.toString());
 					f.setPositionInTable(((Number)field_position).intValue());
 					
 					if ( field_type.toString().equals("int") ) f.setType( java.sql.Types.INTEGER );
@@ -94,7 +94,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#allProceduresAreCallable()
 	 */
 	public boolean allProceduresAreCallable() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -102,7 +102,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#allTablesAreSelectable()
 	 */
 	public boolean allTablesAreSelectable() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -110,7 +110,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 * @see java.sql.DatabaseMetaData#autoCommitFailureClosesAllResultSets()
 	 */
 	public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -119,7 +119,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -128,7 +128,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -137,7 +137,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean deletesAreDetected(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -146,7 +146,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -156,7 +156,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getAttributes(String arg0, String arg1, String arg2,
 			String arg3) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -166,7 +166,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getBestRowIdentifier(String arg0, String arg1,
 			String arg2, int arg3, boolean arg4) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -175,7 +175,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getCatalogSeparator() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -184,7 +184,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getCatalogTerm() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -193,7 +193,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public ResultSet getCatalogs() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -202,7 +202,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public ResultSet getClientInfoProperties() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -212,7 +212,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getColumnPrivileges(String arg0, String arg1, String arg2,
 			String arg3) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -254,7 +254,7 @@ public class PrologMetaData implements DatabaseMetaData {
         for (int i = 0; i < t.size(); i++) {
         	
         	res.moveToInsertRow();
-        	MetaField f = (MetaField) t.get(i);
+        	TableField f = (TableField) t.get(i);
         	res.updateString(0, null);
         	res.updateString(1, null);
         	res.updateString(2, tableNamePattern);
@@ -286,7 +286,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public Connection getConnection() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -296,7 +296,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getCrossReference(String arg0, String arg1, String arg2,
 			String arg3, String arg4, String arg5) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -305,7 +305,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getDatabaseMajorVersion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -314,7 +314,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getDatabaseMinorVersion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -323,7 +323,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getDatabaseProductName() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -332,7 +332,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getDatabaseProductVersion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -341,7 +341,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getDefaultTransactionIsolation() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -350,7 +350,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getDriverMajorVersion() {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -359,7 +359,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getDriverMinorVersion() {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -368,7 +368,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getDriverName() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -377,7 +377,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getDriverVersion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -387,7 +387,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getExportedKeys(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -396,7 +396,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getExtraNameCharacters() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -406,7 +406,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getFunctionColumns(String arg0, String arg1, String arg2,
 			String arg3) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -416,7 +416,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getFunctions(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -425,7 +425,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getIdentifierQuoteString() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -435,7 +435,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getImportedKeys(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -445,7 +445,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getIndexInfo(String arg0, String arg1, String arg2,
 			boolean arg3, boolean arg4) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -454,7 +454,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getJDBCMajorVersion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -463,7 +463,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getJDBCMinorVersion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -472,7 +472,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxBinaryLiteralLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -481,7 +481,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxCatalogNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -490,7 +490,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxCharLiteralLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -499,7 +499,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxColumnNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -508,7 +508,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxColumnsInGroupBy() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -517,7 +517,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxColumnsInIndex() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -526,7 +526,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxColumnsInOrderBy() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -535,7 +535,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxColumnsInSelect() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -544,7 +544,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxColumnsInTable() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -553,7 +553,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxConnections() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -562,7 +562,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxCursorNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -571,7 +571,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxIndexLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -580,7 +580,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxProcedureNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -589,7 +589,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxRowSize() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -598,7 +598,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxSchemaNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -607,7 +607,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxStatementLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -616,7 +616,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxStatements() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -625,7 +625,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxTableNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -634,7 +634,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxTablesInSelect() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -643,7 +643,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getMaxUserNameLength() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -652,7 +652,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getNumericFunctions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -662,7 +662,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getPrimaryKeys(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -672,7 +672,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getProcedureColumns(String arg0, String arg1, String arg2,
 			String arg3) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -681,7 +681,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getProcedureTerm() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -691,7 +691,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getProcedures(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -700,7 +700,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getResultSetHoldability() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -710,7 +710,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getSQLKeywords() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -719,7 +719,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public int getSQLStateType() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return 0;
 	}
 
@@ -728,7 +728,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getSchemaTerm() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -737,7 +737,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public ResultSet getSchemas() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -746,7 +746,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public ResultSet getSchemas(String arg0, String arg1) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -755,7 +755,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getSearchStringEscape() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -764,7 +764,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getStringFunctions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -774,7 +774,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getSuperTables(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -784,7 +784,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getSuperTypes(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -793,7 +793,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getSystemFunctions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -803,7 +803,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getTablePrivileges(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -812,7 +812,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public ResultSet getTableTypes() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -822,7 +822,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getTables(String arg0, String arg1, String arg2,
 			String[] arg3) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -831,7 +831,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getTimeDateFunctions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -840,7 +840,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public ResultSet getTypeInfo() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -850,7 +850,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getUDTs(String arg0, String arg1, String arg2, int[] arg3)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -859,7 +859,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getURL() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -868,7 +868,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public String getUserName() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -878,7 +878,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public ResultSet getVersionColumns(String arg0, String arg1, String arg2)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
@@ -887,7 +887,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean insertsAreDetected(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -896,7 +896,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean isCatalogAtStart() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -905,7 +905,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean isReadOnly() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -914,7 +914,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean locatorsUpdateCopy() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -923,7 +923,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean nullPlusNonNullIsNull() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -932,7 +932,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean nullsAreSortedAtEnd() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -941,7 +941,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean nullsAreSortedAtStart() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -950,7 +950,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean nullsAreSortedHigh() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -959,7 +959,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean nullsAreSortedLow() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -968,7 +968,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean othersDeletesAreVisible(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -977,7 +977,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean othersInsertsAreVisible(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -986,7 +986,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean othersUpdatesAreVisible(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -995,7 +995,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean ownDeletesAreVisible(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1004,7 +1004,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean ownInsertsAreVisible(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1013,7 +1013,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean ownUpdatesAreVisible(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1022,7 +1022,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean storesLowerCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1031,7 +1031,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1040,7 +1040,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean storesMixedCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1049,7 +1049,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1058,7 +1058,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean storesUpperCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1067,7 +1067,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1076,7 +1076,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1085,7 +1085,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsANSI92FullSQL() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1094,7 +1094,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsANSI92IntermediateSQL() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1103,7 +1103,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsAlterTableWithAddColumn() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1112,7 +1112,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsAlterTableWithDropColumn() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1121,7 +1121,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsBatchUpdates() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1130,7 +1130,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCatalogsInDataManipulation() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1139,7 +1139,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1148,7 +1148,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1157,7 +1157,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1166,7 +1166,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1175,7 +1175,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsColumnAliasing() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1184,7 +1184,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsConvert() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1193,7 +1193,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsConvert(int arg0, int arg1) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1202,7 +1202,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCoreSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1211,7 +1211,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsCorrelatedSubqueries() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1221,7 +1221,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public boolean supportsDataDefinitionAndDataManipulationTransactions()
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1231,7 +1231,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public boolean supportsDataManipulationTransactionsOnly()
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1240,7 +1240,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1249,7 +1249,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsExpressionsInOrderBy() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1258,7 +1258,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsExtendedSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1267,7 +1267,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsFullOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1276,7 +1276,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1285,7 +1285,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsGroupBy() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1294,7 +1294,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsGroupByBeyondSelect() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1303,7 +1303,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsGroupByUnrelated() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1312,7 +1312,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1321,7 +1321,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsLikeEscapeClause() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1330,7 +1330,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsLimitedOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1339,7 +1339,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsMinimumSQLGrammar() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1348,7 +1348,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsMixedCaseIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1357,7 +1357,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1366,7 +1366,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsMultipleOpenResults() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1375,7 +1375,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsMultipleResultSets() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1384,7 +1384,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsMultipleTransactions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1393,7 +1393,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsNamedParameters() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1402,7 +1402,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsNonNullableColumns() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1411,7 +1411,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1420,7 +1420,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1429,7 +1429,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1438,7 +1438,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1447,7 +1447,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsOrderByUnrelated() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1456,7 +1456,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsOuterJoins() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1465,7 +1465,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsPositionedDelete() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1474,7 +1474,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsPositionedUpdate() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1484,7 +1484,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public boolean supportsResultSetConcurrency(int arg0, int arg1)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1493,7 +1493,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsResultSetHoldability(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1502,7 +1502,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsResultSetType(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1511,7 +1511,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSavepoints() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1520,7 +1520,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSchemasInDataManipulation() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1529,7 +1529,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1538,7 +1538,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1547,7 +1547,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSchemasInProcedureCalls() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1556,7 +1556,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSchemasInTableDefinitions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1565,7 +1565,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSelectForUpdate() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1574,7 +1574,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsStatementPooling() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1583,7 +1583,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1592,7 +1592,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsStoredProcedures() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1601,7 +1601,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSubqueriesInComparisons() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1610,7 +1610,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSubqueriesInExists() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1619,7 +1619,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSubqueriesInIns() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1628,7 +1628,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1637,7 +1637,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsTableCorrelationNames() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1647,7 +1647,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	public boolean supportsTransactionIsolationLevel(int arg0)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1656,7 +1656,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsTransactions() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1665,7 +1665,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsUnion() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1674,7 +1674,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean supportsUnionAll() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1683,7 +1683,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean updatesAreDetected(int arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1692,7 +1692,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean usesLocalFilePerTable() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1701,7 +1701,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean usesLocalFiles() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1710,7 +1710,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public boolean isWrapperFor(Class<?> arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return false;
 	}
 
@@ -1719,7 +1719,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	
 	public <T> T unwrap(Class<T> arg0) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

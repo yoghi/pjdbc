@@ -253,12 +253,7 @@ void Where():
 void Expression():
 {}
 {
-	(
-		LOOKAHEAD(SQLCondition)
-		result = SQLCondition()
-	) 
-	|
-	result = RegularCondition()
+	{return;}
 }
 
 Expression RegularCondition():

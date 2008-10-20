@@ -137,38 +137,38 @@ public class PrologConnection implements Connection {
 
 	
 	public void clearWarnings() throws SQLException {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	
 	public void close() throws SQLException {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	
 	public void commit() throws SQLException {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	
 	public Array createArrayOf(String typeName, Object[] elements)
 			throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	
 	public Blob createBlob() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	
 	public Clob createClob() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.ParsedRequest;
-import it.unibo.lmc.pjdbc.core.schema.MetaField;
+import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.schema.TableField;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 
@@ -32,27 +32,27 @@ public class PrologStatement implements Statement {
 	}
 
 	public void addBatch(String sql) throws SQLException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public void cancel() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public void clearBatch() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public void clearWarnings() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
 	public void close() throws SQLException {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -108,9 +108,10 @@ public class PrologStatement implements Statement {
 			throw new SQLException("JOIN Not implement yet");
 		} else {
 
+			//creo la richiesta prolog
 			String req = pRequest.getTableNameByPosition(0)+"(";
 			
-			ArrayList<MetaField> requestField = pRequest.getTableField(0);
+			ArrayList<TableField> requestField = pRequest.getTableField(0);
 			
 			PrologMetaData pMeta = (PrologMetaData) this.conn.getMetaData();
 			
@@ -128,7 +129,7 @@ public class PrologStatement implements Statement {
 					
 					System.out.println(""+columnField.getString(2)+" "+columnField.getString(3)+" "+columnField.getInt(16));
 					
-					MetaField x = new MetaField(columnField.getString(3));
+					TableField x = new TableField(columnField.getString(3));
 					x.setTableName(columnField.getString(2));
 					x.setPositionInTable(columnField.getInt(16));
 					

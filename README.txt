@@ -16,6 +16,22 @@ void methodName():
 
 
 
-NOTE 
+> NOTE 
 In caso di presenza di . nella sintassi si considera : 
 schema.table_name.column
+
+> NOTE 2 
+Ho una richiesta diversa a seconda che sia 
+SELECT
+INSERT
+DELETE
+UPDATE
+
+ognuna di loro ha campi diversi 
+
+
+******** COSE DA FARE
+
+Expression,Simple Expression
+
+Caso Insert con values presi da una SubSelect();

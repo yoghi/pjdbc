@@ -5,11 +5,7 @@ public class Table {
 	private String schemaName;
 	private String name;
 	private String alias;
-	
-	public Table(String name){
-		this.name = name;
-	}
-	
+
 	public Table(String schemaName, String name) {
 		this.schemaName = schemaName;
 		this.name = name;
