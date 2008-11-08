@@ -94,7 +94,7 @@ public class PrologStatement implements Statement {
 		ParsedRequest pRequest = null;
 		
 		try {
-			pRequest = parse.parseIt();
+			pRequest = parse.parseIt();	//TODO: su quale schema/db eseguo la query??
 		} catch (ParseException e) {
 			Logger.getLogger(PrologStatement.class).error(e.getLocalizedMessage());
 			throw new SQLException(e.getMessage());

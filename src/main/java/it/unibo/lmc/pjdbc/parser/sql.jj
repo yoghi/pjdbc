@@ -17,6 +17,7 @@ package it.unibo.lmc.pjdbc.parser;
 //CORE
 import it.unibo.lmc.pjdbc.core.Expression;
 import it.unibo.lmc.pjdbc.core.Limit;
+import it.unibo.lmc.pjdbc.core.OrderBy;
 
 //REQUEST
 import it.unibo.lmc.pjdbc.core.request.Delete;
@@ -331,7 +332,6 @@ Select Select():
 	Expression where;
 	
 	Limit limit;
-	
 }
 {
 	<K_SELECT> field=Column() { select.addField(field); } 
@@ -385,10 +385,10 @@ Expression WhereClause():
 }
 
 
-List GroupByColumnReferences():
+ArrayList<TableField> GroupByColumnReferences():
 {
-	ColumnReference columnReference = null;
-	List columnReferences = new ArrayList();
+	TableField columnReference = null;
+	ArrayList<TableField> columnReferences = new ArrayList<TableField>();
 }
 {
     <K_GROUP> <K_BY> columnReference=ColumnReference() {columnReferences.add(columnReference); }
@@ -399,10 +399,10 @@ List GroupByColumnReferences():
 }
 
 
-List OrderByElements():
-{ 
-	List orderByList = new ArrayList();
-	OrderByElement orderByElement = null;
+ArrayList<OrderBy> OrderByElements():
+{
+	ArrayList<OrderBy> orderByList = new ArrayList<OrderBy>();
+	OrderBy orderByElement = null;
 }
 {
     <K_ORDER> <K_BY> orderByElement=OrderByElement() { orderByList.add(orderByElement); }
@@ -412,11 +412,10 @@ List OrderByElements():
     }
 }
 
-OrderByElement OrderByElement():
+OrderBy OrderByElement():
 {
-	OrderByElement orderByElement = new OrderByElement(); 
-	List retval = new ArrayList();
-	ColumnReference columnReference = null;
+	OrderBy orderByElement = new OrderBy(); 
+	TableField columnReference = null;
 }
 {
 	columnReference = ColumnReference()
@@ -451,26 +450,13 @@ Limit Limit():
 	}
 }
 
-ColumnReference ColumnReference():
+TableField ColumnReference():
 {
-	ColumnReference retval = null;
+	TableField retval = null;
 }
 {
-	(retval=Column() | retval=ColumnIndex())
+	(retval=Column())
 	{
-		return retval;
-	}
-}
-
-ColumnIndex ColumnIndex(): 
-{
-	ColumnIndex retval = new ColumnIndex();
-	Token index = null;
-} 
-{
-	index=<S_INTEGER>
-	{
-		retval.setIndex(Integer.parseInt(index.image));
 		return retval;
 	}
 }
