@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import alice.tuprolog.Prolog;
+import alice.tuprolog.Theory;
 
 public class PrologStatement implements Statement {
 
@@ -24,7 +25,7 @@ public class PrologStatement implements Statement {
 	private Psql parse = null;
 	private StringReader currentQuery = null;
 	
-	public PrologStatement(PrologConnection connection,Prolog db) {
+	public PrologStatement(PrologConnection connection,Theory db) {
 		this.conn = connection;
 		this.dbengine = db;
 		this.currentQuery = new StringReader("");

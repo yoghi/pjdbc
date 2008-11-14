@@ -7,6 +7,7 @@ public class Delete extends ParsedRequest {
 
 	private Table table;
 	
+	//se nn viene settato il where devo cancellare tutti gli elementi della cartella (??)
 	public Delete(String schema) {
 		super(schema);
 	}
@@ -29,6 +30,7 @@ public class Delete extends ParsedRequest {
 	//TODO: da fare la gestione della clausola WHERE
 	public void setWhere(Expression where){
 		
-	}
+	}	
+	
 
 }

@@ -16,6 +16,7 @@ package it.unibo.lmc.pjdbc.parser;
 
 //CORE
 import it.unibo.lmc.pjdbc.core.Expression;
+import it.unibo.lmc.pjdbc.core.expression.Operation;
 import it.unibo.lmc.pjdbc.core.Limit;
 import it.unibo.lmc.pjdbc.core.OrderBy;
 
@@ -161,9 +162,9 @@ Update Update():
 }
 {
     <K_UPDATE> t = Table() { update.setTable(t); }
-    <K_SET> column=Column() "=" value=Expression() { update.update(column.getColumnName(),value.toString()); }
+    <K_SET> column=Column() "=" value=Expression() { update.update(column.getColumnName(),value); }
 	(
-		"," column=Column() "=" value=Expression()  { update.update(column.getColumnName(),value.toString()); } 
+		"," column=Column() "=" value=Expression()  { update.update(column.getColumnName(),value); } 
 	)*
 
    [ where=WhereClause() { update.setWhere(where); } ]
@@ -195,7 +196,7 @@ Insert Insert():
 					{
 				
 						for (int i = 0; i < columns.size(); i++) {
-							insert.insert(columns.get(i).getColumnName(),values.get(i).toString());
+							insert.insert(columns.get(i).getColumnName(),values.get(i));
 						}
 					
 					}
@@ -380,7 +381,7 @@ Expression WhereClause():
 	Expression retval = null;
 }
 {
-    <K_WHERE> retval=Condition()
+    <K_WHERE> retval=Expression()
     { return retval; }
 }
 
@@ -462,39 +463,6 @@ TableField ColumnReference():
 }
 
 
-Expression Condition():
-{
-	Expression result = null;
-	Token leftExpression;
-	Token rightExpression;
-	boolean not = false;
-}
-{
-
-	[ <K_NOT> { not = true; } ] 
-	leftExpression=ComparisonItem() { result = leftExpression; }
-
-	(
-	">" { result = new GreaterThan(); }
-	| "<" { result = new MinorThan(); }
-	| "=" { result = new EqualsTo(); }
-	| ">=" { result = new GreaterThanEquals(); }
-	| "<=" { result = new MinorThanEquals(); }
-	| ("<>" | "!=") { result = new NotEqualsTo(); }
-	)
-	
-	rightExpression=ComparisonItem()
-	
-	{
-		BinaryExpression regCond = (BinaryExpression) result;
-		regCond.setLeftExpression(leftExpression);
-		regCond.setRightExpression(rightExpression);
-		if (not) regCond.setNot();
-	}		
-	
-	{ return result; }
-}
-
 Token ComparisonItem() :
 { 
 	Token tk;
@@ -518,39 +486,54 @@ Expression Expression():
 {
 	"("
 	( LOOKAHEAD(2)
-	exp = AddExpression()	
-	|
-	exp = SubExpression()
-	)
+		exp=AritmeticExpression()
+		|
+		exp=BooleanExpression()
+		)
 	")"
 	{
 		return exp;
 	}
 }
 
-Expression AddExpression():
+Expression AritmeticExpression():
 {
-	Operator op = Operator.ADD;
+	Operation op;
 	Token tk1;
 	Token tk2;
 }
 {
-	tk1=ComparisonItem() "+" tk2=ComparisonItem()
+	( 
+		tk1=ComparisonItem() 
+		(
+		"+" { op = Operation.ADD; }
+		|
+		"-" { op = Operation.SUB; }
+		|
+		"*" { op = Operation.MUL; }
+		|
+		"/" { op = Operation.DIV; }
+		)
+		tk2=ComparisonItem()
+	)
 	{
 		return new Expression(op,tk1,tk2);
 	}
 }
 
-Expression SubExpression():
+Expression BooleanExpression():
 {
-	Operator op = Operator.SUB;
+	Operation op;
 	Token tk1;
 	Token tk2;
 }
 {
-	tk1=ComparisonItem() "-" tk2=ComparisonItem()
+	( 
+		tk1=ComparisonItem() 
+			( <K_AND> { op = Operation.AND; } | <K_OR> { op = Operation.OR; } | "==" { op = Operation.EQUAL; } )  
+		tk2=ComparisonItem()
+	)
 	{
-		return new Expression(op,tk1,tk2);	
+		return new Expression(op,tk1,tk2);
 	}
 }
-

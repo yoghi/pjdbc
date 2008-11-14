@@ -17,7 +17,7 @@ public class Update extends ParsedRequest {
 
 	private Table table;
 	
-	private HashMap<String, String> updates = new HashMap<String, String>();
+	private HashMap<String, Object> updates = new HashMap<String, Object>();
 	
 	public Update(String schema) {
 		super(schema);
@@ -41,10 +41,10 @@ public class Update extends ParsedRequest {
 	/**
 	 * Setto gli aggiornamenti da fare
 	 * @param columnName
-	 * @param newValue
+	 * @param expression
 	 */
-	public void update(String columnName,String newValue){
-		this.updates.put(columnName, newValue);
+	public void update(String columnName,Expression expression){
+		this.updates.put(columnName, expression);
 	}
 	
 	/**

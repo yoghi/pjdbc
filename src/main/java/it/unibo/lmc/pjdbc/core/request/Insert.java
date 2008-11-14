@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.core.request;
 
+import it.unibo.lmc.pjdbc.core.Expression;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class Insert extends ParsedRequest {
 	
 	private Table table;
 	
-	private HashMap<String, String> inserts = new HashMap<String, String>();
+	private HashMap<String, Object> inserts = new HashMap<String, Object>();
 
 	public Insert(String schema) {
 		super(schema);
@@ -42,8 +43,8 @@ public class Insert extends ParsedRequest {
 	 * @param columnName
 	 * @param newValue
 	 */
-	public void insert(String columnName,String newValue){
-		this.inserts.put(columnName, newValue);
+	public void insert(String columnName,Expression expression){
+		this.inserts.put(columnName, expression);
 	}
 	
 	/**
