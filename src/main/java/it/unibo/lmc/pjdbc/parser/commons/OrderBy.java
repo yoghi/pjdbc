@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core;
+package it.unibo.lmc.pjdbc.parser.commons;
 
 import it.unibo.lmc.pjdbc.core.schema.TableField;
 

@@ -2,9 +2,9 @@ package it.unibo.lmc.pjdbc.core.request;
 
 import java.util.List;
 
-import it.unibo.lmc.pjdbc.core.Expression;
-import it.unibo.lmc.pjdbc.core.Limit;
 import it.unibo.lmc.pjdbc.core.schema.TableField;
+import it.unibo.lmc.pjdbc.parser.commons.Expression;
+import it.unibo.lmc.pjdbc.parser.commons.Limit;
 
 /**
  * In questo caso ho una richiesta del tipo 

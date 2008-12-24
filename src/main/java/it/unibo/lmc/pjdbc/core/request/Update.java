@@ -2,8 +2,8 @@ package it.unibo.lmc.pjdbc.core.request;
 
 import java.util.HashMap;
 
-import it.unibo.lmc.pjdbc.core.Expression;
 import it.unibo.lmc.pjdbc.core.schema.Table;
+import it.unibo.lmc.pjdbc.parser.commons.Expression;
 
 /**
  * In questo caso ho una richiesta del tipo 

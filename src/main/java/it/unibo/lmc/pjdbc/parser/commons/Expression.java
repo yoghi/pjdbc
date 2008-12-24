@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core;
+package it.unibo.lmc.pjdbc.parser.commons;
 
 import java.lang.reflect.Field;
 

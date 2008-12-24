@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.core.request;
 
-import it.unibo.lmc.pjdbc.core.Expression;
 import it.unibo.lmc.pjdbc.core.schema.Table;
+import it.unibo.lmc.pjdbc.parser.commons.Expression;
 
 import java.util.HashMap;
 
