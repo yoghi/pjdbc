@@ -1,0 +1,79 @@
+
+\documentclass[a4paper,titlepage,12pt]{article}	% documento A4, carattere 12pt , dopo il titolo si passa ad una pagina nuova
+%\documentclass[a4paper,12pt,twoside]{article}	% documento A4, ottimizzato fronte-retro
+
+\usepackage{graphicx} 				%inserisco la grafica nel documento
+\usepackage{booktabs} 				% for much better looking tables
+\usepackage{array} 					% for better arrays (eg matrices) in maths
+\usepackage{paralist} 				% very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage[italian]{babel} 			%[riferimento all'utilizzo di LaTeX in italiano].
+\usepackage[T1]{fontenc} 			% uso caratteri con lo stesso aspetto su ogni pc usabile
+\usepackage[utf8x]{inputenc} 			% codifica : utf8 
+\usepackage{lipsum} 				% inserisco carateri a caso per poter formattare la paginazione
+\usepackage{listings}				% inserisco codice da visualizzare come testo
+
+%le mie definzione
+\makeatletter
+\def\maketitle{%
+  \null
+  \thispagestyle{empty}%
+  \vfill
+  \begin{center}\leavevmode
+    \normalfont
+    {\huge \raggedright \@title \par}%
+    \hrulefill \par
+    di {\LARGE \raggedleft \@author \par }%
+    {\raggedleft Matricola XYZXYZ \par}%
+    \vskip 3cm
+    Corso : Linguaggi e Modelli Computazionali 2006/07
+    \vskip 1cm
+    last update : { \@date\par}%
+  \end{center}%
+  \vfill
+  \null
+  \cleardoublepage
+  }
+\makeatother
+
+
+% Titolo del corso, autore, data
+\title{Realizzazione di un driver JDBC per l'accesso ad un database scritto in prolog}
+\author{Stefano Tamagnini} 
+\date{\today}
+
+%enfatizzo i metodi square,root
+\lstset{ %
+language=Java 		%linguaggio
+%,frame=single			%frame
+}
+
+
+% metto i rif. di pagina in alto invece che in baso nelle pagine
+%\pagestyle{headings}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Introduzione}
+
+Come progetto per l'esame di Linguaggi e Modelli Computazionali, si è richiesto la relizzazione di un driver JDBC che permettesse di poter eseguire query SQL su un database Prolog. Della sintassi SQL che è molto vasta sono richieste le funzionalità di base che permettano basilarmente : Creation, Read, Update, Delete (CRUD), lasciando l'implementazione completa secondo lo standard SQL ad un secondo momento.
+\par 
+Questo driver, ho deciso di chiamarlo {\bf PJDBC}, dove la lettera P sta appunto per Prolog ossia il linguaggio in cui è espresso il database da interrogare; le parti coinvolte in questo progetto sono : 
+\begin{enumerate}
+\item il database
+\item il linguaggio con cui interrogarlo (sql)
+\item il driver fisico che permetta l'interazione del database con le richieste dell'utente
+\end{enumerate}
+
+\include{database}
+
+\include{sql}
+
+\include{driver}
+	
+\end{document}

@@ -1,0 +1,47 @@
+\section{Il database}
+
+Una definizione di database può essere {\bf il database rappresenta un archivio di dati strutturati}; la struttura più diffusa in questo momento è quella chiamata \emph{relazionale}, che si compone di tabelle e di relazioni tra di esse.
+
+\subsection{Database Prolog}
+Il database che si andrà ad interrogare attraverso il driver sviluppato avrà una struttura relazionale e sarà descritto attraverso una teoria prolog; le relazioni saranno espresse mediante l'uso di opportuni predicati. La tabella all'interno di questo database sarà rappresenta da un insieme di termini \emph{compound} prolog che rappresenteranno le righe della tabella; le righe avranno come sintassi:  
+\begin{lstlisting}[language=Prolog]
+ nomeTabella(col1,col2,......,colN).
+\end{lstlisting}
+I termini per appartenere ad una tabella dovranno avere lo stesso numero di argomenti e avere come nome il nome dela tabella. Esempio:
+\begin{lstlisting}[language=Prolog]
+ ta(col1,col2,col3).
+ ta(col11,col21,col31).
+\end{lstlisting}
+questi due termini rappresentano due righe di una tabella;
+\begin{lstlisting}[language=Prolog]
+ ta(col1,col2,col3).
+ tb(col1,col2,col3).
+\end{lstlisting}
+questi due termini rappresentano due righe di due tabelle rispettivamente ta e tb;
+\begin{lstlisting}[language=Prolog]
+ ta(col1,col2,col3).
+ ta(col1,col2).
+\end{lstlisting}
+queste due termini rappresentano due righe di due tabelle differenti questo in quanto non è predicibile quale argomento manchi per avere la stessa struttura del termine della prima riga, se fosse predicibile si potrebbe tranquillamente pensare che l'elemento mancante sia \emph{NULL} o \emph{any}.
+
+\subsection{Il metabase}
+Per avere la completezza di informazioni tipiche di un moderno database relazionale è necessario avere delle ulteriori informazioni su come è strutturato il database ed in particolare sulla struttura delle tabelle; queste informazioni solitamente compongono quello che è chiamato \emph{metabase} o \emph{metadatabase}. Un possibile insieme di informazioni utili possono essere : 
+\begin{enumerate}
+\item il nome da associare ad una colonna
+\item il tipo di dato che contiene una colonna
+\item la descrizione del contenuto di una colonna 
+\end{enumerate}
+questi sono solo alcuni possibili elementi. Nel nostro caso il \emph{metabase} può essere descritto attraverso l'uso di una tabella speciale dal nome {\bf metabase}; la sintassi sarà : 
+\begin{lstlisting}[language=Prolog,showstringspaces=false]
+metabase(
+	"nome tabella",
+	"posizione della colonna tra gli argomenti",
+	"nome della colonna",
+	"tipo di dato contenuto",
+	"descrizione"
+).
+\end{lstlisting}
+Questa particolare tabella non è pero necessaria, il database sarà comuque consistente, ma la sua presenza facilita l'interazione dell'utente nello scrivere query sql. Un esempio :
+\begin{lstlisting}[language=Prolog,showstringspaces=false]
+metabase("ta",1,"colonna1","string","prima colonna").
+\end{lstlisting}
