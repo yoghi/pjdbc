@@ -218,7 +218,7 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	/**
 	 * 
-	 *		1.  TABLE_CAT String => table catalog (may be null)
+	 *		1. TABLE_CAT String => table catalog (may be null)
 	 *		2. TABLE_SCHEM String => table schema (may be null)
 	 *		3. TABLE_NAME String => table name
 	 *		4. COLUMN_NAME String => column name

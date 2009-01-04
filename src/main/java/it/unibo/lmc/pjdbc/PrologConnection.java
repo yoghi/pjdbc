@@ -104,7 +104,7 @@ public class PrologConnection implements Connection {
 			try {
 				this.databaseMetaData = new PrologMetaData(this.dbengine);
 			} catch (Exception e) {
-				this.log.warn(e);
+				this.log.info(e);
 				//throw new SQLException("metabase not present");
 			}
 
@@ -174,7 +174,9 @@ public class PrologConnection implements Connection {
 
 	
 	public Statement createStatement() throws SQLException {
-		return new PrologStatement(this, this.dbengine);
+		//return new PrologStatement(this, this.dbengine);
+		/** @todo da sistemare */
+		return null;
 	}
 
 	

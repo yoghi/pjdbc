@@ -3,7 +3,7 @@
 Lo Structured Query Language o SQL in forma abbreviata, è un linguaggio standard utilizzato per interrogare i database relazionali; allo stato attuale i moderni database implementano solo la parte \emph{Entry Level} di tale standard. 
 
 \subsection{Il parser}
-Per poter interpretare le richieste sql dell'utente si è reso necessario la creazione di un parser; esso è in grado di poter riconoscere un sottoinsieme dello standard SQL/92. La sua realizzazione è avvenuta attraverso lo strumento javacc che ha permesso di specificare solo la grammatica da riconoscere e di lasciare allo strumento la generazione del codice relativa all'effettiva analisi del testo. La grammatica utilizzata per generare il parser comprende :
+Per poter interpretare le richieste sql dell'utente si è reso necessario la creazione di un parser; in particolare dovrà essere in grado di poter riconoscere un sottoinsieme dello standard SQL/92. La sua realizzazione è avvenuta attraverso lo strumento javacc che ha permesso di specificare solo la grammatica da riconoscere e di lasciare allo strumento la generazione del codice relativa all'effettiva analisi del testo. La grammatica utilizzata per generare il parser comprende :
 \begin{itemize}
 \item {\bf Operatori del linguaggio}, ossia le parole significative, che nel nostro caso possono essere di due tipi : 
 \begin{itemize}
@@ -20,7 +20,6 @@ I Comandi possibili sono suddivisi in due categorie Data Definition Language o D
 \begin{itemize}
 \item[-] Create "Database"
 \item[-] Drop "Database"
-\item[-] Rename "Database"
 \end{itemize}
 \item DML :
 \begin{itemize}
@@ -29,10 +28,17 @@ I Comandi possibili sono suddivisi in due categorie Data Definition Language o D
 \item[-] Insert 
 \item[-] Delete
 \item[-] Truncate Table
+\item[-] Drop Table
 \end{itemize}
 \end{itemize}
-Come si nota non ho inserito \emph{Create/Drop Table} in quanto già la \emph{Insert} permette di creare una tabella all'interno del database prolog; ovviamente in questo caso mancano i metadati ma possono essere inseriti manualmente con delle \emph{Insert} direttamente con riferimento alla tabella metabase. 
+Come si nota non ho inserito \emph{Create Table} in quanto già la \emph{Insert} permette di creare una tabella all'interno del database prolog; ovviamente in questo caso mancano i metadati ma possono essere inseriti manualmente con delle \emph{Insert} direttamente con riferimento alla tabella metabase. 
 
 \subsection{Operatori}
-Gli operatori, messi a disposizione dal SQL/92 si dividono in quattro categorie:\begin{enumerate}\item Operatori di confronto\item Operatori aritmetici\item Operatori condizionali\item Operatori logic
+Gli operatori, messi a disposizione dal SQL/92 si dividono in quattro categorie:
+\begin{enumerate}
+\item Operatori di confronto
+\item Operatori aritmetici
+\item Operatori condizionali
+\item Operatori logici
 \end{enumerate}
+Di questi sono stati presi in considerazione quelli aritmetici e quelli di confronto 

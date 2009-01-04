@@ -16,17 +16,22 @@ package it.unibo.lmc.pjdbc.parser;
 
 //CORE
 import it.unibo.lmc.pjdbc.core.Expression;
-import it.unibo.lmc.pjdbc.core.expression.Operation;
-import it.unibo.lmc.pjdbc.core.Limit;
-import it.unibo.lmc.pjdbc.core.OrderBy;
+import it.unibo.lmc.pjdbc.core.expression.IOperation;
+import it.unibo.lmc.pjdbc.core.expression.Operator;
+import it.unibo.lmc.pjdbc.core.expression.CompareOperation;
+import it.unibo.lmc.pjdbc.core.expression.AritmeticOperation;
+import it.unibo.lmc.pjdbc.parser.commons.Limit;
+import it.unibo.lmc.pjdbc.parser.commons.OrderBy;
 
 //REQUEST
-import it.unibo.lmc.pjdbc.core.request.Delete;
-import it.unibo.lmc.pjdbc.core.request.Drop;
-import it.unibo.lmc.pjdbc.core.request.Insert;
+import it.unibo.lmc.pjdbc.core.request.imp.Delete;
+import it.unibo.lmc.pjdbc.core.request.imp.CreateDB;
+import it.unibo.lmc.pjdbc.core.request.imp.DropDB;
+import it.unibo.lmc.pjdbc.core.request.imp.Drop;
+import it.unibo.lmc.pjdbc.core.request.imp.Insert;
+import it.unibo.lmc.pjdbc.core.request.imp.Select;
+import it.unibo.lmc.pjdbc.core.request.imp.Update;
 import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
-import it.unibo.lmc.pjdbc.core.request.Select;
-import it.unibo.lmc.pjdbc.core.request.Update;
 
 //SCHEMA DB
 import it.unibo.lmc.pjdbc.core.schema.Table;
@@ -85,6 +90,7 @@ TOKEN: /* OPERATORS */
 	|   <K_ELSE:"ELSE">
 	|   <K_SOME: "SOME">
 	|   <K_TABLE:"TABLE">
+	|   <K_DATABASE:"DATABASE">
 	|   <K_WHERE:"WHERE">
 	|   <K_USING:"USING">
 	|   <K_UNION:"UNION">
@@ -145,7 +151,13 @@ ParsedRequest parseIt(String schema) :
 	    |
 	    request = Delete()			// DELETE FROM table_name WHERE (expression) 
 	    |
-	    request = Drop()			// DROP table_name1, table_name2,....
+	    request = CreateDB()		// CREATE database_name
+	    |
+	    ( LOOKAHEAD(2)
+		    request = Drop()			// DROP TABLE table_name1, table_name2,....
+		    |
+		    request = DropDB()			// DROP DATABASE database_name
+	    )
     )
     ";"
     { return request; }
@@ -231,6 +243,33 @@ Delete Delete():
     <K_DELETE> [<K_FROM>] t=Table() { delete.setTable(t); }
     [where=WhereClause() { delete.setWhere(where); } ]
     { return delete; }
+}
+
+CreateDB CreateDB():
+{
+	CreateDB create = null;
+	String t = null;
+}
+{
+	<K_CREATE> <K_DATABASE> t=RelObjectName() { create=new CreateDB(t); }
+	
+	{
+		return create;
+	}
+}
+
+DropDB DropDB():
+{
+	DropDB drop = null;
+	String t = null;
+}
+{
+	
+	<K_DROP> <K_TABLE> t=RelObjectName() { drop=new DropDB(t); }
+	
+	{
+		return drop;
+	}
 }
 
 Drop Drop():
@@ -498,7 +537,7 @@ Expression Expression():
 
 Expression AritmeticExpression():
 {
-	Operation op;
+	IOperation op;
 	Token tk1;
 	Token tk2;
 }
@@ -506,13 +545,13 @@ Expression AritmeticExpression():
 	( 
 		tk1=ComparisonItem() 
 		(
-		"+" { op = Operation.ADD; }
+		"+" { op = new Operator(AritmeticOperation.ADD); }
 		|
-		"-" { op = Operation.SUB; }
+		"-" { op = new Operator(AritmeticOperation.SUB); }
 		|
-		"*" { op = Operation.MUL; }
+		"*" { op = new Operator(AritmeticOperation.MUL); }
 		|
-		"/" { op = Operation.DIV; }
+		"/" { op = new Operator(AritmeticOperation.DIV); }
 		)
 		tk2=ComparisonItem()
 	)
@@ -523,14 +562,24 @@ Expression AritmeticExpression():
 
 Expression BooleanExpression():
 {
-	Operation op;
+	IOperation op;
 	Token tk1;
 	Token tk2;
 }
 {
 	( 
 		tk1=ComparisonItem() 
-			( <K_AND> { op = Operation.AND; } | <K_OR> { op = Operation.OR; } | "==" { op = Operation.EQUAL; } )  
+			(
+			"<" { op = new Operator(CompareOperation.MINOR); } 
+			| 
+			">" { op = new Operator(CompareOperation.MAJOR); } 
+			|
+			"<=" { op = new Operator(CompareOperation.MINOREQUAL); } 
+			| 
+			">=" { op = new Operator(CompareOperation.MAJOREQUAL); } 
+			|  
+			"==" { op = new Operator(CompareOperation.EQUAL); } 
+		)  
 		tk2=ComparisonItem()
 	)
 	{

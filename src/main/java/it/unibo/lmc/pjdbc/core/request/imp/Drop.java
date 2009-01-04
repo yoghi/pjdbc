@@ -1,5 +1,6 @@
-package it.unibo.lmc.pjdbc.core.request;
+package it.unibo.lmc.pjdbc.core.request.imp;
 
+import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 
 import java.util.ArrayList;

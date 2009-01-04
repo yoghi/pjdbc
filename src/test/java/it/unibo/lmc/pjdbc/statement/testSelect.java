@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.statement;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -30,7 +30,7 @@ public class testSelect extends TestCase {
 	protected void setUp() throws Exception {
 
 		Class.forName("it.unibo.lmc.pjdbc.PrologDriver");
-
+		
 		/*
 		String systemOs = System.getProperty("os.name");
 		if ( systemOs == "Windows XP" ) {

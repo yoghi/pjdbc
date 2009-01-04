@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.core.request;
 
 
-public abstract class ParsedRequest {
+public abstract class ParsedRequest implements IRequest {
 	
 	protected String defaultSchema;
 	

@@ -1,12 +1,9 @@
 /*
  * JDBC 4.0 
- * Type 3
-      Type 3 drivers provide a client with a generic network API that is then translated into
-      database-specific access at the server level. In other words, the JDBC driver on the client
-      uses sockets to call a middleware application on the server that translates the client requests
-      into an API specific to the desired driver. As it turns out, this kind of driver is extremely
-      flexible, since it requires no code installed on the client and a single driver can actually
-      provide access to multiple databases.
+ * 
+   	Type 4 — drivers that are pure Java often using a network protocol or File I/O to 
+			 communicate with a specific data source. The client connects directly to the data 
+			 source.   
  */
 package it.unibo.lmc.pjdbc;
 
@@ -24,7 +21,7 @@ public class PrologDriver implements Driver {
 		try {
 			DriverManager.registerDriver(new PrologDriver());
 		} catch (Exception e) {
-			/* non può generare eccezioni */
+			/* non può generare eccezioni (??) */
 		}
 	}
 

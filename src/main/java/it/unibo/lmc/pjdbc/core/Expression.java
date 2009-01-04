@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.parser.commons;
+package it.unibo.lmc.pjdbc.core;
 
 import java.lang.reflect.Field;
 
@@ -13,8 +13,6 @@ public class Expression {
 		//token: o numeri o variabili 
 		
 	}
-	
-	
 	
 	
 	/**
