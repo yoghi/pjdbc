@@ -5,7 +5,7 @@
 			 communicate with a specific data source. The client connects directly to the data 
 			 source.   
  */
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.driver;
 
 import java.sql.*;
 import java.util.*;

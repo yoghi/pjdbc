@@ -2,10 +2,18 @@ package it.unibo.lmc.pjdbc.core;
 
 import it.unibo.lmc.pjdbc.core.request.IRequest;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.MalformedGoalException;
@@ -23,26 +31,120 @@ import alice.tuprolog.Theory;
  * 		uno di commit per la conferma dei cambiamenti
  * 		uno di savePoint  per poter salvare lo stato in un dato momento 
  */
-public class PrologSingleDB {
-	
-	ReentrantLock lock = new ReentrantLock();
-	
-	String schema;
-	
-	Theory current_theory;
-	/** @todo: dovrei poter salvare gli stati su file e non solo su memoria */
-	HashMap<String, Theory> savePoint = new HashMap<String, Theory>();
+public class PrologLocalDB implements IDatabase {
 	
 	/**
-	 * Costruttore PrologDB
-	 * @param th teoria prolog da usare come base del DB.
+	 * Properties / custumization
 	 */
-	public PrologSingleDB(String schemaName,Theory th){
-		this.schema = schemaName;
-		this.current_theory = th;
+	private Properties properties = new Properties();;
+
+	/**
+	 * Logger 
+	 */
+	private Logger log = null;
+	
+	/**
+	 * Lock 
+	 */
+	ReentrantLock lock = new ReentrantLock();
+	
+	/**
+	 * Database name
+	 */
+	String schema;
+	
+	/**
+	 * Theory corrente
+	 */
+	Theory current_theory;
+	
+	/** 
+	 * 
+	 * @todo: dovrei poter salvare gli stati su file e non solo su memoria 
+	 */
+	HashMap<String, Theory> savePoint = new HashMap<String, Theory>();
+	
+//	/**
+//	 * Costruttore PrologDB
+//	 * @param th teoria prolog da usare come base del DB.
+//	 */
+//	public PrologLocalDB(String schemaName,Theory th){
+//		
+//		this.schema = schemaName;
+//		this.current_theory = th;
+//		
+//		this.createMeta();
+//		
+//		
+//	}
+	
+	
+	public PrologLocalDB(String sourceUrl) throws IOException {
+		
+		File file = new File(sourceUrl);
+		boolean exists = file.exists();
+	    
+	    if ( exists ) {
+	    	String userDir = System.getProperty("user.dir");
+	    	if ( !(new File(userDir+File.separator+sourceUrl)).exists() ){
+	    		throw new FileNotFoundException("File "+sourceUrl+" and "+userDir+File.separator+sourceUrl+" doesn't exist");
+	    	} else {
+	    		sourceUrl = userDir + File.separator + sourceUrl;
+	    	}
+	    } else {
+	    	System.out.println("Impossibile caricare il db: "+file.getAbsolutePath());
+	    	boolean success = file.createNewFile();
+	    	if ( success ) System.out.println("Creato database vuoto: "+file.getAbsolutePath());
+	    	else throw new IOException("Impossibile creare: "+file.getAbsolutePath());
+	    }
+	    
+	    File propFile = new File(sourceUrl+".properties");
+	    
+	    // carico eventuali opzioni
+	    if ( propFile.exists() ) {
+	    	try {
+	    		properties.load(new FileInputStream(propFile));
+	    	} catch (Exception e) {
+	    		System.out.println("><"+e.getLocalizedMessage());
+			}
+	    	
+	    }
+		
+		this.logger_init();
+		
+		this.load_theory(file);
+		
 		this.createMeta();
+		
 	}
 	
+	private void load_theory(File file) throws FileNotFoundException, IOException {
+		
+		this.log.debug("Avvio prolog db engine");
+
+//		this.dbengine = new Prolog();
+		this.current_theory = new Theory(new FileInputStream(file));
+		
+//		this.log.debug("Setto la teoria prolog");
+//		this.dbengine.setTheory(t);
+		
+//		try {
+//			this.databaseMetaData = new PrologMetaData(this.dbengine);
+//		} catch (Exception e) {
+//			this.log.info(e);
+//			//throw new SQLException("metabase not present");
+//		}
+		
+	}
+
+	protected void logger_init() {
+		PropertyConfigurator.configure(properties);
+		log = Logger.getLogger("it.unibo.lmc.pjdbc");
+	}
+	
+	
+	
+
 	/**
 	 * Eseguo una richiesta sul database
 	 * @param request

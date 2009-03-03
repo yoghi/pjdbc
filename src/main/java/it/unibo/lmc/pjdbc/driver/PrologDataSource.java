@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.driver;
 
 import java.io.PrintWriter;
 import java.sql.Connection;

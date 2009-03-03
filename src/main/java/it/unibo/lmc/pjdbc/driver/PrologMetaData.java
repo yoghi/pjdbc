@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.schema.TableField;
 

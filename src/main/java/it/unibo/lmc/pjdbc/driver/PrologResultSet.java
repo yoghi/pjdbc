@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.driver;
 
 import java.io.InputStream;
 import java.io.Reader;

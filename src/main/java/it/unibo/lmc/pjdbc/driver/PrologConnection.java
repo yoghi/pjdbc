@@ -1,8 +1,9 @@
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.driver;
 
 
-import java.io.File;
-import java.io.FileInputStream;
+import it.unibo.lmc.pjdbc.core.IDatabase;
+import it.unibo.lmc.pjdbc.core.PrologLocalDB;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Array;
@@ -20,12 +21,7 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.Prolog;
-import alice.tuprolog.Theory;
 
 public class PrologConnection implements Connection {
 
@@ -35,104 +31,57 @@ public class PrologConnection implements Connection {
 	private Prolog dbengine = null;
 	
 	/**
-	 * Metadati Database
+	 * Nome database
 	 */
-	private PrologMetaData databaseMetaData = null;
+	private String database;
 	
 	/**
-	 * Url
+	 * Filename o host
+	 * nome.db o 192.168.2.1:1231@nome
 	 */
-	private final String url;
+	private String sourceUrl;
 	
 	/**
-	 * Properties / custumization
+	 * Database
 	 */
-	private Properties properties = null;
-
-	/**
-	 * Logger 
-	 */
-	private Logger log = null;
+	private IDatabase db;
 
 	/**
 	 * Costruttore 
-	 * @param url url passato al factory
-	 * @param filename nome del file del database
+	 * @param url_totale url passato al factory
+	 * @param url_specifico informazioni per accedere al database
 	 * @throws SQLException ...
 	 * TODO gestire le ecezzioni 
 	 */
-	public PrologConnection(String url, String filename) throws SQLException {
+	public PrologConnection(String url_totale, String url_specifico) throws SQLException {
 
 		try {
 			
-			properties = new Properties();
+			String[] url = url_specifico.split(";");
 			
-			File file = new File(filename);
+			this.sourceUrl = url[0];
 			
-			boolean exists = file.exists();
-		    boolean exists_prop = (new File(filename+".properties")).exists();
-		    
-		    if ( exists ) {
-		    	String userDir = System.getProperty("user.dir");
-		    	if ( !(new File(userDir+File.separator+filename)).exists() ){
-		    		throw new FileNotFoundException("File "+filename+" and "+userDir+File.separator+filename+" doesn't exist");
-		    	} else {
-		    		filename = userDir + File.separator + filename;
-		    	}
-		    } else {
-		    	System.out.println("Impossibile caricare il db: "+file.getAbsolutePath());
-		    	boolean success = file.createNewFile();
-		    	if ( success ) System.out.println("Creato database vuoto: "+file.getAbsolutePath());
-		    	else System.out.println("Impossibile creare: "+file.getAbsolutePath());
-		    }
-		    
-		    // carico eventuali opzioni
-		    if ( exists_prop ) {
-		    	properties.load(new FileInputStream(filename+".properties"));
-		    }
-		    
-			this.logger_init();
-			
-			this.log.debug("Avvio prolog db engine");
-
-			this.dbengine = new Prolog();
-			Theory t = new Theory(new FileInputStream(filename));
-			
-			this.log.debug("Setto la teoria prolog");
-			this.dbengine.setTheory(t);
-			
-			try {
-				this.databaseMetaData = new PrologMetaData(this.dbengine);
-			} catch (Exception e) {
-				this.log.info(e);
-				//throw new SQLException("metabase not present");
+			if ( url.length == 2 ) {
+				this.database = url[1];
 			}
+			
+			if ( this.sourceUrl.contains("@") ) {
+				//host
+				//this.db = new PrologRemoteDB();
+			} else {
+				//file
+				this.db = new PrologLocalDB(this.sourceUrl);
+			}
+			
 
-		} catch (InvalidTheoryException e) {
-			throw new SQLException("Prolog database internal error : "+ e.toString());
+//		} catch (InvalidTheoryException e) {
+//			throw new SQLException("Prolog database internal error : "+ e.toString());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		this.url = url;
-	}
-
-	protected void logger_init() {
-
-		PropertyConfigurator.configure(properties);
-		log = Logger.getLogger("it.unibo.lmc.pjdbc");
-		
-	}
-
-	/**
-	 * Get the prolog engine use from connection
-	 * @return Prolog engine
-	 * @deprecated
-	 */
-	public Prolog getEngine() {
-		return this.dbengine;
 	}
 
 	
@@ -205,10 +154,12 @@ public class PrologConnection implements Connection {
 		return false;
 	}
 
-	
+
+	/**
+	 * Il catalog coincide per semplicità con il database
+	 */
 	public String getCatalog() throws SQLException {
-		
-		return null;
+		return this.database;
 	}
 
 	
@@ -231,9 +182,10 @@ public class PrologConnection implements Connection {
 
 	/**
 	 * Restituisce un wrapper per ottenere MetaDati
+	 * @TODO: da collegare con il db...
 	 */
 	public DatabaseMetaData getMetaData() throws SQLException {
-		return this.databaseMetaData;
+		return null;
 	}
 
 	

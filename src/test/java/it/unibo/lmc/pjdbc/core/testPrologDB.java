@@ -67,7 +67,7 @@ public class testPrologDB extends TestCase {
 		
  		Theory thMalf = new Theory("prova(1,_).");
  		
- 		PrologSingleDB database = new PrologSingleDB("malformed",thMalf);
+ 		PrologLocalDB database = new PrologLocalDB("malformed",thMalf);
  		
 	}
 	
@@ -81,7 +81,7 @@ public class testPrologDB extends TestCase {
 		System.out.println("  testExecutionSelect   ");
  		System.out.println(" ====================== ");
 		
-		PrologSingleDB database = new PrologSingleDB("dbTest",th);
+		PrologLocalDB database = new PrologLocalDB("dbTest",th);
 		
 		class SelectRequest implements IRequest{
 			public String toString(){
@@ -113,7 +113,7 @@ public class testPrologDB extends TestCase {
 		System.out.println("  testExecutionInsert   ");
  		System.out.println(" ====================== ");
 		
- 		PrologSingleDB database = new PrologSingleDB("dbTest",th);
+ 		PrologLocalDB database = new PrologLocalDB("dbTest",th);
 		
 		class InsertRequest implements IRequest{
 			public String toString(){
@@ -139,7 +139,7 @@ public class testPrologDB extends TestCase {
 		System.out.println("  testExecutionInsertMultiple   ");
  		System.out.println(" ============================== ");
 		
- 		PrologSingleDB database = new PrologSingleDB("dbTest",th);
+ 		PrologLocalDB database = new PrologLocalDB("dbTest",th);
 		
 		class InsertRequest implements IRequest{
 			public String toString(){

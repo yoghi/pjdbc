@@ -1,12 +1,11 @@
 package it.unibo.lmc.pjdbc;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.Connection;
+import it.unibo.lmc.pjdbc.driver.PrologConnection;
+import it.unibo.lmc.pjdbc.driver.PrologStatement;
+
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class Main {
 
@@ -15,11 +14,16 @@ public class Main {
 		
 		try {
 		
-			Class.forName("it.unibo.lmc.pjdbc.PrologDriver");
+			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 			// SENZA METADATI
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+			
+			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+			
+			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+			
+			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
+			
 			PrologStatement stmt = (PrologStatement)conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");

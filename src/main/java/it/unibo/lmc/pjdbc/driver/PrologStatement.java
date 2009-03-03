@@ -1,7 +1,6 @@
-package it.unibo.lmc.pjdbc;
+package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
-import it.unibo.lmc.pjdbc.core.schema.TableField;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 
@@ -11,17 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Statement;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import alice.tuprolog.Prolog;
 import alice.tuprolog.Theory;
 
 public class PrologStatement implements Statement {
 
 	private PrologConnection conn = null;
-	private Prolog dbengine = null;
+	private Theory dbengine = null;
 	private Psql parse = null;
 	private StringReader currentQuery = null;
 	
@@ -95,64 +92,13 @@ public class PrologStatement implements Statement {
 		ParsedRequest pRequest = null;
 		
 		try {
-			pRequest = parse.parseIt();	//TODO: su quale schema/db eseguo la query??
+			pRequest = parse.parseIt("");	//TODO: su quale schema/db eseguo la query??
 		} catch (ParseException e) {
 			Logger.getLogger(PrologStatement.class).error(e.getLocalizedMessage());
 			throw new SQLException(e.getMessage());
 		}
 		
-		//FIXME: miglioare il controllo se è una select o meno...  
-//		if ( PrologRequestType.READ != pRequest.getType() ) throw new SQLException("Not Select Statement");
-		
-		// Verifico se c'è un JOIN
-		if ( pRequest.getNumTable() > 1 ) {
-			throw new SQLException("JOIN Not implement yet");
-		} else {
-
-			//creo la richiesta prolog
-			String req = pRequest.getTableNameByPosition(0)+"(";
-			
-			ArrayList<TableField> requestField = pRequest.getTableField(0);
-			
-			PrologMetaData pMeta = (PrologMetaData) this.conn.getMetaData();
-			
-			//se ho i metadati allora considero il numero reale di campi
-			if ( null != pMeta ) {
-			
-				PrologResultSet columnField = (PrologResultSet) pMeta.getColumns(pRequest.getTableNameByPosition(0), null, pRequest.getTableNameByPosition(0), null);
-				
-				//quante colonne ho trovato
-				int max = columnField.getFetchSize();
-				
-				columnField.first();				
-				
-				while(columnField.next()){
-					
-					System.out.println(""+columnField.getString(2)+" "+columnField.getString(3)+" "+columnField.getInt(16));
-					
-					TableField x = new TableField(columnField.getString(3));
-					x.setTableName(columnField.getString(2));
-					x.setPositionInTable(columnField.getInt(16));
-					
-					if ( requestField.contains(x) ) System.out.println("c'e");
-				
-				}
-				
-				
-			
-			} else {	//provo con i campi che mi ha dato, magari bastano
-				
-				for (int j = 0; j < requestField.size()-1; j++) {
-					req += "X"+j+",";
-				}
-				
-				req += "X"+(requestField.size()-1)+").";
-				
-			}
-
-			System.out.println(req);
-			
-		}
+		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
 		
 		return null;
 	}
