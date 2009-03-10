@@ -317,7 +317,7 @@ TableField Column():
    	|
    	"*"
    	{
-   		field = new TableField("*");
+   		field = new TableGenericField("*");
    		return field;
    	}
 }
@@ -461,7 +461,7 @@ ArrayList<OrderBy> OrderByElements():
 OrderBy OrderByElement():
 {
 	OrderBy orderByElement = new OrderBy(); 
-	TableField columnReference = null;
+	TableSpecificField columnReference = null;
 }
 {
 	columnReference = ColumnReference()

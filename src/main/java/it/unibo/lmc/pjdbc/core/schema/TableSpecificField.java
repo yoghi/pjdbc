@@ -5,7 +5,6 @@ public class TableSpecificField {
 	private int length;    				// Internal Length of this field
     private int oid;        			// OID of the type
     private String columnLabel; 		// Column label
-    private String columnName;        	// Column name; null if undetermined
     private Integer nullable;        	// Is this column nullable? null if undetermined.
     private boolean autoIncrement;   	// Is this column automatically numbered?
     private int positionInTable;		// Position in table
@@ -13,10 +12,10 @@ public class TableSpecificField {
     private String tableName;			// Table name;
     private String schema;				// Schema name;
     private int type;					// type 
+	protected String columnName;
     
     public TableSpecificField(String columnName){
-		this.setColumnName(columnName);
-		
+    	this.setColumnName(columnName);
     }
     
     /**
@@ -51,18 +50,6 @@ public class TableSpecificField {
     	
     	return true;
     }
-
-	
-    public String getColumnName() {
-		return this.columnName;
-	}
-
-	/**
-	 * @param columnName the columnName to set
-	 */
-	public void setColumnName(String columnName) {
-		this.columnName = columnName;
-	}
 
 	/**
 	 * @param positionInTable the positionInTable to set
@@ -133,9 +120,20 @@ public class TableSpecificField {
 	public void setSchema(String schema) {
 		this.schema = schema;
 	}
-	
-	public String toString(){
+
+	/**
+	 * @param columnName the columnName to set
+	 */
+	public void setColumnName(String columnName) {
+		this.columnName = columnName;
+	}
+
+	public String toString() {
 		return "["+this.columnName+"]";
+	}
+
+	public String getColumnName() {
+		return this.columnName;
 	}
     
 }
