@@ -1,24 +1,27 @@
 package it.unibo.lmc.pjdbc.core.schema;
 
-public class TableSpecificField {
+public class TableField {
 
 	private int length;    				// Internal Length of this field
     private int oid;        			// OID of the type
+    private int mod;        			// type modifier of this field
     private String columnLabel; 		// Column label
+    private String columnName;        	// Column name; null if undetermined
     private Integer nullable;        	// Is this column nullable? null if undetermined.
-    private boolean autoIncrement;   	// Is this column automatically numbered?
+    private Boolean autoIncrement;   	// Is this column automatically numbered?
     private int positionInTable;		// Position in table
     private int tableOid; 				// OID of table ( zero if no table )
     private String tableName;			// Table name;
     private String schema;				// Schema name;
     private int type;					// type 
-	protected String columnName;
+    private boolean dinstinct;			// distinct field
     
-    public TableSpecificField(String columnName){
-    	this.setColumnName(columnName);
+    public TableField(String columnName){
+		this.setColumnName(columnName);
+		
     }
     
-    /**
+    /*
      * Construct a field based on the information fed to it.
      *
      * @param columnLabel the column label of the field
@@ -28,12 +31,13 @@ public class TableSpecificField {
      * @param tableOid the OID of the columns' table
      * @param positionInTable the position of column in the table (first column is 1, second column is 2, etc...)
      */
-    public TableSpecificField(String columnLabel, String columnName, int oid, int length, int tableOid, int positionInTable)
+    public TableField(String columnLabel, String columnName, int oid, int length, int mod, int tableOid, int positionInTable)
     {
     	this.setColumnName(columnName);
         this.columnLabel = columnLabel;
         this.oid = oid;
         this.length = length;
+        this.mod = mod;
         this.setTableOid(tableOid);
         this.setPositionInTable(positionInTable);
     }
@@ -43,13 +47,25 @@ public class TableSpecificField {
      * @param c altro MetaField
      * @return vero se sono riferiti allo stesso campo
      */
-    public boolean equals(TableSpecificField c){
+    public boolean equals(TableField c){
     	
     	if ( !c.getColumnName().equals(this.columnName) ) return false;
     	if ( !c.getTableName().equals(this.tableName) ) return false;
     	
     	return true;
     }
+
+	
+    public String getColumnName() {
+		return this.columnName;
+	}
+
+	/**
+	 * @param columnName the columnName to set
+	 */
+	public void setColumnName(String columnName) {
+		this.columnName = columnName;
+	}
 
 	/**
 	 * @param positionInTable the positionInTable to set
@@ -120,20 +136,17 @@ public class TableSpecificField {
 	public void setSchema(String schema) {
 		this.schema = schema;
 	}
-
-	/**
-	 * @param columnName the columnName to set
-	 */
-	public void setColumnName(String columnName) {
-		this.columnName = columnName;
+	
+	public void setDistinct(boolean b){
+		this.dinstinct = true;
 	}
-
-	public String toString() {
+    
+	public boolean isDinstinct(){
+		return this.dinstinct;
+	}
+	
+	public String toString(){
 		return "["+this.columnName+"]";
-	}
-
-	public String getColumnName() {
-		return this.columnName;
 	}
     
 }
