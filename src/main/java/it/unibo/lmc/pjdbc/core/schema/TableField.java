@@ -2,23 +2,34 @@ package it.unibo.lmc.pjdbc.core.schema;
 
 public class TableField {
 
-	private int length;    				// Internal Length of this field
-    private int oid;        			// OID of the type
-    private int mod;        			// type modifier of this field
-    private String columnLabel; 		// Column label
-    private String columnName;        	// Column name; null if undetermined
-    private Integer nullable;        	// Is this column nullable? null if undetermined.
-    private Boolean autoIncrement;   	// Is this column automatically numbered?
-    private int positionInTable;		// Position in table
-    private int tableOid; 				// OID of table ( zero if no table )
-    private String tableName;			// Table name;
-    private String schema;				// Schema name;
-    private int type;					// type 
-    private boolean dinstinct;			// distinct field
+	/**
+	 * Nome identificativo della colonna
+	 */
+	private String columnName;        			// Column name; null if undetermined
+	
+	
+	/**
+	 * Meta Informazioni
+	 */
+	private int length;    						// Internal Length of this field
+    private int oid;        					// OID of the type
+    private String columnLabel; 				// Column label
+    private Integer nullable;        			// Is this column nullable? null if undetermined.
+    private boolean autoIncrement = false;   	// Is this column automatically numbered?
+    private int positionInTable;				// Position in table
+    private int tableOid; 						// OID of table ( zero if no table )
+    private String tableName;					// Table name;
+    private String schema;						// Schema name;
+    private int type;							// type 
+    private boolean dinstinct;					// distinct field
+    
+    
+    public TableField(){
+    	this.setColumnName("*");
+    }
     
     public TableField(String columnName){
 		this.setColumnName(columnName);
-		
     }
     
     /*
@@ -31,13 +42,12 @@ public class TableField {
      * @param tableOid the OID of the columns' table
      * @param positionInTable the position of column in the table (first column is 1, second column is 2, etc...)
      */
-    public TableField(String columnLabel, String columnName, int oid, int length, int mod, int tableOid, int positionInTable)
+    public TableField(String columnLabel, String columnName, int oid, int length, int tableOid, int positionInTable)
     {
     	this.setColumnName(columnName);
         this.columnLabel = columnLabel;
         this.oid = oid;
         this.length = length;
-        this.mod = mod;
         this.setTableOid(tableOid);
         this.setPositionInTable(positionInTable);
     }

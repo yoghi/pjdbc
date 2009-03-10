@@ -317,7 +317,7 @@ TableField Column():
    	|
    	"*"
    	{
-   		field = new TableGenericField("*");
+   		field = new TableField();
    		return field;
    	}
 }
