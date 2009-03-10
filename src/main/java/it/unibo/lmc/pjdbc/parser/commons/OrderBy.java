@@ -1,15 +1,15 @@
 package it.unibo.lmc.pjdbc.parser.commons;
 
-import it.unibo.lmc.pjdbc.core.schema.TableSpecificField;
+import it.unibo.lmc.pjdbc.core.schema.TableField;
 
 public class OrderBy {
 	
-	private TableSpecificField column;
+	private TableField column;
 
 	/*ASCENDENTE*/
 	private boolean asc = true;
 	
-	public void setColumnReference(TableSpecificField columnReference) {
+	public void setColumnReference(TableField columnReference) {
 		this.column = columnReference;
 	}
 

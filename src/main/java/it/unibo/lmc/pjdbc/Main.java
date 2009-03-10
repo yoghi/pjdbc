@@ -28,9 +28,13 @@ public class Main {
 			
 			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
 			
-			ResultSet rs2 = stmt.executeQuery("select id from employee;");
+			ResultSet rs2 = stmt.executeQuery("select id from employee where id == 1;");
 			
-			ResultSet rs3 = stmt.executeQuery("select * from employee;");
+			ResultSet rs2bis = stmt.executeQuery("select id,idRef from employee where id == idRef;");	//cerco i figli che sono anche padri...
+			
+			ResultSet rs3 = stmt.executeQuery("select * from employee limit 5;");
+			
+			ResultSet rs4 = stmt.executeQuery("select * from employee limit 5,15;");
 			
 			/*
 			while(rs.next()) {

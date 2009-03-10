@@ -7,11 +7,15 @@ import it.unibo.lmc.pjdbc.parser.Token;
 
 public class Expression {
 	
+	Token left = null;
+	Token right = null;
+	IOperation operation = null;
 	
 	public Expression(IOperation op,Token tk1, Token tk2) {
-		
 		//token: o numeri o variabili 
-		
+		this.left = tk1;
+		this.right = tk2;
+		this.operation = op;
 	}
 	
 	
@@ -23,5 +27,8 @@ public class Expression {
 		return null;
 	}
 	
+	public String toString(){
+		return "[" + left.toString() + " " + this.operation.toString()  + " " + right.toString() + "]";
+	}
 	
 }

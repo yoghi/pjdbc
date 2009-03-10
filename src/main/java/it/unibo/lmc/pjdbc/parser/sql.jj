@@ -123,16 +123,18 @@ TOKEN: /* OPERATORS */
 
 TOKEN :
 {
+
 	< S_IDENTIFIER: ( <LETTER>|<SPECIAL_CHARS> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
 	| < #LETTER: ["a"-"z","A"-"Z"]>
 	| < #SPECIAL_CHARS: "$" | "_">
 	| < S_BIND: ":" <S_IDENTIFIER> ("." <S_IDENTIFIER>)? >
 	| < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
 	| < S_QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])* "\"" >
-	| < S_NUMBER: <FLOAT> | <FLOAT> ( ["e","E"] ([ "-","+"])? <FLOAT> )? >
-	| < #FLOAT: <S_INTEGER> | <S_INTEGER> ( "." <S_INTEGER> )? | "." <S_INTEGER> >
+	
+	| < S_DOUBLE: ((<S_INTEGER>)? "." <S_INTEGER> ( ["e","E"] ([ "-","+"])? <S_INTEGER> )? |(<S_INTEGER>)+ (".")? ["e","E"] ([ "-","+"])? (<S_INTEGER>)+ )>
 	| < S_INTEGER: ( <DIGIT> )+ >
 	| < #DIGIT: ["0"-"9"]>
+
 }
 
 
@@ -461,7 +463,7 @@ ArrayList<OrderBy> OrderByElements():
 OrderBy OrderByElement():
 {
 	OrderBy orderByElement = new OrderBy(); 
-	TableSpecificField columnReference = null;
+	TableField columnReference = null;
 }
 {
 	columnReference = ColumnReference()
@@ -479,15 +481,24 @@ Limit Limit():
 }
 {
 	(
-		
 		// mysql-> LIMIT offset,row_count
-		<K_LIMIT> 
-		 (
-		 	token=<S_INTEGER> { limit.setOffset(Long.parseLong(token.image)); } 
-		 ) 
-		","  
+		LOOKAHEAD(3)
 		(
-		token=<S_INTEGER> { limit.setRowCount(Long.parseLong(token.image)); }
+			<K_LIMIT>
+			 (
+			 	token=<S_INTEGER> { limit.setOffset(Long.parseLong(token.image)); } 
+			 ) 
+			","  
+			(
+			token=<S_INTEGER> { limit.setRowCount(Long.parseLong(token.image)); }
+			)
+		)
+		|
+		(
+			<K_LIMIT>
+			(
+			token=<S_INTEGER> { limit.setRowCount(Long.parseLong(token.image)); }
+			)
 		)
 			
 	)
@@ -513,15 +524,18 @@ Token ComparisonItem() :
 	Token tk;
 }
 {
-  (
-    tk=<S_CHAR_LITERAL>
-    |
-    tk=<S_NUMBER>
-  )
-
-   {
-      return tk;
-   }
+	(
+		tk=<S_CHAR_LITERAL>
+		|
+		tk=<S_DOUBLE>
+		|
+		tk=<S_INTEGER>
+		|
+		tk=<S_IDENTIFIER>
+	)
+	{
+		return tk;
+	}
 }
 
 Expression Expression():
@@ -529,13 +543,14 @@ Expression Expression():
 	Expression exp;
 }
 {
-	"("
+	
 	( LOOKAHEAD(2)
 		exp=AritmeticExpression()
 		|
 		exp=BooleanExpression()
-		)
-	")"
+		| 
+		"(" exp = Expression() ")"
+	)
 	{
 		return exp;
 	}
