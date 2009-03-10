@@ -18,8 +18,8 @@ package it.unibo.lmc.pjdbc.parser;
 import it.unibo.lmc.pjdbc.core.Expression;
 import it.unibo.lmc.pjdbc.core.expression.IOperation;
 import it.unibo.lmc.pjdbc.core.expression.Operator;
-import it.unibo.lmc.pjdbc.core.expression.CompareOperation;
-import it.unibo.lmc.pjdbc.core.expression.AritmeticOperation;
+import it.unibo.lmc.pjdbc.core.expression.imp.AritmeticOperation;
+import it.unibo.lmc.pjdbc.core.expression.imp.CompareOperation;
 import it.unibo.lmc.pjdbc.parser.commons.Limit;
 import it.unibo.lmc.pjdbc.parser.commons.OrderBy;
 
@@ -314,6 +314,12 @@ TableField Column():
     	field.setDistinct(distinct);
     	return field;
    	}
+   	|
+   	"*"
+   	{
+   		field = new TableField("*");
+   		return field;
+   	}
 }
 
 String RelObjectName()  :
@@ -365,7 +371,7 @@ Select Select():
 	Select select = new Select(this.defaultSchema);
 	TableField field;
 	
-	List fromList;
+	List<Table> fromList;
 	List group;
 	List order;
 	
@@ -392,9 +398,9 @@ String Alias():
    { return retval; }
 }
 
-List FromItemsList():
+List<Table> FromItemsList():
 {
-	ArrayList fromItemsList = new ArrayList();
+	ArrayList<Table> fromItemsList = new ArrayList<Table>();
 	Table t = null;
 }
 {

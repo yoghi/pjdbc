@@ -3,7 +3,7 @@
  */
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.schema.TableField;
+import it.unibo.lmc.pjdbc.core.schema.TableSpecificField;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -29,7 +29,7 @@ import alice.tuprolog.UnknownVarException;
  */
 public class PrologMetaData implements DatabaseMetaData {
 	
-	private Hashtable<String,ArrayList<TableField>> table = new Hashtable<String,ArrayList<TableField>>();
+	private Hashtable<String,ArrayList<TableSpecificField>> table = new Hashtable<String,ArrayList<TableSpecificField>>();
 
 	/**
 	 * Costruttore 
@@ -51,17 +51,17 @@ public class PrologMetaData implements DatabaseMetaData {
 				
 				if ( table_name.isAtom() && field_name.isAtom() &&  (field_position instanceof Number)  && field_type.isAtom() ){ 
 					
-					ArrayList<TableField> fields = null;
+					ArrayList<TableSpecificField> fields = null;
 					
 					if ( !this.table.containsKey(table_name.toString()) ) {
-						fields = new ArrayList<TableField>();
+						fields = new ArrayList<TableSpecificField>();
 						this.table.put(table_name.toString(), fields);
 						Logger.getLogger("it.unibo.lmc.pjdbc").debug("trovati metadati tabella "+table_name.toString());
 					} else {	
-						fields = (ArrayList<TableField>) this.table.get(table_name.toString());
+						fields = (ArrayList<TableSpecificField>) this.table.get(table_name.toString());
 					}
 					
-					TableField f = new TableField(field_name.toString());
+					TableSpecificField f = new TableSpecificField(field_name.toString());
 					f.setPositionInTable(((Number)field_position).intValue());
 					
 					if ( field_type.toString().equals("int") ) f.setType( java.sql.Types.INTEGER );
@@ -254,7 +254,7 @@ public class PrologMetaData implements DatabaseMetaData {
         for (int i = 0; i < t.size(); i++) {
         	
         	res.moveToInsertRow();
-        	TableField f = (TableField) t.get(i);
+        	TableSpecificField f = (TableSpecificField) t.get(i);
         	res.updateString(0, null);
         	res.updateString(1, null);
         	res.updateString(2, tableNamePattern);

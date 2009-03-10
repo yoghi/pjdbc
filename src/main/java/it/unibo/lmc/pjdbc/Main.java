@@ -30,6 +30,8 @@ public class Main {
 			
 			ResultSet rs2 = stmt.executeQuery("select id from employee;");
 			
+			ResultSet rs3 = stmt.executeQuery("select * from employee;");
+			
 			/*
 			while(rs.next()) {
 	            String name = rs.getString("name");

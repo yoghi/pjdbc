@@ -1,6 +1,5 @@
 package it.unibo.lmc.pjdbc.driver;
 
-
 import it.unibo.lmc.pjdbc.core.IDatabase;
 import it.unibo.lmc.pjdbc.core.PrologLocalDB;
 
@@ -21,6 +20,7 @@ import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
 
+import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.Prolog;
 
 public class PrologConnection implements Connection {
@@ -47,9 +47,14 @@ public class PrologConnection implements Connection {
 	private IDatabase db;
 
 	/**
-	 * Costruttore 
+	 * Connesione ad un database Prolog 
 	 * @param url_totale url passato al factory
 	 * @param url_specifico informazioni per accedere al database
+	 *  <i>database_location;database_name</i> 
+	 * 	<ul>
+	 * 		<li>database_name : se il database è un contenitore di piu database scelgo quale usare</li>
+	 *  	<li>database_location : indico il percorso per raggiungere il database (host@port or filename)</li>
+	 * 	</ul>
 	 * @throws SQLException ...
 	 * TODO gestire le ecezzioni 
 	 */
@@ -66,7 +71,9 @@ public class PrologConnection implements Connection {
 			}
 			
 			if ( this.sourceUrl.contains("@") ) {
-				//host
+				String[] hs = this.sourceUrl.split("@");
+				String host = hs[0];
+				int port = Integer.parseInt(hs[1]);
 				//this.db = new PrologRemoteDB();
 			} else {
 				//file
@@ -74,8 +81,8 @@ public class PrologConnection implements Connection {
 			}
 			
 
-//		} catch (InvalidTheoryException e) {
-//			throw new SQLException("Prolog database internal error : "+ e.toString());
+		} catch (InvalidTheoryException e) {
+			throw new SQLException("Prolog database internal error : "+ e.toString());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -123,9 +130,7 @@ public class PrologConnection implements Connection {
 
 	
 	public Statement createStatement() throws SQLException {
-		//return new PrologStatement(this, this.dbengine);
-		/** @todo da sistemare */
-		return null;
+		return new PrologStatement(this, this.db);
 	}
 
 	

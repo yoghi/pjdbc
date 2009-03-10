@@ -2,9 +2,11 @@ package it.unibo.lmc.pjdbc.core.request.imp;
 
 import it.unibo.lmc.pjdbc.core.Expression;
 import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
-import it.unibo.lmc.pjdbc.core.schema.TableField;
+import it.unibo.lmc.pjdbc.core.schema.Table;
+import it.unibo.lmc.pjdbc.core.schema.TableSpecificField;
 import it.unibo.lmc.pjdbc.parser.commons.Limit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,24 +18,27 @@ import java.util.List;
  *
  */
 public class Select extends ParsedRequest {
+	
+	List<Table> fromTable = null;
+	
+	List<TableSpecificField> campiRicerca = new ArrayList<TableSpecificField>();
+	
+	Expression whereClausole = null;
 
 	public Select(String schema) {
 		super(schema);
 	}
 
-	public void addField(TableField field) {
-		// TODO Auto-generated method stub
-		
+	public void addField(TableSpecificField field) {
+		this.campiRicerca.add(field);
 	}
 
-	public void from(List fromList) {
-		// TODO Auto-generated method stub
-		
+	public void from(List<Table> fromList) {
+		this.fromTable = fromList;
 	}
 
 	public void where(Expression where) {
-		// TODO Auto-generated method stub
-		
+		this.whereClausole = where;
 	}
 
 	public void groupBy(List group) {
@@ -49,6 +54,25 @@ public class Select extends ParsedRequest {
 	public void limit(Limit limit) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public String toString() {
+		
+		String fieldList = "";
+		for (TableSpecificField t : this.campiRicerca) {
+			fieldList += t+",";
+		}
+		
+		String tableList = "";
+		for (Table t : this.fromTable) {
+			tableList += t+",";
+		}
+		
+		String res = "select " + fieldList.substring(0, fieldList.length()-1) + " from "+tableList.substring(0, tableList.length()-1);
+		
+		if ( null != this.whereClausole ) res = res + " where " + this.whereClausole.toString() ;
+		
+		return res; 
 	}
 	
 	

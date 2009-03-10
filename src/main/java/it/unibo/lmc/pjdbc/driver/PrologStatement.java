@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import it.unibo.lmc.pjdbc.core.IDatabase;
 import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
@@ -13,20 +14,22 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import alice.tuprolog.Theory;
-
 public class PrologStatement implements Statement {
 
 	private PrologConnection conn = null;
-	private Theory dbengine = null;
+	private IDatabase database = null;
+	
 	private Psql parse = null;
 	private StringReader currentQuery = null;
 	
-	public PrologStatement(PrologConnection connection,Theory db) {
+	private Logger log;
+	
+	
+	
+	public PrologStatement(PrologConnection connection,IDatabase database) {
 		this.conn = connection;
-		this.dbengine = db;
-		this.currentQuery = new StringReader("");
-		this.parse = new Psql(this.currentQuery);
+		this.database = database;
+		log = Logger.getLogger(PrologStatement.class);
 	}
 
 	public void addBatch(String sql) throws SQLException {
@@ -83,11 +86,15 @@ public class PrologStatement implements Statement {
 	 */
 	public ResultSet executeQuery(String sql) throws SQLException {
 		
-		Logger.getLogger("it.unibo.lmc.pjdbc").debug("eseguo query: \""+sql+"\"");
+		log.debug("eseguo la query: \""+sql+"\"");
 		
 		this.currentQuery = new StringReader(sql);
 		
-		this.parse.ReInit(this.currentQuery);
+		if ( null == this.parse ) {
+			this.parse = new Psql(this.currentQuery);
+		} else {
+			this.parse.ReInit(this.currentQuery);
+		}
 		
 		ParsedRequest pRequest = null;
 		
@@ -99,6 +106,7 @@ public class PrologStatement implements Statement {
 		}
 		
 		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
+		log.info(pRequest.toString());
 		
 		return null;
 	}

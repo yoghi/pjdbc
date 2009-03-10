@@ -64,22 +64,13 @@ public class PrologLocalDB implements IDatabase {
 	 */
 	HashMap<String, Theory> savePoint = new HashMap<String, Theory>();
 	
-//	/**
-//	 * Costruttore PrologDB
-//	 * @param th teoria prolog da usare come base del DB.
-//	 */
-//	public PrologLocalDB(String schemaName,Theory th){
-//		
-//		this.schema = schemaName;
-//		this.current_theory = th;
-//		
-//		this.createMeta();
-//		
-//		
-//	}
-	
-	
-	public PrologLocalDB(String sourceUrl) throws IOException {
+	/**
+	 * Database locale scritto in prolog 	
+	 * @param sourceUrl path del file contenente il db prolog
+	 * @throws IOException
+	 * @throws InvalidTheoryException 
+	 */
+	public PrologLocalDB(String sourceUrl) throws IOException, InvalidTheoryException {
 		
 		File file = new File(sourceUrl);
 		boolean exists = file.exists();
@@ -118,15 +109,26 @@ public class PrologLocalDB implements IDatabase {
 		
 	}
 	
-	private void load_theory(File file) throws FileNotFoundException, IOException {
+	/**
+	 * Carico la teoria/db da un file
+	 * @param file file da cui caricare la teoria
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws InvalidTheoryException
+	 */
+	private void load_theory(File file) throws FileNotFoundException, IOException, InvalidTheoryException {
 		
 		this.log.debug("Avvio prolog db engine");
 
-//		this.dbengine = new Prolog();
-		this.current_theory = new Theory(new FileInputStream(file));
+		Theory th = new Theory(new FileInputStream(file));
 		
-//		this.log.debug("Setto la teoria prolog");
-//		this.dbengine.setTheory(t);
+		this.log.debug("Verifico la teoria prolog");
+		
+		Prolog engine = new Prolog();
+		
+		engine.setTheory(th);
+		
+		this.current_theory = th;
 		
 //		try {
 //			this.databaseMetaData = new PrologMetaData(this.dbengine);
@@ -137,6 +139,9 @@ public class PrologLocalDB implements IDatabase {
 		
 	}
 
+	/**
+	 * Inizializzo il sistema di logging
+	 */
 	protected void logger_init() {
 		PropertyConfigurator.configure(properties);
 		log = Logger.getLogger("it.unibo.lmc.pjdbc");
@@ -166,8 +171,6 @@ public class PrologLocalDB implements IDatabase {
 				engine.setTheory(this.current_theory);
 				
 				SolveInfo s = engine.solve(request.toString());
-				
-				engine.getTheory();
 				
 				while(s.isSuccess()){
 					lista.add(s);

@@ -13,4 +13,6 @@ public abstract class ParsedRequest implements IRequest {
 		return this.defaultSchema;
 	}
 	
+	abstract public String toString();
+	
 }
