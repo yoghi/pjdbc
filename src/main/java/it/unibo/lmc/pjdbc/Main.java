@@ -32,6 +32,8 @@ public class Main {
 			
 			ResultSet rs2bis = stmt.executeQuery("select id,idRef from employee where id == idRef;");	//cerco i figli che sono anche padri...
 			
+			ResultSet rs2bis2 = stmt.executeQuery("select id from employee where ( (id == 1) AND (idRed > 2) );");
+			
 			ResultSet rs3 = stmt.executeQuery("select * from employee limit 5;");
 			
 			ResultSet rs4 = stmt.executeQuery("select * from employee limit 5,15;");

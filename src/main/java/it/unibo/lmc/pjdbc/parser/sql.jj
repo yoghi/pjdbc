@@ -540,70 +540,74 @@ Token ComparisonItem() :
 
 Expression Expression():
 {
-	Expression exp;
+	Expression exp1;
 }
-{
-	
-	( LOOKAHEAD(2)
-		exp=AritmeticExpression()
+{		
+	( LOOKAHEAD(2) 
+		"(" exp1 = Expression() ")"
 		|
-		exp=BooleanExpression()
-		| 
-		"(" exp = Expression() ")"
+		exp1 = UnaryExpression()
 	)
 	{
 		return exp;
 	}
 }
 
-Expression AritmeticExpression():
+Expression UnaryExpression():
 {
-	IOperation op;
-	Token tk1;
-	Token tk2;
+	Expression exp1;
+	Expression exp2;
+	IOperator cond;
 }
 {
-	( 
-		tk1=ComparisonItem() 
-		(
-		"+" { op = new Operator(AritmeticOperation.ADD); }
+	( LOOKAHEAD(LogicCondition() AritmeticCondition()) 
+		exp1 = ComparisonItem()
 		|
-		"-" { op = new Operator(AritmeticOperation.SUB); }
-		|
-		"*" { op = new Operator(AritmeticOperation.MUL); }
-		|
-		"/" { op = new Operator(AritmeticOperation.DIV); }
-		)
-		tk2=ComparisonItem()
+		"(" exp1 = UnaryExpression() ")" cond=Condition() "(" exp2 = UnaryExpression() ")"
 	)
 	{
-		return new Expression(op,tk1,tk2);
+		return new Expression(exp1,exp2,cond);
 	}
 }
 
-Expression BooleanExpression():
+Token Condition():
 {
-	IOperation op;
-	Token tk1;
-	Token tk2;
 }
 {
-	( 
-		tk1=ComparisonItem() 
-			(
-			"<" { op = new Operator(CompareOperation.MINOR); } 
-			| 
-			">" { op = new Operator(CompareOperation.MAJOR); } 
-			|
-			"<=" { op = new Operator(CompareOperation.MINOREQUAL); } 
-			| 
-			">=" { op = new Operator(CompareOperation.MAJOREQUAL); } 
-			|  
-			"==" { op = new Operator(CompareOperation.EQUAL); } 
-		)  
-		tk2=ComparisonItem()
+	(LOOKAHEAD(1)
+		LogicCondition()
+		|
+		AritmeticCondition()
 	)
 	{
-		return new Expression(op,tk1,tk2);
+		return null;
+	}
+}
+
+Token LogicCondition():
+{
+}
+{
+	(LOOKAHEAD(1)
+		<K_AND>
+		|
+		<K_OR>
+	)
+	{
+		return null;
+	}
+}
+
+Token AritmeticCondition():
+{
+}
+{
+	(LOOKAHEAD(1)
+		"+"
+		|
+		"-"
+	)
+	{
+		return null;
 	}
 }
