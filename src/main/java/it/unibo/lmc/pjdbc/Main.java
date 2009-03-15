@@ -28,11 +28,19 @@ public class Main {
 			
 			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
 			
-			ResultSet rs2 = stmt.executeQuery("select id from employee where id == 1;");
+			ResultSet rs21bis = stmt.executeQuery("select id from employee where true;");
 			
-			ResultSet rs2bis = stmt.executeQuery("select id,idRef from employee where id == idRef;");	//cerco i figli che sono anche padri...
+			ResultSet rs21 = stmt.executeQuery("select id from employee where (true);");
 			
-			ResultSet rs2bis2 = stmt.executeQuery("select id from employee where ( (id == 1) AND (idRed > 2) );");
+			ResultSet rs22 = stmt.executeQuery("select id from employee where (id == 1);");
+			
+			ResultSet rs2bis = stmt.executeQuery("select id,idRef from employee where (id == idRef);");	//cerco i figli che sono anche padri...
+			
+			ResultSet rs2bis3 = stmt.executeQuery("select id from employee where (id == 1) ;");
+			
+			ResultSet rs2bis2 = stmt.executeQuery("select id,idRef from employee where ( (id == 1) AND (idRef > 2) );");
+			
+			ResultSet rs2bis4 = stmt.executeQuery("select id,idRef from employee where ( ( (id == 1) AND (idRef > 2) ) AND (idRef + 1) ) limit 5 ;");
 			
 			ResultSet rs3 = stmt.executeQuery("select * from employee limit 5;");
 			

@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.core.request.imp;
 
-import it.unibo.lmc.pjdbc.core.Expression;
+import it.unibo.lmc.pjdbc.core.expression.Expression;
 import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 import it.unibo.lmc.pjdbc.core.schema.TableField;

@@ -15,11 +15,14 @@ package it.unibo.lmc.pjdbc.parser;
 //import alice.tuprolog.Prolog;
 
 //CORE
-import it.unibo.lmc.pjdbc.core.Expression;
-import it.unibo.lmc.pjdbc.core.expression.IOperation;
-import it.unibo.lmc.pjdbc.core.expression.Operator;
-import it.unibo.lmc.pjdbc.core.expression.imp.AritmeticOperation;
-import it.unibo.lmc.pjdbc.core.expression.imp.CompareOperation;
+import it.unibo.lmc.pjdbc.core.expression.Expression;
+import it.unibo.lmc.pjdbc.core.expression.ICondition;
+import it.unibo.lmc.pjdbc.core.expression.condition.AritmeticCondition;
+import it.unibo.lmc.pjdbc.core.expression.condition.AndCondition;
+import it.unibo.lmc.pjdbc.core.expression.condition.EqualCondition;
+import it.unibo.lmc.pjdbc.core.expression.condition.MajorCondition;
+import it.unibo.lmc.pjdbc.core.expression.condition.MinorCondition;
+import it.unibo.lmc.pjdbc.core.expression.condition.OrCondition;
 import it.unibo.lmc.pjdbc.parser.commons.Limit;
 import it.unibo.lmc.pjdbc.parser.commons.OrderBy;
 
@@ -130,6 +133,9 @@ TOKEN :
 	| < S_BIND: ":" <S_IDENTIFIER> ("." <S_IDENTIFIER>)? >
 	| < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
 	| < S_QUOTED_IDENTIFIER: "\"" (~["\n","\r","\""])* "\"" >
+	
+	| < S_LPAR: "(" >
+	| < S_RPAR: ")" >
 	
 	| < S_DOUBLE: ((<S_INTEGER>)? "." <S_INTEGER> ( ["e","E"] ([ "-","+"])? <S_INTEGER> )? |(<S_INTEGER>)+ (".")? ["e","E"] ([ "-","+"])? (<S_INTEGER>)+ )>
 	| < S_INTEGER: ( <DIGIT> )+ >
@@ -525,6 +531,7 @@ Token ComparisonItem() :
 }
 {
 	(
+		
 		tk=<S_CHAR_LITERAL>
 		|
 		tk=<S_DOUBLE>
@@ -538,76 +545,158 @@ Token ComparisonItem() :
 	}
 }
 
+ICondition Condition():
+{
+	ICondition cond;
+}
+{
+	(
+		cond = LogicCondition()
+		|
+		cond = AritmeticCondition()
+		|
+		cond = ComparisonCondition()
+	)
+	{
+		return cond;
+	}
+}
+
+ICondition LogicCondition():
+{
+	ICondition cond;
+}
+{
+	(
+		<K_AND>	{ cond = new AndCondition(); }
+		|
+		<K_OR> { cond = new OrCondition(); }
+	)
+	{
+		return cond;
+	}
+}
+
+ICondition ComparisonCondition():
+{
+	ICondition cond;
+}
+{
+	(
+		"<" { cond = new MinorCondition(false); } 
+		| 
+		">" { cond = new MajorCondition(false); } 
+		|
+		"<=" { cond = new MinorCondition(true); } 
+		| 
+		">=" { cond = new MajorCondition(true); } 
+		|  
+		"==" { cond = new EqualCondition(); } 
+	)
+	{
+		return cond;
+	}
+}
+
+ICondition AritmeticCondition():
+{
+	ICondition cond;
+}
+{
+	(
+		"+" { cond = new AritmeticCondition("+");  }
+		|
+		"-"	{ cond = new AritmeticCondition("-");  }
+		|
+		"*" { cond = new AritmeticCondition("*");  }
+		|
+		"/" { cond = new AritmeticCondition("/");  }
+	)
+	{
+		return cond;
+	}
+}
+
 Expression Expression():
 {
-	Expression exp1;
+	Expression result = null;
+	Token item;
 }
-{		
-	( LOOKAHEAD(2) 
-		"(" exp1 = Expression() ")"
+{
+	( 
+		LOOKAHEAD ( 4 ) 
+		result = DirectExpression() { return result; }
 		|
-		exp1 = UnaryExpression()
+		result = SimpleExpression() { return result; }
+		|
+		item = ComparisonItem() { return new Expression(item);  }
 	)
+
+}
+
+Expression DirectExpression():
+{
+	Expression result,right;
+	ICondition cond;
+	Token item;
+}
+{
+	
+	<S_LPAR> item = ComparisonItem() { result = new Expression(item); }
+	( 
+		LOOKAHEAD ( Condition() ) 
+		cond = Condition()
+		right = Expression()
+		{
+			result = new Expression(result,right,cond);
+		}		
+	)*
+	<S_RPAR>
+	
 	{
-		return exp;
+		return result;
 	}
 }
 
-Expression UnaryExpression():
+Expression SimpleExpression():
 {
-	Expression exp1;
-	Expression exp2;
-	IOperator cond;
+	Expression left,right,result;
+	ICondition cond;
 }
 {
-	( LOOKAHEAD(LogicCondition() AritmeticCondition()) 
-		exp1 = ComparisonItem()
-		|
-		"(" exp1 = UnaryExpression() ")" cond=Condition() "(" exp2 = UnaryExpression() ")"
-	)
+	<S_LPAR>
+	left = LeftExpression() { result = left; }
+	(
+		LOOKAHEAD( Condition() ) 
+			cond = Condition()
+			right = LeftExpression()
+			{
+				result = new Expression(left,right,cond);
+			}	
+	
+	)*
+	<S_RPAR>
 	{
-		return new Expression(exp1,exp2,cond);
+		return result;
 	}
 }
 
-Token Condition():
+Expression LeftExpression():
 {
+	Expression left,right,result;
+	Token item;
+	ICondition cond;
 }
 {
-	(LOOKAHEAD(1)
-		LogicCondition()
-		|
-		AritmeticCondition()
-	)
-	{
-		return null;
-	}
-}
 
-Token LogicCondition():
-{
-}
-{
-	(LOOKAHEAD(1)
-		<K_AND>
-		|
-		<K_OR>
-	)
+	<S_LPAR> 
+		left = Expression() 
+		cond = Condition()
+		right = Expression() 
+	<S_RPAR>
 	{
-		return null;
+		result = new Expression(left,right,cond);
+		return result;
 	}
-}
-
-Token AritmeticCondition():
-{
-}
-{
-	(LOOKAHEAD(1)
-		"+"
-		|
-		"-"
-	)
-	{
-		return null;
-	}
+	
 }
