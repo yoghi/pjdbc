@@ -172,7 +172,7 @@ public class testSelect extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select $0 from employee where $0=1 ;");
+			ResultSet rs = stmt.executeQuery("select $0 from employee where $0==1 ;");
 			String id = rs.getString(0);
 			assertEquals(id, "1");
 			

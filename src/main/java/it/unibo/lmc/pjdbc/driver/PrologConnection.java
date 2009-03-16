@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
-import it.unibo.lmc.pjdbc.core.PrologLocalDB;
+import it.unibo.lmc.pjdbc.core.database.PrologLocalDB;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,19 +21,18 @@ import java.util.Map;
 import java.util.Properties;
 
 import alice.tuprolog.InvalidTheoryException;
-import alice.tuprolog.Prolog;
 
 public class PrologConnection implements Connection {
 
 	/**
 	 * Prolog Engine
 	 */
-	private Prolog dbengine = null;
+//	private Prolog dbengine = null;
 	
 	/**
 	 * Nome database
 	 */
-	private String database;
+	private String databaseName;
 	
 	/**
 	 * Filename o host
@@ -45,6 +44,22 @@ public class PrologConnection implements Connection {
 	 * Database
 	 */
 	private IDatabase db;
+	
+	/**
+	 * The transaction isolation level for this
+     * <code>Connection</code> object to the one given.
+     * Level one of the following <code>Connection</code> constants:
+     *        <code>Connection.TRANSACTION_READ_UNCOMMITTED = 1</code>,
+     *        <code>Connection.TRANSACTION_READ_COMMITTED = 2</code>,
+     *        <code>Connection.TRANSACTION_REPEATABLE_READ = 4</code>, or
+     *        <code>Connection.TRANSACTION_SERIALIZABLE = 8</code>.
+     *        (Note that <code>Connection.TRANSACTION_NONE</code> cannot be used because it specifies that transactions are not supported.)
+     * @see DatabaseMetaData#supportsTransactionIsolationLevel 
+     * @see #getTransactionIsolation 
+	 */
+	private int transactionLevel = 1;
+	
+	private boolean autoCommit = true;
 
 	/**
 	 * Connesione ad un database Prolog 
@@ -67,13 +82,13 @@ public class PrologConnection implements Connection {
 			this.sourceUrl = url[0];
 			
 			if ( url.length == 2 ) {
-				this.database = url[1];
+				this.databaseName = url[1];
 			}
 			
 			if ( this.sourceUrl.contains("@") ) {
-				String[] hs = this.sourceUrl.split("@");
-				String host = hs[0];
-				int port = Integer.parseInt(hs[1]);
+//				String[] hs = this.sourceUrl.split("@");
+//				String host = hs[0];
+//				int port = Integer.parseInt(hs[1]);
 				//this.db = new PrologRemoteDB();
 			} else {
 				//file
@@ -106,7 +121,6 @@ public class PrologConnection implements Connection {
 	
 	public void commit() throws SQLException {
 		
-
 	}
 
 	
@@ -140,9 +154,7 @@ public class PrologConnection implements Connection {
 	}
 
 	
-	public Statement createStatement(int resultSetType,
-			int resultSetConcurrency, int resultSetHoldability)
-			throws SQLException {
+	public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
 		return null;
 	}
 
@@ -155,16 +167,14 @@ public class PrologConnection implements Connection {
 
 	
 	public boolean getAutoCommit() throws SQLException {
-		
-		return false;
+		return this.autoCommit;
 	}
-
 
 	/**
 	 * Il catalog coincide per semplicità con il database
 	 */
 	public String getCatalog() throws SQLException {
-		return this.database;
+		return this.databaseName;
 	}
 
 	
@@ -195,7 +205,7 @@ public class PrologConnection implements Connection {
 
 	
 	public int getTransactionIsolation() throws SQLException {
-		return 0;
+		return this.transactionLevel;
 	}
 
 	
@@ -353,8 +363,8 @@ public class PrologConnection implements Connection {
 
 	
 	public void setTransactionIsolation(int level) throws SQLException {
-		
-
+		this.transactionLevel = level;
+		//TODO aggiornare il monitor usato per gestire le transazioni
 	}
 
 	

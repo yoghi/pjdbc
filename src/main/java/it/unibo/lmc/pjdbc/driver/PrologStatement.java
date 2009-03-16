@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
-import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 
@@ -86,7 +86,7 @@ public class PrologStatement implements Statement {
 	 */
 	public ResultSet executeQuery(String sql) throws SQLException {
 		
-		log.debug("eseguo la query: \""+sql+"\"");
+		log.info("query: \""+sql+"\"");
 		
 		this.currentQuery = new StringReader(sql);
 		
@@ -106,7 +106,11 @@ public class PrologStatement implements Statement {
 		}
 		
 		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
-		log.info(pRequest.toString());
+		log.debug(pRequest.toString());
+		
+		//pRequest
+		
+		//this.database.
 		
 		return null;
 	}
@@ -132,8 +136,7 @@ public class PrologStatement implements Statement {
 	}
 
 	public Connection getConnection() throws SQLException {
-		
-		return null;
+		return this.conn;
 	}
 
 	public int getFetchDirection() throws SQLException {

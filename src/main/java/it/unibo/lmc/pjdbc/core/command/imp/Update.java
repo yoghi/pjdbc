@@ -1,9 +1,9 @@
-package it.unibo.lmc.pjdbc.core.request.imp;
+package it.unibo.lmc.pjdbc.core.command.imp;
 
 import java.util.HashMap;
 
+import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.expression.Expression;
-import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 
 /**

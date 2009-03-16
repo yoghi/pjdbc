@@ -3,7 +3,8 @@ package it.unibo.lmc.pjdbc.core;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import it.unibo.lmc.pjdbc.core.request.IRequest;
+import it.unibo.lmc.pjdbc.core.command.IRequest;
+import it.unibo.lmc.pjdbc.core.database.PrologLocalDB;
 import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.NoMoreSolutionException;
 import alice.tuprolog.NoSolutionException;

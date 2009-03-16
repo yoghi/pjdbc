@@ -90,7 +90,7 @@
 		</plugins>
 	</reporting>
 	<build>
-		<finalName>brill_tatpa</finalName>
+		<finalName>pjdbc</finalName>
 
 		<!-- FTP support -->
 		<extensions>
@@ -127,6 +127,7 @@
 			</plugin>
 
 			<!-- possibilita di compile JDK 1.6 -->
+			<!-- 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>RELEASE</version>
@@ -139,6 +140,7 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			-->
 
 		</plugins>
 	</build>

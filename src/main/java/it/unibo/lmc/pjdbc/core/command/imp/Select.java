@@ -1,7 +1,7 @@
-package it.unibo.lmc.pjdbc.core.request.imp;
+package it.unibo.lmc.pjdbc.core.command.imp;
 
+import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.expression.Expression;
-import it.unibo.lmc.pjdbc.core.request.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 import it.unibo.lmc.pjdbc.core.schema.TableField;
 import it.unibo.lmc.pjdbc.parser.commons.Limit;
@@ -44,13 +44,11 @@ public class Select extends ParsedRequest {
 	}
 
 	public void groupBy(List group) {
-		// TODO Auto-generated method stub
-		
+		// TODO da fare groupBy
 	}
 
 	public void orderBy(List order) {
-		// TODO Auto-generated method stub 
-		
+		//TODO da fare OrderBy
 	}
 
 	public void limit(Limit limit) {
