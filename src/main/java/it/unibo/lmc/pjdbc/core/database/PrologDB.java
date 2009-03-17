@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
+import it.unibo.lmc.pjdbc.utils.CacheTheoryString;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,6 +21,11 @@ public abstract class PrologDB implements IDatabase {
 	protected Theory current_theory;
 	
 	/**
+	 * Cache della theory sottoforma di stringhe
+	 */
+	protected CacheTheoryString cache = new CacheTheoryString();
+	
+	/**
 	 * Carico la teoria/db prolog  
 	 * @throws FileNotFoundException
 	 * @throws IOException
@@ -27,23 +33,23 @@ public abstract class PrologDB implements IDatabase {
 	 */
 	protected void load_theory() throws FileNotFoundException, IOException, InvalidTheoryException {
 		
-		StringBuffer buff = new StringBuffer();
-		
 		int i = 0;
 		String line = this.readRow(i);
 		while(line != null ){
-			buff.append(line);
 			i++;
+			this.cache.add(line);
 			line = this.readRow(i);
 		}
 		
-		Theory th = new Theory(buff.toString());
+		Theory th = new Theory(this.cache.toString());
 	
 		Prolog engine = new Prolog();
 		
 		engine.setTheory(th);
 		
 		this.current_theory = th;
+		
+		System.out.println(this.cache.toString());
 		
 //		try {
 //			this.databaseMetaData = new PrologMetaData(this.dbengine);

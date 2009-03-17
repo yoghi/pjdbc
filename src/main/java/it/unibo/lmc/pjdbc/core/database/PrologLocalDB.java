@@ -1,11 +1,11 @@
 package it.unibo.lmc.pjdbc.core.database;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -26,13 +26,16 @@ public class PrologLocalDB extends PrologDB {
 	 * Properties / custumization
 	 */
 	private Properties properties = new Properties();
-	
-	private String[] cache;
 
 	/**
 	 * Logger 
 	 */
 	private Logger log = null;
+	
+	/**
+	 * Reader of prolog file
+	 */
+	BufferedReader input;
 	
 	
 	/**
@@ -43,8 +46,8 @@ public class PrologLocalDB extends PrologDB {
 	 */
 	public PrologLocalDB(String sourceUrl) throws IOException, InvalidTheoryException {
 		
-		File file = new File(sourceUrl);
-		boolean exists = file.exists();
+		File filePrologDB = new File(sourceUrl);
+		boolean exists = filePrologDB.exists();
 	    
 	    if ( exists ) {
 	    	String userDir = System.getProperty("user.dir");
@@ -54,11 +57,13 @@ public class PrologLocalDB extends PrologDB {
 	    		sourceUrl = userDir + File.separator + sourceUrl;
 	    	}
 	    } else {
-	    	System.out.println("Impossibile caricare il db: "+file.getAbsolutePath());
-	    	boolean success = file.createNewFile();
-	    	if ( success ) System.out.println("Creato database vuoto: "+file.getAbsolutePath());
-	    	else throw new IOException("Impossibile creare: "+file.getAbsolutePath());
+	    	System.out.println("Impossibile caricare il db: "+filePrologDB.getAbsolutePath());
+	    	boolean success = filePrologDB.createNewFile();
+	    	if ( success ) System.out.println("Creato database vuoto: "+filePrologDB.getAbsolutePath());
+	    	else throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
 	    }
+	    
+	    input = new BufferedReader(new FileReader(filePrologDB));
 	    
 	    File propFile = new File(sourceUrl+".properties");
 	    
@@ -74,14 +79,12 @@ public class PrologLocalDB extends PrologDB {
 		
 		this.logger_init();
 		
-		this.cache = this.readAllFromFile(file);		//leggo il database e lo metto in cache
-		
 		this.load_theory();
 		
 		this.readMeta();
 		
 	}
-	
+
 	/**
 	 * Inizializzo il sistema di logging
 	 */
@@ -92,23 +95,17 @@ public class PrologLocalDB extends PrologDB {
 
 	@Override
 	protected String readRow(int numLine) {
-		if ( numLine > 0 && numLine < this.cache.length ){
-			return this.cache[numLine];
+		try {
+			return input.readLine();
+		} catch (IOException e) {
+			return null;
 		}
-		return null;
-	}
-	
-	private String[] readAllFromFile(File file) throws FileNotFoundException {
-		FileInputStream finput = new FileInputStream(file);
 		
-		//TODO: devo leggere lo stream!!
-		
-		return null;
 	}
 
 	@Override
 	protected String writeRow(int numLine, String newVal) {
-		// TODO Auto-generated method stub
+		// TODO DA PENSRE BENE COME SCRIVERE UNA MODIFICA .....
 		return null;
 	}
 	

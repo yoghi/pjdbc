@@ -8,5 +8,11 @@ prova(4,2,12).
 % trovo tutti coloro che comandano
 prova(Xid,XidRef,Xval),Xid == XidRef.
 
-% DOPPIA CLAUSOLA
+% DOPPIA CLAUSOLA in AND
 prova(Xid,XidRef,Xval),Xid>2,Xval>3.
+
+% per le clausole in OR ??
+
+eseguo la clausola DX => ottengo delle row , eseguo la clausola di SX =>  ottengo delle row , unisco le row!
+
+ 
