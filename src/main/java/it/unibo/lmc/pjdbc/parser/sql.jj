@@ -24,19 +24,19 @@ import it.unibo.lmc.pjdbc.core.expression.condition.MajorCondition;
 import it.unibo.lmc.pjdbc.core.expression.condition.MinorCondition;
 import it.unibo.lmc.pjdbc.core.expression.condition.OrCondition;
 
-//OPZIONI sui COMANDI
+//OPZIONI sui DML
 import it.unibo.lmc.pjdbc.core.options.Limit;
 import it.unibo.lmc.pjdbc.core.options.OrderBy;
 
-//COMANDI
-import it.unibo.lmc.pjdbc.core.command.imp.Delete;
-import it.unibo.lmc.pjdbc.core.command.imp.CreateDB;
-import it.unibo.lmc.pjdbc.core.command.imp.DropDB;
-import it.unibo.lmc.pjdbc.core.command.imp.Drop;
-import it.unibo.lmc.pjdbc.core.command.imp.Insert;
-import it.unibo.lmc.pjdbc.core.command.imp.Select;
-import it.unibo.lmc.pjdbc.core.command.imp.Update;
-import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
+//DML ( Data manipulation Language)
+import it.unibo.lmc.pjdbc.core.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.core.dml.imp.CreateDB;
+import it.unibo.lmc.pjdbc.core.dml.imp.DropDB;
+import it.unibo.lmc.pjdbc.core.dml.imp.Drop;
+import it.unibo.lmc.pjdbc.core.dml.imp.Insert;
+import it.unibo.lmc.pjdbc.core.dml.imp.Select;
+import it.unibo.lmc.pjdbc.core.dml.imp.Update;
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
 
 //SCHEMA DB
 import it.unibo.lmc.pjdbc.core.schema.Table;
@@ -146,10 +146,10 @@ TOKEN :
 }
 
 
-ParsedRequest parseIt(String schema) : 
+ParsedCommand parseIt(String schema) : 
 {
 	this.defaultSchema = schema;
-	ParsedRequest request;
+	ParsedCommand request;
 }
 {
 	(

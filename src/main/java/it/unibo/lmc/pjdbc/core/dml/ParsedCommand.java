@@ -1,11 +1,11 @@
-package it.unibo.lmc.pjdbc.core.command;
+package it.unibo.lmc.pjdbc.core.dml;
 
 
-public abstract class ParsedRequest implements IRequest {
+public abstract class ParsedCommand implements IRequest {
 	
 	protected String defaultSchema;
 	
-	public ParsedRequest(String schema){
+	public ParsedCommand(String schema){
 		this.defaultSchema = schema;
 	}
 	
@@ -18,11 +18,5 @@ public abstract class ParsedRequest implements IRequest {
 	 * @return la forma testuale del comando
 	 */
 	abstract public String toString();
-	
-	/**
-	 * Richiesta Prolog 
-	 * @return la richiesta prolog che più si adatta alla richiesta SQL
-	 */
-//	abstract public String toProlog();
 	
 }

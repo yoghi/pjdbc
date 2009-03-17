@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
-import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 
@@ -96,7 +96,7 @@ public class PrologStatement implements Statement {
 			this.parse.ReInit(this.currentQuery);
 		}
 		
-		ParsedRequest pRequest = null;
+		ParsedCommand pRequest = null;
 		
 		try {
 			pRequest = parse.parseIt("");	//TODO: su quale schema/db eseguo la query??
@@ -107,6 +107,8 @@ public class PrologStatement implements Statement {
 		
 		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
 		log.debug(pRequest.toString());
+		
+		this.database.applyCommand(pRequest);
 		
 		//pRequest
 		

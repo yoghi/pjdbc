@@ -1,6 +1,6 @@
-package it.unibo.lmc.pjdbc.core.command.imp;
+package it.unibo.lmc.pjdbc.core.dml.imp;
 
-import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.core.expression.Expression;
 import it.unibo.lmc.pjdbc.core.options.Limit;
 import it.unibo.lmc.pjdbc.core.schema.Table;
@@ -17,7 +17,7 @@ import java.util.List;
  * @author yoghi
  *
  */
-public class Select extends ParsedRequest {
+public class Select extends ParsedCommand {
 	
 	private List<Table> fromTable = null;
 	

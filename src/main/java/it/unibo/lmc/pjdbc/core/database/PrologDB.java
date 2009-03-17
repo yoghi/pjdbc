@@ -49,8 +49,6 @@ public abstract class PrologDB implements IDatabase {
 		
 		this.current_theory = th;
 		
-		System.out.println(this.cache.toString());
-		
 //		try {
 //			this.databaseMetaData = new PrologMetaData(this.dbengine);
 //		} catch (Exception e) {

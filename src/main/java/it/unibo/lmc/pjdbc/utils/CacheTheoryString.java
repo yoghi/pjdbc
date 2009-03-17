@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.utils;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class CacheTheoryString {
@@ -79,8 +80,22 @@ public class CacheTheoryString {
 		return this.cache.size();
 	}
 	
+	/**
+	 * Restituisce il numero di elementi validi in cache
+	 * @return intero
+	 */
 	public int numValidString(){
 		return valid;
+	}
+	
+	/**
+	 * Stampo la cache
+	 * @param out lo stream su cui visualizzarla
+	 */
+	public void show(PrintStream out){
+		for (String o : this.cache) {
+			out.println(o);
+		}
 	}
 	
 }

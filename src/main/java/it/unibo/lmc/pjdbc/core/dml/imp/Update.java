@@ -1,8 +1,8 @@
-package it.unibo.lmc.pjdbc.core.command.imp;
+package it.unibo.lmc.pjdbc.core.dml.imp;
 
 import java.util.HashMap;
 
-import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.core.expression.Expression;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 
@@ -14,7 +14,7 @@ import it.unibo.lmc.pjdbc.core.schema.Table;
  * @author yoghi
  *
  */
-public class Update extends ParsedRequest {
+public class Update extends ParsedCommand {
 
 	private Table table;
 	

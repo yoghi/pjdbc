@@ -1,6 +1,6 @@
-package it.unibo.lmc.pjdbc.core.command.imp;
+package it.unibo.lmc.pjdbc.core.dml.imp;
 
-import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * @author yoghi
  *
  */
-public class Drop extends ParsedRequest {
+public class Drop extends ParsedCommand {
 
 	private ArrayList<Table> tables = new ArrayList<Table>();
 	
