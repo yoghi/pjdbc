@@ -1,6 +1,6 @@
-package it.unibo.lmc.pjdbc.core.expression.condition;
+package it.unibo.lmc.pjdbc.core.dml.expression.condition;
 
-import it.unibo.lmc.pjdbc.core.expression.ICondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.ICondition;
 
 public class AndCondition implements ICondition {
 
