@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.parser.commons;
+package it.unibo.lmc.pjdbc.core.options;
 
 public class Limit {
 

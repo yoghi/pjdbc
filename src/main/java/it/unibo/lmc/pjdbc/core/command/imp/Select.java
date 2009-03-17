@@ -2,9 +2,9 @@ package it.unibo.lmc.pjdbc.core.command.imp;
 
 import it.unibo.lmc.pjdbc.core.command.ParsedRequest;
 import it.unibo.lmc.pjdbc.core.expression.Expression;
+import it.unibo.lmc.pjdbc.core.options.Limit;
 import it.unibo.lmc.pjdbc.core.schema.Table;
 import it.unibo.lmc.pjdbc.core.schema.TableField;
-import it.unibo.lmc.pjdbc.parser.commons.Limit;
 
 import java.util.ArrayList;
 import java.util.List;

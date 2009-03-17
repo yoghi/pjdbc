@@ -31,6 +31,8 @@ public class Main {
 			PrologStatement stmt = (PrologStatement)conn.createStatement();
 			
 			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
+			
+			ResultSet rs2bis4 = stmt.executeQuery("select id,idRef from employee where ( ( (id == 1) OR (idRef > 2) ) AND (idRef + 1) ) limit 5 ;");
 			/*
 			while(rs.next()) {
 	            String name = rs.getString(0);
@@ -62,7 +64,7 @@ public class Main {
 //
 //ResultSet rs2bis2 = stmt.executeQuery("select id,idRef from employee where ( (id == 1) AND (idRef > 2) );");
 //
-//ResultSet rs2bis4 = stmt.executeQuery("select id,idRef from employee where ( ( (id == 1) AND (idRef > 2) ) AND (idRef + 1) ) limit 5 ;");
+//ResultSet rs2bis4 = stmt.executeQuery("select id,idRef from employee where ( ( (id == 1) OR (idRef > 2) ) AND (idRef + 1) ) limit 5 ;");
 //
 //ResultSet rs3 = stmt.executeQuery("select * from employee limit 5;");
 //

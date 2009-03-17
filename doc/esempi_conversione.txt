@@ -1,0 +1,12 @@
+%prova(id,idRef,val).
+prova(1,2,3).
+prova(2,2,9).
+prova(3,2,12).
+prova(4,2,12).
+
+
+% trovo tutti coloro che comandano
+prova(Xid,XidRef,Xval),Xid == XidRef.
+
+% DOPPIA CLAUSOLA
+prova(Xid,XidRef,Xval),Xid>2,Xval>3.
