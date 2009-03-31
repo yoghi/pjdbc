@@ -1,13 +1,19 @@
 package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
-import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.core.dml.Pselect;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.utils.CacheTheoryString;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.concurrent.locks.ReentrantLock;
 
 import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.Prolog;
@@ -23,9 +29,15 @@ public abstract class PrologDB implements IDatabase {
 	protected Theory current_theory;
 	
 	/**
-	 * Cache della theory sottoforma di stringhe
+	 * Cache della theory sottoforma di stringhe 
+	 * in modo da poter riscrivere più veloceente la teoria in caso di insert/update/delete 
 	 */
 	protected CacheTheoryString cache = new CacheTheoryString();
+	
+	/**
+	 * Monitor per coordinare l'accesso al database
+	 */
+	private ReentrantLock lock = new ReentrantLock();
 	
 	/**
 	 * Carico la teoria/db prolog  
@@ -51,8 +63,10 @@ public abstract class PrologDB implements IDatabase {
 		
 		this.current_theory = th;
 		
+		this.cache.show(System.out);	/** @todo da cavare ?? .*/
+		
 //		try {
-//			this.databaseMetaData = new PrologMetaData(this.dbengine);
+//			this.databaseMetaData = new PrologMetaData(dbengine);
 //		} catch (Exception e) {
 //			this.log.info(e);
 //			//throw new SQLException("metabase not present");
@@ -115,11 +129,36 @@ public abstract class PrologDB implements IDatabase {
 	 */
 	abstract protected String writeRow(int numLine,String newVal);
 	
+	public PrologResultSet applyCommand(Select rsel) {
+		
+		try {
+		
+			this.lock.lock();
+		
+			Pselect result = new Pselect(rsel);
+		
+			return result.execute(this.current_theory);
+			
+		} catch (Exception e) {
+			
+		} finally {
+			this.lock.unlock();
+		}
+		
+		return null;
+		
+	}
 	
-	public void applyCommand(ParsedCommand request, PrologResultSet result) {
-		
-		System.out.println(request.toString());
-		
+	public int applyCommand(Insert rins) {
+		return -1;
+	}
+	
+	public int applyCommand(Update rup) {
+		return -1;
+	}
+
+	public int applyCommand(Delete rdel) {
+		return -1;
 	}
 
 }

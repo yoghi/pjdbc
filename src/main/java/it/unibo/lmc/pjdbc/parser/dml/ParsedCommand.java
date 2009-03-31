@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core.dml;
+package it.unibo.lmc.pjdbc.parser.dml;
 
 
 public abstract class ParsedCommand implements IRequest {

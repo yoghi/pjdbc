@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core.dml.expression;
+package it.unibo.lmc.pjdbc.parser.dml.expression;
 
 public interface ICondition {
 

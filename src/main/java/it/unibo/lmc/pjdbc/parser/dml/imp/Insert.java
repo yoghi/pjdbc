@@ -1,8 +1,8 @@
-package it.unibo.lmc.pjdbc.core.dml.imp;
+package it.unibo.lmc.pjdbc.parser.dml.imp;
 
-import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.core.dml.expression.Expression;
-import it.unibo.lmc.pjdbc.core.schema.Table;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
+import it.unibo.lmc.pjdbc.parser.schema.Table;
 
 import java.util.HashMap;
 

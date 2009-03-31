@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.core.database;
 
-import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 
 import java.io.BufferedReader;

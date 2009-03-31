@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core.schema;
+package it.unibo.lmc.pjdbc.parser.schema;
 
 public class Table {
 

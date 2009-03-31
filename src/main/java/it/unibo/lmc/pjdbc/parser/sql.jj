@@ -15,32 +15,32 @@ package it.unibo.lmc.pjdbc.parser;
 //import alice.tuprolog.Prolog;
 
 //EXPRESSIONI 
-import it.unibo.lmc.pjdbc.core.dml.expression.Expression;
-import it.unibo.lmc.pjdbc.core.dml.expression.ICondition;
-import it.unibo.lmc.pjdbc.core.dml.expression.condition.AritmeticCondition;
-import it.unibo.lmc.pjdbc.core.dml.expression.condition.AndCondition;
-import it.unibo.lmc.pjdbc.core.dml.expression.condition.EqualCondition;
-import it.unibo.lmc.pjdbc.core.dml.expression.condition.MajorCondition;
-import it.unibo.lmc.pjdbc.core.dml.expression.condition.MinorCondition;
-import it.unibo.lmc.pjdbc.core.dml.expression.condition.OrCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
+import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.AritmeticCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.AndCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.EqualCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.MajorCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.MinorCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.OrCondition;
 
 //OPZIONI sui DML
-import it.unibo.lmc.pjdbc.core.options.Limit;
-import it.unibo.lmc.pjdbc.core.options.OrderBy;
+import it.unibo.lmc.pjdbc.parser.options.Limit;
+import it.unibo.lmc.pjdbc.parser.options.OrderBy;
 
 //DML ( Data manipulation Language)
-import it.unibo.lmc.pjdbc.core.dml.imp.Delete;
-import it.unibo.lmc.pjdbc.core.dml.imp.CreateDB;
-import it.unibo.lmc.pjdbc.core.dml.imp.DropDB;
-import it.unibo.lmc.pjdbc.core.dml.imp.Drop;
-import it.unibo.lmc.pjdbc.core.dml.imp.Insert;
-import it.unibo.lmc.pjdbc.core.dml.imp.Select;
-import it.unibo.lmc.pjdbc.core.dml.imp.Update;
-import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.parser.dml.imp.CreateDB;
+import it.unibo.lmc.pjdbc.parser.dml.imp.DropDB;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 
 //SCHEMA DB
-import it.unibo.lmc.pjdbc.core.schema.Table;
-import it.unibo.lmc.pjdbc.core.schema.TableField;
+import it.unibo.lmc.pjdbc.parser.schema.Table;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -391,7 +391,7 @@ Select Select():
 }
 {
 	<K_SELECT> field=Column() { select.addField(field); } 
-		[ "," field=Column() { select.addField(field); } ] 
+		[ ( "," field=Column() { select.addField(field); } )+ ] 
 	fromList=FromItemsList() { select.from(fromList); } 
 		[ where=WhereClause() { select.where(where); } ] 
 		[ group=GroupByColumnReferences() { select.groupBy(group); } ] 

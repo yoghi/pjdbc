@@ -18,6 +18,7 @@ public class Main {
 		
 			// SENZA METADATI
 			
+			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
 			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
 			
 			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
@@ -32,6 +33,8 @@ public class Main {
 			
 			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
 
+			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
+			
 			/*
 			while(rs.next()) {
 	            String name = rs.getString(0);

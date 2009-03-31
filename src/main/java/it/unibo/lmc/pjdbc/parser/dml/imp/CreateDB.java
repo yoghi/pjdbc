@@ -1,6 +1,6 @@
-package it.unibo.lmc.pjdbc.core.dml.imp;
+package it.unibo.lmc.pjdbc.parser.dml.imp;
 
-import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 
 public class CreateDB extends ParsedCommand {
 

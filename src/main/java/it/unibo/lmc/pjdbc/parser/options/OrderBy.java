@@ -1,6 +1,6 @@
-package it.unibo.lmc.pjdbc.core.options;
+package it.unibo.lmc.pjdbc.parser.options;
 
-import it.unibo.lmc.pjdbc.core.schema.TableField;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 public class OrderBy {
 	
