@@ -106,13 +106,9 @@ public class PrologStatement implements Statement {
 		}
 		
 		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
-		log.debug(pRequest.toString());
+		//log.debug(pRequest.toString());
 		
-		this.database.applyCommand(pRequest);
-		
-		//pRequest
-		
-		//this.database.
+		this.database.applyCommand(pRequest,null);
 		
 		return null;
 	}

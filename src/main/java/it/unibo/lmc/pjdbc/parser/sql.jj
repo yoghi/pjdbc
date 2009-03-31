@@ -15,14 +15,14 @@ package it.unibo.lmc.pjdbc.parser;
 //import alice.tuprolog.Prolog;
 
 //EXPRESSIONI 
-import it.unibo.lmc.pjdbc.core.expression.Expression;
-import it.unibo.lmc.pjdbc.core.expression.ICondition;
-import it.unibo.lmc.pjdbc.core.expression.condition.AritmeticCondition;
-import it.unibo.lmc.pjdbc.core.expression.condition.AndCondition;
-import it.unibo.lmc.pjdbc.core.expression.condition.EqualCondition;
-import it.unibo.lmc.pjdbc.core.expression.condition.MajorCondition;
-import it.unibo.lmc.pjdbc.core.expression.condition.MinorCondition;
-import it.unibo.lmc.pjdbc.core.expression.condition.OrCondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.Expression;
+import it.unibo.lmc.pjdbc.core.dml.expression.ICondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.condition.AritmeticCondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.condition.AndCondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.condition.EqualCondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.condition.MajorCondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.condition.MinorCondition;
+import it.unibo.lmc.pjdbc.core.dml.expression.condition.OrCondition;
 
 //OPZIONI sui DML
 import it.unibo.lmc.pjdbc.core.options.Limit;

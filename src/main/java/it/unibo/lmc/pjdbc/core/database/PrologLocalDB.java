@@ -1,5 +1,8 @@
 package it.unibo.lmc.pjdbc.core.database;
 
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.driver.PrologResultSet;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -92,7 +95,7 @@ public class PrologLocalDB extends PrologDB {
 		PropertyConfigurator.configure(properties);
 		log = Logger.getLogger("it.unibo.lmc.pjdbc");
 	}
-
+	
 	@Override
 	protected String readRow(int numLine) {
 		try {

@@ -1,6 +1,8 @@
 package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
+import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.utils.CacheTheoryString;
 
 import java.io.FileNotFoundException;
@@ -112,5 +114,12 @@ public abstract class PrologDB implements IDatabase {
 	 * @return il vecchio valore
 	 */
 	abstract protected String writeRow(int numLine,String newVal);
+	
+	
+	public void applyCommand(ParsedCommand request, PrologResultSet result) {
+		
+		System.out.println(request.toString());
+		
+	}
 
 }

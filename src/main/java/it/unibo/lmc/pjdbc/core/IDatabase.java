@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.core;
 
 import it.unibo.lmc.pjdbc.core.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 
 public interface IDatabase {
 
@@ -8,6 +9,6 @@ public interface IDatabase {
 	
 	boolean joinSnapshot(IDatabase snapshot);
 
-	void applyCommand(ParsedCommand request);
+	void applyCommand(ParsedCommand request,PrologResultSet result);
 
 }
