@@ -10,17 +10,21 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.utils.CacheTheoryString;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.Iterator;
+import java.util.Properties;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.Prolog;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
 import alice.tuprolog.Theory;
 
 public abstract class PrologDB implements IDatabase {
@@ -37,9 +41,71 @@ public abstract class PrologDB implements IDatabase {
 	protected CacheTheoryString cache = new CacheTheoryString();
 	
 	/**
+	 * Properties / custumization
+	 */
+	private Properties properties = new Properties();
+
+	/**
+	 * Logger 
+	 */
+	private Logger log = null;
+	
+	/**
+	 * Reader of prolog file
+	 */
+	BufferedReader input;
+	
+	/**
 	 * Monitor per coordinare l'accesso al database
 	 */
 	private ReentrantLock lock = new ReentrantLock();
+	
+	/**
+	 * Database locale scritto in prolog 	
+	 * @param sourceUrl path del file contenente il db prolog
+	 * @throws IOException
+	 * @throws InvalidTheoryException 
+	 */
+	public PrologDB(String sourceUrl) throws IOException, InvalidTheoryException {
+		
+		File filePrologDB = new File(sourceUrl);
+		boolean exists = filePrologDB.exists();
+	    
+	    if ( exists ) {
+	    	String userDir = System.getProperty("user.dir");
+	    	if ( !(new File(userDir+File.separator+sourceUrl)).exists() ){
+	    		throw new FileNotFoundException("File "+sourceUrl+" and "+userDir+File.separator+sourceUrl+" doesn't exist");
+	    	} else {
+	    		sourceUrl = userDir + File.separator + sourceUrl;
+	    	}
+	    } else {
+	    	System.out.println("Impossibile caricare il db: "+filePrologDB.getAbsolutePath());
+	    	boolean success = filePrologDB.createNewFile();
+	    	if ( success ) System.out.println("Creato database vuoto: "+filePrologDB.getAbsolutePath());
+	    	else throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
+	    }
+	    
+	    input = new BufferedReader(new FileReader(filePrologDB));
+	    
+	    File propFile = new File(sourceUrl+".properties");
+	    
+	    // carico eventuali opzioni
+	    if ( propFile.exists() ) {
+	    	try {
+	    		properties.load(new FileInputStream(propFile));
+	    	} catch (Exception e) {
+	    		System.out.println("><"+e.getLocalizedMessage());
+			}
+	    	
+	    }
+		
+		this.logger_init();
+		
+		this.load_theory();
+		
+		this.readMeta();
+		
+	}
 	
 	/**
 	 * Carico la teoria/db prolog  
@@ -115,16 +181,26 @@ public abstract class PrologDB implements IDatabase {
 	}
 	
 	/**
-	 * Inizializzo il sistema di log
+	 * Inizializzo il sistema di logging
 	 */
-	abstract protected void logger_init();
+	protected void logger_init() {
+		PropertyConfigurator.configure(properties);
+		log = Logger.getLogger("it.unibo.lmc.pjdbc");
+	}
 	
 	/**
 	 * Leggo una riga dal database
 	 * @param numLine numero di linea da leggere
 	 * @return il contenuto della riga o null se la riga non esiste
 	 */
-	abstract protected String readRow(int numLine);
+	protected String readRow(int numLine) {
+		try {
+			return input.readLine();
+		} catch (IOException e) {
+			return null;
+		}
+		
+	}
 	
 	/**
 	 * Aggiorno/Inserisco/Rimuovo una riga al database
@@ -132,7 +208,10 @@ public abstract class PrologDB implements IDatabase {
 	 * @param newVal il nuovo valore
 	 * @return il vecchio valore
 	 */
-	abstract protected String writeRow(int numLine,String newVal);
+	protected String writeRow(int numLine,String newVal){
+		//TODO: da fare..
+		return null;
+	}
 	
 	public PrologResultSet applyCommand(Select rsel) {
 		
