@@ -38,6 +38,7 @@ public class Main {
 			/*
 			while(rs.next()) {
 	            String name = rs.getString(0);
+	            String name = rs.getString("name");
 	            System.out.println("$0 = "+name.toString());
 			}
 			*/

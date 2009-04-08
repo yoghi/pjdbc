@@ -1,7 +1,11 @@
 package it.unibo.lmc.pjdbc.utils;
 
+import it.unibo.lmc.pjdbc.driver.PrologStatement;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
 
 public class CacheTheoryString {
 
@@ -11,12 +15,19 @@ public class CacheTheoryString {
 	ArrayList<String> cache = new ArrayList<String>();
 	
 	/**
+	 * Log
+	 */
+	private Logger log;
+	
+	/**
 	 * Quanti elementi validi ci sono in cache
 	 */
 	private int valid;
 	
 	
-	public CacheTheoryString() {}
+	public CacheTheoryString() {
+		log = Logger.getLogger(CacheTheoryString.class);
+	}
 	
 	/**
 	 * Aggiungo una stringa alla cache
@@ -25,6 +36,7 @@ public class CacheTheoryString {
 	 */
 	public int add(String o){
 		this.cache.add(o);
+		log.debug(">> "+o);
 		this.valid++;
 		return this.cache.size()-1;
 	}
@@ -58,6 +70,7 @@ public class CacheTheoryString {
 	public String change(int line,String newVal) throws IndexOutOfBoundsException {
 		String oldVal = this.get(line);
 		this.cache.set(line, newVal);
+		log.debug("~~ "+oldVal+" => "+newVal);
 		return oldVal;
 	}
 	

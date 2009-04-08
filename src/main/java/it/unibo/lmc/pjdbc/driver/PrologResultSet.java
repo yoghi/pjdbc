@@ -24,9 +24,11 @@ import java.util.Map;
 public class PrologResultSet implements ResultSet {
 
 	private LinkedList<ArrayList<Object>> row_data = new LinkedList<ArrayList<Object>>();
+	
 	private int currentPosition = 0;
 	private int insertPosition = 0;
 	
+	//TODO: costruttore
 	
 	public boolean absolute(int row) throws SQLException {
 		
@@ -196,11 +198,15 @@ public class PrologResultSet implements ResultSet {
 	
 	public Reader getCharacterStream(int columnIndex) throws SQLException {
 		
+		//new CharArrayReader(char[] buf);
+		
 		return null;
 	}
 
 	
 	public Reader getCharacterStream(String columnLabel) throws SQLException {
+		
+		//new CharArrayReader(char[] buf);
 		
 		return null;
 	}
@@ -225,8 +231,7 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public String getCursorName() throws SQLException {
-		
-		return null;
+		throw new SQLException("Non Implemented Yet");
 	}
 
 	

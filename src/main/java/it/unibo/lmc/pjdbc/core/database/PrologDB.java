@@ -2,16 +2,18 @@ package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
 import it.unibo.lmc.pjdbc.core.dml.Pselect;
-import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.driver.PrologMetaData;
+import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
-import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.utils.CacheTheoryString;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -63,8 +65,6 @@ public abstract class PrologDB implements IDatabase {
 		
 		this.current_theory = th;
 		
-		this.cache.show(System.out);	/** @todo da cavare ?? .*/
-		
 //		try {
 //			this.databaseMetaData = new PrologMetaData(dbengine);
 //		} catch (Exception e) {
@@ -75,28 +75,33 @@ public abstract class PrologDB implements IDatabase {
 	}
 	
 	/**
-	 * Genero i metadati del database
+	 * Genero i metadati del database 
 	 */
-	@SuppressWarnings("unchecked")
 	protected void readMeta() {
 		
-		Iterator i = this.current_theory.iterator(new Prolog());
-		while(i.hasNext()){
-			Term t = (Term)i.next();
-			if ( t instanceof Struct ){
-	        	
-	        	Struct s = (Struct)t;
-	        	
-	        	// rimane il caso "predicato(...):-!"
-	        	if ( s.isGround() ){
-	        		//NB: X e _ sono due variabili
-	        		//System.out.println("Ground (non contiene variabili) "+x.isGround());	        		
-	        		int l = s.getArity();
-	        		//System.out.println(s.getName()+"/"+l);
-	        	}
-	        }
-		}
+		PrologMetaData md = new PrologMetaData(this.current_theory);
 		
+//		Iterator i = this.current_theory.iterator(new Prolog());
+//		while(i.hasNext()){
+//			Term t = (Term)i.next();
+//			if ( t instanceof Struct ){
+//	        	
+//	        	Struct s = (Struct)t;
+//	        	
+//	        	// rimane il caso "predicato(...):-!"
+//	        	if ( s.isGround() ){
+//	        		//NB: X e _ sono due variabili
+//	        		//System.out.println("Ground (non contiene variabili) "+x.isGround());	        		
+//	        		int l = s.getArity();
+//	        		System.out.println(s.getName()+"/"+l);
+//	        	}
+//	        }
+//		}
+		
+	}
+	
+	public DatabaseMetaData getMetaData(){
+		return null;
 	}
 	
 	public IDatabase getSnapshot() {
@@ -140,7 +145,7 @@ public abstract class PrologDB implements IDatabase {
 			return result.execute(this.current_theory);
 			
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 		} finally {
 			this.lock.unlock();
 		}

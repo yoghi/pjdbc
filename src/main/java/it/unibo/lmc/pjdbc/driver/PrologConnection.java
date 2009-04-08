@@ -197,10 +197,9 @@ public class PrologConnection implements Connection {
 
 	/**
 	 * Restituisce un wrapper per ottenere MetaDati
-	 * @TODO: da collegare con il db...
 	 */
 	public DatabaseMetaData getMetaData() throws SQLException {
-		return null;
+		return this.db.getMetaData();
 	}
 
 	

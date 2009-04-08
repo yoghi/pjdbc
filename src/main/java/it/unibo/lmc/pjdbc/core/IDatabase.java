@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.core;
 
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -18,5 +19,7 @@ public interface IDatabase {
 	int applyCommand(Insert request) throws SQLException;
 	int applyCommand(Update request) throws SQLException;
 	int applyCommand(Delete request) throws SQLException;
+
+	DatabaseMetaData getMetaData();
 
 }
