@@ -16,6 +16,7 @@ public interface IDatabase {
 	boolean joinSnapshot(IDatabase snapshot);
 
 	PrologResultSet applyCommand(Select request) throws SQLException;
+	
 	int applyCommand(Insert request) throws SQLException;
 	int applyCommand(Update request) throws SQLException;
 	int applyCommand(Delete request) throws SQLException;

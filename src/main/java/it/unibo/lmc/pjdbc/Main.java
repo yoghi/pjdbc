@@ -1,55 +1,97 @@
 package it.unibo.lmc.pjdbc;
 
+import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.driver.PrologConnection;
 import it.unibo.lmc.pjdbc.driver.PrologStatement;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Properties;
+
+import org.apache.log4j.PropertyConfigurator;
 
 public class Main {
 
 	public static void main(String[] args) {
 
 		
-		try {
+		load_config();
+	    
+//	    try {
+//			PSchema psh = new PSchema("target/classes/prolog.db");
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
-			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
+//		try {
+//		
+//			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
+//		
+//			// SENZA METADATI
+//			
+//			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
+//			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+//			
+//			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+//			
+//			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
+//			
+//			conn.setAutoCommit(false);
+//			
+//			conn.setTransactionIsolation(2);	//DEFAULT = 1
+//			
+//			PrologStatement stmt = (PrologStatement)conn.createStatement();
+//			
+//			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
+//
+//			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
+//			
+//			/*
+//			while(rs.next()) {
+//	            String name = rs.getString(0);
+//	            String name = rs.getString("name");
+//	            System.out.println("$0 = "+name.toString());
+//			}
+//			*/
+//			conn.commit();
+//			
+//		
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
 		
-			// SENZA METADATI
-			
-			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
-			
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
-			
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
-			
-			conn.setAutoCommit(false);
-			
-			conn.setTransactionIsolation(2);	//DEFAULT = 1
-			
-			PrologStatement stmt = (PrologStatement)conn.createStatement();
-			
-			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
+	}
 
-			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
-			
-			/*
-			while(rs.next()) {
-	            String name = rs.getString(0);
-	            String name = rs.getString("name");
-	            System.out.println("$0 = "+name.toString());
-			}
-			*/
-			conn.commit();
-			
+	private static void load_config() {
+		/**
+		 * Properties / custumization
+		 */
+		Properties properties = new Properties();
 		
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    
+	    // carico eventuali opzioni
+	    if ( propFile.exists() ) {
+	    	try {
+	    		properties.load(new FileInputStream(propFile));
+	    	} catch (Exception e) {
+	    		System.out.println("><"+e.getLocalizedMessage());
+			}
+	    	
+	    }
+	    
+	    PropertyConfigurator.configure(properties);
 		
 	}
 
