@@ -1,0 +1,80 @@
+package it.unibo.lmc.pjdbc.core.transaction;
+
+import java.sql.SQLException;
+import java.util.UUID;
+
+import it.unibo.lmc.pjdbc.core.database.PSchema;
+import it.unibo.lmc.pjdbc.driver.PrologResultSet;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+
+/**
+ * 
+ * Transaction Schema : TRANSACTION_READ_UNCOMMITTED
+ * 
+ * Leggo e scrivo direttamente sullo schema, non ho meccanismi di sicurezza 
+ * 
+ * Ho Dirty Reads, Nonrepeatable Reads, Phantom Reads
+ *
+ */
+public class TSchemaRU extends TSchema {
+
+	public TSchemaRU(PSchema schema) {
+		super(schema);
+	}
+
+	@Override
+	public PrologResultSet applyCommand(Select request) throws SQLException {
+		this.log.add(request);
+		return this.realSchema.applyCommand(request);
+	}
+
+	@Override
+	public int applyCommand(Insert request) throws SQLException {
+		this.log.add(request);
+		return this.realSchema.applyCommand(request);
+	}
+
+	@Override
+	public int applyCommand(Update request) throws SQLException {
+		this.log.add(request);
+		return this.realSchema.applyCommand(request);
+	}
+
+	@Override
+	public int applyCommand(Delete request) throws SQLException {
+		this.log.add(request);
+		return this.realSchema.applyCommand(request);
+	}
+
+	@Override
+	public void rollback() {
+		
+		//TODO : itero sull'array di elementi e eseguo l'operazione contraria
+		
+		ParsedCommand[] tmp = null;
+		tmp = this.log.toArray(tmp);
+		
+		//this.realSchema.
+		
+		
+		
+		this.currentTransactionID = UUID.randomUUID();
+	}
+
+	@Override
+	public void commit() {
+		
+		// Lavoro già sul vero database non ho nulla da committare
+		
+		this.log.clear();
+		
+		this.currentTransactionID = UUID.randomUUID();
+		
+	}
+
+	
+}

@@ -1,7 +1,8 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
-import it.unibo.lmc.pjdbc.core.database.PrologLocalDB;
+import it.unibo.lmc.pjdbc.core.PrologDatabase;
+import it.unibo.lmc.pjdbc.core.database.PSchema;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class PrologConnection implements Connection {
 	/**
 	 * Database
 	 */
-	private IDatabase db;
+	private PSchema db;
 	
 	/**
 	 * The transaction isolation level for this
@@ -92,12 +93,11 @@ public class PrologConnection implements Connection {
 				//this.db = new PrologRemoteDB();
 			} else {
 				//file
-				this.db = new PrologLocalDB(this.sourceUrl);
+				this.db = PrologDatabase.openDatabase(this.sourceUrl); 
+				//new PrologLocalDB(this.sourceUrl);
 			}
 			
 
-		} catch (InvalidTheoryException e) {
-			throw new SQLException("Prolog database internal error : "+ e.toString());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -114,8 +114,7 @@ public class PrologConnection implements Connection {
 
 	
 	public void close() throws SQLException {
-		
-
+		PrologDatabase.close(this.sourceUrl);
 	}
 
 	
@@ -199,7 +198,8 @@ public class PrologConnection implements Connection {
 	 * Restituisce un wrapper per ottenere MetaDati
 	 */
 	public DatabaseMetaData getMetaData() throws SQLException {
-		return this.db.getMetaData();
+		//return this.db.getMetaData();
+		return null;
 	}
 
 	

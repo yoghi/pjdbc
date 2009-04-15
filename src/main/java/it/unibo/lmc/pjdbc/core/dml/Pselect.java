@@ -18,6 +18,7 @@ import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Theory;
 import alice.tuprolog.UnknownVarException;
+import alice.tuprolog.Var;
 
 public class Pselect {
 
@@ -88,7 +89,7 @@ public class Pselect {
 		log.info("Psql generato: "+psql);
 	}
 
-	public PrologResultSet execute(Theory current_theory) throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException, NoMoreSolutionException {
+	public PrologResultSet execute(Theory current_theory) throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException {
 		
 		List<SolveInfo> rows = new ArrayList<SolveInfo>();
 		
@@ -100,18 +101,23 @@ public class Pselect {
 		
 		while (info.isSuccess()){ 
 			
-//			List<Var> vars = info.getBindingVars();
-//			for (Var var : vars) {
-//				System.out.println(var.getName()+" => "+var.getTerm());
-//			}
+			List<Var> vars = info.getBindingVars();
+			for (Var var : vars) {
+				System.out.println(var.getName()+" => "+var.getTerm());
+			}
 			
 			rows.add(info);
 			
 			if (p.hasOpenAlternatives()){ 
-				info=p.solveNext(); 
+				try {
+					info=p.solveNext();
+				} catch (NoMoreSolutionException e) {
+					break;
+				} 
 			} else { 
 				break;
 			}
+			
 		}
 
 		return null;

@@ -32,44 +32,44 @@ public class Main {
 //			e.printStackTrace();
 //		}
 		
-//		try {
-//		
-//			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
-//		
-//			// SENZA METADATI
-//			
-//			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
-//			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
-//			
-//			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
-//			
-//			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
-//			
-//			conn.setAutoCommit(false);
-//			
-//			conn.setTransactionIsolation(2);	//DEFAULT = 1
-//			
-//			PrologStatement stmt = (PrologStatement)conn.createStatement();
-//			
-//			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
-//
-//			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
-//			
-//			/*
-//			while(rs.next()) {
-//	            String name = rs.getString(0);
-//	            String name = rs.getString("name");
-//	            System.out.println("$0 = "+name.toString());
-//			}
-//			*/
-//			conn.commit();
-//			
-//		
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		try {
+		
+			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
+		
+			// SENZA METADATI
+			
+			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
+			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+			
+			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+			
+			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
+			
+			conn.setAutoCommit(false);
+			
+			conn.setTransactionIsolation(2);	//DEFAULT = 1
+			
+			PrologStatement stmt = (PrologStatement)conn.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
+
+			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
+			
+			/*
+			while(rs.next()) {
+	            String name = rs.getString(0);
+	            String name = rs.getString("name");
+	            System.out.println("$0 = "+name.toString());
+			}
+			*/
+			conn.commit();
+			
+		
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -79,7 +79,8 @@ public class Main {
 		 */
 		Properties properties = new Properties();
 		
-	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    //File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+		File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {

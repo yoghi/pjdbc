@@ -35,6 +35,7 @@ public class PrologDriver implements Driver {
 		url = url.trim();
 		
 		//FIXME: devo restituire la stessa Connection se richiedo di lavorare sullo stesso DB! Quindi 1 connection per Db!!
+		//TODO: è a livello di connessione che devo gestire i lock!!
 		return new PrologConnection(url, PREFIX.equalsIgnoreCase(url) ? ":memory:" : url.substring(PREFIX.length()) );
 	}
 

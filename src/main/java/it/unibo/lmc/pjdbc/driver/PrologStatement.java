@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
+import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
@@ -21,7 +22,7 @@ import org.apache.log4j.Logger;
 public class PrologStatement implements Statement {
 
 	private PrologConnection conn = null;
-	private IDatabase database = null;
+	private PSchema currentSchema = null;
 	
 	private Psql parse = null;
 	private StringReader currentQuery = null;
@@ -30,9 +31,9 @@ public class PrologStatement implements Statement {
 	
 	
 	
-	public PrologStatement(PrologConnection connection,IDatabase database) {
+	public PrologStatement(PrologConnection connection,PSchema database) {
 		this.conn = connection;
-		this.database = database;
+		this.currentSchema = database;
 		log = Logger.getLogger(PrologStatement.class);
 	}
 
@@ -112,7 +113,7 @@ public class PrologStatement implements Statement {
 		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
 		//log.debug(pRequest.toString());
 		
-		if ( pRequest instanceof Select ) return this.database.applyCommand((Select)pRequest);
+		if ( pRequest instanceof Select ) return this.currentSchema.applyCommand((Select)pRequest);
 		
 		else throw new SQLException("Invalid Command: "+pRequest.toString());
 	}
@@ -138,11 +139,11 @@ public class PrologStatement implements Statement {
 			throw new SQLException(e.getMessage());
 		}
 		
-		if ( pRequest instanceof Insert ) return this.database.applyCommand((Insert)pRequest);
+		if ( pRequest instanceof Insert ) return this.currentSchema.applyCommand((Insert)pRequest);
 		
-		else if ( pRequest instanceof Update ) return this.database.applyCommand((Update)pRequest);
+		else if ( pRequest instanceof Update ) return this.currentSchema.applyCommand((Update)pRequest);
 		
-		else if ( pRequest instanceof Delete ) return this.database.applyCommand((Delete)pRequest);
+		else if ( pRequest instanceof Delete ) return this.currentSchema.applyCommand((Delete)pRequest);
 		
 		else throw new SQLException("Invalid Command: "+pRequest.toString());
 	}
