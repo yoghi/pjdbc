@@ -12,6 +12,8 @@ dept(dirigenti,1).
 %metabase('dept','').
 %metabase('employee','/home/workspace...').
 
+%le colonne sono numerate come 1 , 2 ... e lo 0???
+
 metabase('dept',1,'d-name','string').
 metabase('dept',2,'id-emp','int').
 metabase('employee',1,'id','int').

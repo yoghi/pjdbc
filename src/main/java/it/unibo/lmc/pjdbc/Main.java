@@ -1,13 +1,10 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.driver.PrologConnection;
 import it.unibo.lmc.pjdbc.driver.PrologStatement;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,9 +36,9 @@ public class Main {
 			// SENZA METADATI
 			
 			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
 			
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
 			
 			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
 			

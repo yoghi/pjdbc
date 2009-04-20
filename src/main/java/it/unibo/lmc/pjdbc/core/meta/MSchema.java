@@ -30,43 +30,15 @@ public class MSchema {
 			Prolog prolog = new Prolog();
 			prolog.setTheory(th);
 
+			ArrayList<SolveInfo> soluzioni = new ArrayList<SolveInfo>();
+			
 			SolveInfo info = prolog.solve("metabase(TABLE,POSITION,NAME,TYPE).");
 			if (info.isSuccess()) {
 
 				while (info.isSuccess()) {
 
-					Term table_name = info.getTerm("TABLE");
-					Term field_position = info.getTerm("POSITION");
-					Term field_name = info.getTerm("NAME");
-					Term field_type = info.getTerm("TYPE");
-
-					if (table_name.isAtom() && field_name.isAtom() && (field_position instanceof Number) && field_type.isAtom()) {
-
-//						ArrayList<TableSpecificField> fields = null;
-//
-//						if (!this.table.containsKey(table_name.toString())) {
-//							fields = new ArrayList<TableSpecificField>();
-//							this.table.put(table_name.toString(), fields);
-//							Logger.getLogger("it.unibo.lmc.pjdbc").debug("trovati metadati tabella " + table_name.toString());
-//						} else {
-//							fields = (ArrayList<TableSpecificField>) this.table.get(table_name.toString());
-//						}
-//
-//						TableSpecificField f = new TableSpecificField(field_name.toString());
-//						f.setPositionInTable(((Number) field_position).intValue());
-//
-//						if (field_type.toString().equals("int"))
-//							f.setType(java.sql.Types.INTEGER);
-//						else if (field_type.toString().equals("string"))
-//							f.setType(java.sql.Types.VARCHAR);
-//
-//						fields.add(f);
-
-					} else {
-						//throw new SQLException("Malformed metabase");
-						System.out.println("Malformed metabase");
-					}
-
+					soluzioni.add(info);
+					
 					if ( prolog.hasOpenAlternatives() ){
 						try {
 							info = prolog.solveNext();
@@ -78,6 +50,38 @@ public class MSchema {
 					}
 					
 				}
+				
+				// ora controllo le soluzioni
+				for (SolveInfo solveInfo : soluzioni) {
+					
+					Term table_name = solveInfo.getTerm("TABLE");
+					Term field_position = solveInfo.getTerm("POSITION");
+					Term field_name = solveInfo.getTerm("NAME");
+					Term field_type = solveInfo.getTerm("TYPE");
+
+					if (table_name.isAtom() && field_name.isAtom() && (field_position instanceof Number) && field_type.isAtom()) {
+
+						MTable t;
+						if ( this.tables.containsKey(table_name.toString()) ) {
+							t = this.tables.get(table_name.toString());
+						} else {
+							t  = new MTable(1);
+							this.tables.put(table_name.toString(), t);
+						}
+						
+						t.addField( ((Number) field_position).intValue() , field_name.toString(), field_type.toString() ) ;
+						
+
+					} else {
+						//throw new SQLException("Malformed metabase");
+						System.out.println("Malformed metabase");
+					}
+					
+				}
+			
+			for (String tname : this.tables.keySet()) {
+				System.out.println(this.tables.get(tname).toString());
+			}	
 
 			} else {
 
