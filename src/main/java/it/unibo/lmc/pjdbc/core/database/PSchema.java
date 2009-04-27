@@ -133,6 +133,7 @@ public class PSchema implements IDml {
 	
 	protected void load_meta() {
 		this.metaSchema.loadFromTheory(this.current_theory);
+		this.metaSchema.printMetaInfo(System.out);
 	}
 	
 	// devo avere informazioni su come è fatto il database
@@ -145,7 +146,6 @@ public class PSchema implements IDml {
 	/*
 	 * A.P.I. di accesso al database
 	 */
-	
 	
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		

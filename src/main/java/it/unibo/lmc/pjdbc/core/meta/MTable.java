@@ -21,19 +21,24 @@ public class MTable {
 		column[1] = type;
 	
 		if ( position < this.columns.length ) {
-			this.columns[position] = column;
+			this.columns[position] = column;		//OVERRIDE??
 		} else {
 			
-			int newsize = position+1;
-			String[][] temp = new String[newsize][2];
-			
-			for(int i = 0; i < position; i++ ){
-				temp[i] = this.columns[i];
+			try { 
+				
+				int newsize = position+1;
+				String[][] temp = new String[newsize][2];
+				
+				for(int i = 0; i < this.columns.length; i++ ){
+					temp[i] = this.columns[i];
+				}
+				
+				temp[position] = column;
+				this.columns = temp;
+		
+			} catch (IndexOutOfBoundsException e) {
+				e.printStackTrace();
 			}
-			
-			temp[position] = column;
-			
-			this.columns = temp;
 		}
 		
 	}
@@ -44,21 +49,45 @@ public class MTable {
 		
 		for ( int i = 0; i < this.columns.length; i++ ){
 			
+			buffer.append(i);
+			buffer.append(":");
+			
 			if ( this.columns[i][0] != null ){
 			
-				buffer.append(i);
-				buffer.append(":");
 				buffer.append(this.columns[i][0].toString());
 				buffer.append(":");
 				buffer.append(this.columns[i][1].toString());
-				buffer.append("\n");
 				
 			} else {
-				
+				buffer.append("unknown:unknown");
 			}
+			
+			buffer.append("\n");
 		}
 		
 		return buffer.toString();
+	}
+	
+	/**
+	 * Quante colonne ha questa tabella
+	 * @return numero di colonne
+	 */
+	public int numColum(){
+		return this.columns.length;
+	}
+	
+	/**
+	 * Verifico se la colonna X è una colonna di numeri
+	 * @param position posizione della colonna nella tabella
+	 * @return vero se la colonna è composta da numeri
+	 */
+	public boolean columnIsNumber(int position){
+		
+		if ( this.columns[position][1].equalsIgnoreCase("int") ) return true;
+		if ( this.columns[position][1].equalsIgnoreCase("double") ) return true;
+		if ( this.columns[position][1].equalsIgnoreCase("float") ) return true;
+		return false;
+		
 	}
 
 }

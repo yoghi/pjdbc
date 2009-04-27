@@ -76,8 +76,8 @@ public class Main {
 		 */
 		Properties properties = new Properties();
 		
-	    //File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
-		File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+		//File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {

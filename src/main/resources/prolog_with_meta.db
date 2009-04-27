@@ -7,8 +7,6 @@ dept(produzione,1113).
 dept(dirigenti,1).
 
 
-
-
 %metabase('dept','').
 %metabase('employee','/home/workspace...').
 
@@ -16,6 +14,7 @@ dept(dirigenti,1).
 
 metabase('dept',1,'d-name','string').
 metabase('dept',2,'id-emp','int').
-metabase('employee',1,'id','int').
-metabase('employee',2,'nome','string').
-metabase('employee',3,'salary','string').
+
+metabase('employee',0,'id','int').
+metabase('employee',1,'nome','string').
+metabase('employee',5,'salary','string').
