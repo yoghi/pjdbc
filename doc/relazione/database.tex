@@ -7,7 +7,7 @@ Il database che si andrà ad interrogare attraverso il driver sviluppato avrà u
 \begin{lstlisting}[language=Prolog]
  nomeTabella(col1,col2,......,colN).
 \end{lstlisting}
-I termini per appartenere ad una tabella dovranno avere lo stesso numero di argomenti e avere come nome il nome dela tabella. Esempio:
+I termini per appartenere ad una tabella dovranno avere come nome il nome della tabella. Esempio:
 \begin{lstlisting}[language=Prolog]
  ta(col1,col2,col3).
  ta(col11,col21,col31).
@@ -22,7 +22,11 @@ questi due termini rappresentano due righe di due tabelle rispettivamente ta e t
  ta(col1,col2,col3).
  ta(col1,col2).
 \end{lstlisting}
-queste due termini rappresentano due righe di due tabelle differenti questo in quanto non è predicibile quale argomento manchi per avere la stessa struttura del termine della prima riga, se fosse predicibile si potrebbe tranquillamente pensare che l'elemento mancante sia \emph{NULL} o \emph{any}.
+questi due termini rappresentano due righe della stessa tabella, il secondo è pero mancante di un campo, si suppone quindi che i campi mancanti siano settati a \emph{NULL};  inoltre da notare che si assume che i campi mancanti siano sempre nelle ultime colonne e non in mezzo in quanto quest'ultimo scenario non sarebbe predicibile. Per esprimere che una colonna è non settata basta usare il valore \emph{NULL} come valore, esempio : 
+\begin{lstlisting}[language=Prolog]
+ ta(col1,col2,col3).
+ ta(col1,NULL,col2).
+\end{lstlisting} 
 
 \subsection{Il metabase}
 Per avere la completezza di informazioni tipiche di un moderno database relazionale è necessario avere delle ulteriori informazioni su come è strutturato il database ed in particolare sulla struttura delle tabelle; queste informazioni solitamente compongono quello che è chiamato \emph{metabase} o \emph{metadatabase}. Un possibile insieme di informazioni utili possono essere : 

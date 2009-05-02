@@ -78,7 +78,7 @@ public class MSchema {
 						if ( this.tables.containsKey(table_name.toString()) ) {
 							t = this.tables.get(table_name.toString());
 						} else {
-							t  = new MTable(1);
+							t  = new MTable(table_name.toString(),1);
 							this.tables.put(table_name.toString(), t);
 						}
 						
@@ -110,14 +110,19 @@ public class MSchema {
 		        	// rimane il caso "predicato(...):-!"
 		        	if ( s.isGround() ){
 		        		//NB: X e _ sono due variabili
-		        		//System.out.println("Ground (non contiene variabili) "+x.isGround());	        		
+		        		//System.out.println("Ground (non contiene variabili) "+s.isGround());	        		
 		        		int l = s.getArity();
 		        		
 		        		if ( this.tables.containsKey(s.getName()) ) {
 		        			if ( this.tables.get(s.getName()).numColum() < l ) {
 		        				this.tables.get(s.getName()).addField(l-1, "unknown" , "unknown");
+		        				log.debug("aggiunto a "+s.getName()+" la colonna "+l);
 		        			} 
+		        		} else {
+		        			this.tables.put(s.getName(), new MTable(s.getName(),l));
+		        			log.debug("trovata tabella "+s.getName()+" di dimensione "+l);
 		        		}
+		        		
 		        	}
 		        }
 			}
@@ -135,6 +140,15 @@ public class MSchema {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	/**
+	 * Ottengo le informazioni sulla tabella tname
+	 * @param tname nome della tabella
+	 * @return MTable
+	 */
+	public MTable getMetaTableInfo(String tname){
+		return this.tables.get(tname);
 	}
 	
 	public void printMetaInfo(PrintStream stream){

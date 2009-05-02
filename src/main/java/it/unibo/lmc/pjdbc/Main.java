@@ -36,9 +36,9 @@ public class Main {
 			// SENZA METADATI
 			
 			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
 			
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
 			
 			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
 			
@@ -76,8 +76,8 @@ public class Main {
 		 */
 		Properties properties = new Properties();
 		
-	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
-		//File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    //File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+		File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {

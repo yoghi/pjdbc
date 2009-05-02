@@ -27,6 +27,8 @@ public class Pselect {
 	private String[] campiRicerca;
 
 	private Logger log;
+
+	private String[] tables;
 	
 	
 	public Pselect(Select sql){
@@ -41,10 +43,12 @@ public class Pselect {
 		// CASO A - 1 tabella 
 		
 		campiRicerca = new String[cr.size()];
+
+		this.tables = new String[tb.size()];
 		
 		if ( tb.size() == 1 ) {
 			
-			psql = tb.get(0).getName()+"(";
+			this.tables[0] = tb.get(0).getName();
 			
 			int i = 0;
 			
@@ -66,8 +70,6 @@ public class Pselect {
 			
 		}
 		
-		this.generatePsql();
-		
 		// CASO B - piu tabelle
 		// .-- non implementato --
 		
@@ -76,6 +78,11 @@ public class Pselect {
 	}
 	
 	private void generatePsql(){
+		
+		//devo correggere ... $0...$X sono i possibili campi di richiesta e poi devo mettere quelli necessari per completare 
+		//la tabella
+		
+		psql = this.tables[0] +"(";
 		
 		StringBuffer buff = new StringBuffer();
 		for ( int i = 0; i < this.campiRicerca.length; i++ ){
@@ -91,6 +98,8 @@ public class Pselect {
 
 	public PrologResultSet execute(Theory current_theory) throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException {
 		
+		this.generatePsql();
+		
 		List<SolveInfo> rows = new ArrayList<SolveInfo>();
 		
 		Prolog p = new Prolog();
@@ -103,7 +112,7 @@ public class Pselect {
 			
 			List<Var> vars = info.getBindingVars();
 			for (Var var : vars) {
-				System.out.println(var.getName()+" => "+var.getTerm());
+				log.debug(var.getName()+" => "+var.getTerm());
 			}
 			
 			rows.add(info);

@@ -4,10 +4,12 @@ package it.unibo.lmc.pjdbc.core.meta;
 public class MTable {
 	
 	//private ArrayList<String[]> columns = new ArrayList<String[]>();
-	String[][] columns;
+	String[][] tcolumns;
+	private String tname;
 	
-	public MTable(int columNumber) {
-		 this.columns = new String[columNumber][2];
+	public MTable(String name, int columNumber) {
+		 this.tcolumns = new String[columNumber][2];
+		 this.tname = name;
 	}
 	
 	public void addField(int position, String name, String type) {
@@ -20,8 +22,8 @@ public class MTable {
 		column[0] = name;
 		column[1] = type;
 	
-		if ( position < this.columns.length ) {
-			this.columns[position] = column;		//OVERRIDE??
+		if ( position < this.tcolumns.length ) {
+			this.tcolumns[position] = column;		//OVERRIDE??
 		} else {
 			
 			try { 
@@ -29,12 +31,12 @@ public class MTable {
 				int newsize = position+1;
 				String[][] temp = new String[newsize][2];
 				
-				for(int i = 0; i < this.columns.length; i++ ){
-					temp[i] = this.columns[i];
+				for(int i = 0; i < this.tcolumns.length; i++ ){
+					temp[i] = this.tcolumns[i];
 				}
 				
 				temp[position] = column;
-				this.columns = temp;
+				this.tcolumns = temp;
 		
 			} catch (IndexOutOfBoundsException e) {
 				e.printStackTrace();
@@ -47,16 +49,16 @@ public class MTable {
 		
 		StringBuffer buffer = new StringBuffer();
 		
-		for ( int i = 0; i < this.columns.length; i++ ){
+		for ( int i = 0; i < this.tcolumns.length; i++ ){
 			
 			buffer.append(i);
 			buffer.append(":");
 			
-			if ( this.columns[i][0] != null ){
+			if ( this.tcolumns[i][0] != null ){
 			
-				buffer.append(this.columns[i][0].toString());
+				buffer.append(this.tcolumns[i][0].toString());
 				buffer.append(":");
-				buffer.append(this.columns[i][1].toString());
+				buffer.append(this.tcolumns[i][1].toString());
 				
 			} else {
 				buffer.append("unknown:unknown");
@@ -73,7 +75,7 @@ public class MTable {
 	 * @return numero di colonne
 	 */
 	public int numColum(){
-		return this.columns.length;
+		return this.tcolumns.length;
 	}
 	
 	/**
@@ -83,9 +85,9 @@ public class MTable {
 	 */
 	public boolean columnIsNumber(int position){
 		
-		if ( this.columns[position][1].equalsIgnoreCase("int") ) return true;
-		if ( this.columns[position][1].equalsIgnoreCase("double") ) return true;
-		if ( this.columns[position][1].equalsIgnoreCase("float") ) return true;
+		if ( this.tcolumns[position][1].equalsIgnoreCase("int") ) return true;
+		if ( this.tcolumns[position][1].equalsIgnoreCase("double") ) return true;
+		if ( this.tcolumns[position][1].equalsIgnoreCase("float") ) return true;
 		return false;
 		
 	}
