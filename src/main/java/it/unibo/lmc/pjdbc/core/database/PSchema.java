@@ -92,14 +92,14 @@ public class PSchema implements IDml {
 
 	}
 
-	protected PSchema(Theory th){
+	protected PSchema(Theory th, MSchema schema){
 		this.current_theory = th;
 		this.logger_init();
-		this.load_meta();		
+		this.metaSchema = schema;
 	}
 	
 	public PSchema clone(){
-		return new PSchema(this.current_theory);
+		return new PSchema(this.current_theory,this.metaSchema);
 	}
 	
 	
@@ -153,7 +153,9 @@ public class PSchema implements IDml {
 		Pselect result = new Pselect(request);
 		
 		try {
-			return result.execute(this.current_theory);
+			
+			return result.execute(this.current_theory,this.metaSchema);
+			
 		} catch (InvalidTheoryException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
 		} catch (MalformedGoalException e) {

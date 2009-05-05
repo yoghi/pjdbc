@@ -1,5 +1,7 @@
 package it.unibo.lmc.pjdbc.core.dml;
 
+import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.core.meta.MTable;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
@@ -77,10 +79,14 @@ public class Pselect {
 		
 	}
 	
-	private void generatePsql(){
+	private void generatePsql(MSchema schema){
 		
 		//devo correggere ... $0...$X sono i possibili campi di richiesta e poi devo mettere quelli necessari per completare 
 		//la tabella
+		
+		MTable metaTable = schema.getMetaTableInfo(this.tables[0]);
+		
+		//metaTable.numColum(); ho queste colonne
 		
 		psql = this.tables[0] +"(";
 		
@@ -96,9 +102,19 @@ public class Pselect {
 		log.info("Psql generato: "+psql);
 	}
 
-	public PrologResultSet execute(Theory current_theory) throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException {
+	/**
+	 * 
+	 * @param current_theory la teoria su cui eseguire la richiesta
+	 * @param schema le meta-informazioni sulla teoria passata (quindi di tutte le tabelle presenti)
+	 * @return
+	 * @throws InvalidTheoryException
+	 * @throws MalformedGoalException
+	 * @throws NoSolutionException
+	 * @throws UnknownVarException
+	 */
+	public PrologResultSet execute(Theory current_theory, MSchema schema) throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException {
 		
-		this.generatePsql();
+		this.generatePsql(schema);
 		
 		List<SolveInfo> rows = new ArrayList<SolveInfo>();
 		

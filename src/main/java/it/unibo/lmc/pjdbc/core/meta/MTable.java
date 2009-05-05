@@ -85,11 +85,9 @@ public class MTable {
 	 */
 	public boolean columnIsNumber(int position){
 		
-		if ( this.tcolumns[position][1].equalsIgnoreCase("int") ) return true;
-		if ( this.tcolumns[position][1].equalsIgnoreCase("double") ) return true;
-		if ( this.tcolumns[position][1].equalsIgnoreCase("float") ) return true;
+		if ( this.tcolumns[position][1].equalsIgnoreCase("int") || this.tcolumns[position][1].equalsIgnoreCase("double") || this.tcolumns[position][1].equalsIgnoreCase("float") ) return true;
 		return false;
-		
+			
 	}
 
 }
