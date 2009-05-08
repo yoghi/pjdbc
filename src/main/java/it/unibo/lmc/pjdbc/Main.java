@@ -48,9 +48,13 @@ public class Main {
 			
 			PrologStatement stmt = (PrologStatement)conn.createStatement();
 			
-			ResultSet rs = stmt.executeQuery("select $0,$1 from employee;");
+			ResultSet rs = stmt.executeQuery("select $0,$3 from employee;");
+			
+			ResultSet rs3 = stmt.executeQuery("select pippo from employee;");
 
 			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
+			
+			ResultSet rs4 = stmt.executeQuery("select e.$0,d.$1 from employee as e, adept as d;");
 			
 			/*
 			while(rs.next()) {

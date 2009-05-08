@@ -11,16 +11,16 @@ public class TableField {
 	/**
 	 * Meta Informazioni
 	 */
-	private int length;    						// Internal Length of this field
-    private int oid;        					// OID of the type
-    private String columnLabel; 				// Column label
-    private Integer nullable;        			// Is this column nullable? null if undetermined.
-    private boolean autoIncrement = false;   	// Is this column automatically numbered?
-    private int positionInTable;				// Position in table
-    private int tableOid; 						// OID of table ( zero if no table )
+//	private int length;    						// Internal Length of this field
+//    private int oid;        					// OID of the type
+//    private String columnLabel; 				// Column label
+//    private Integer nullable;        			// Is this column nullable? null if undetermined.
+//    private boolean autoIncrement = false;   	// Is this column automatically numbered?
+//    private int positionInTable;				// Position in table
+//    private int tableOid; 						// OID of table ( zero if no table )
     private String tableName;					// Table name;
     private String schema;						// Schema name;
-    private int type;							// type 
+//    private int type;							// type 
     private boolean dinstinct;					// distinct field
     
     
@@ -32,7 +32,7 @@ public class TableField {
 		this.setColumnName(columnName);
     }
     
-    /*
+    /**
      * Construct a field based on the information fed to it.
      *
      * @param columnLabel the column label of the field
@@ -42,15 +42,15 @@ public class TableField {
      * @param tableOid the OID of the columns' table
      * @param positionInTable the position of column in the table (first column is 1, second column is 2, etc...)
      */
-    public TableField(String columnLabel, String columnName, int oid, int length, int tableOid, int positionInTable)
-    {
-    	this.setColumnName(columnName);
-        this.columnLabel = columnLabel;
-        this.oid = oid;
-        this.length = length;
-        this.setTableOid(tableOid);
-        this.setPositionInTable(positionInTable);
-    }
+//    public TableField(String columnLabel, String columnName, int oid, int length, int tableOid, int positionInTable)
+//    {
+//    	this.setColumnName(columnName);
+//        this.columnLabel = columnLabel;
+//        this.oid = oid;
+//        this.length = length;
+//        this.setTableOid(tableOid);
+//        this.setPositionInTable(positionInTable);
+//    }
     
     /**
      * Comparazione tra due MetaField
@@ -60,7 +60,12 @@ public class TableField {
     public boolean equals(TableField c){
     	
     	if ( !c.getColumnName().equals(this.columnName) ) return false;
-    	if ( !c.getTableName().equals(this.tableName) ) return false;
+    	
+    	if ( this.tableName != null ){
+    		if ( !c.getTableName().equals(this.tableName) ) return false;
+    	} else {
+    		if ( c.getTableName() != null ) return false;
+    	}
     	
     	return true;
     }
@@ -77,50 +82,50 @@ public class TableField {
 		this.columnName = columnName;
 	}
 
-	/**
-	 * @param positionInTable the positionInTable to set
-	 */
-	public void setPositionInTable(int positionInTable) {
-		this.positionInTable = positionInTable;
-	}
+//	/**
+//	 * @param positionInTable the positionInTable to set
+//	 */
+//	public void setPositionInTable(int positionInTable) {
+//		this.positionInTable = positionInTable;
+//	}
+//
+//	/**
+//	 * @return the positionInTable
+//	 */
+//	public int getPositionInTable() {
+//		return positionInTable;
+//	}
+//
+//	/**
+//	 * @param tableOid the tableOid to set
+//	 */
+//	public void setTableOid(int tableOid) {
+//		this.tableOid = tableOid;
+//	}
+//
+//	/**
+//	 * @return the tableOid
+//	 */
+//	public int getTableOid() {
+//		return tableOid;
+//	}
+//
+//	/**
+//	 * @param i the type to set
+//	 */
+//	public void setType(int i) {
+//		this.type = i;
+//	}
+//
+//	/**
+//	 * @return the type
+//	 */
+//	public int getType() {
+//		return type;
+//	}
 
 	/**
-	 * @return the positionInTable
-	 */
-	public int getPositionInTable() {
-		return positionInTable;
-	}
-
-	/**
-	 * @param tableOid the tableOid to set
-	 */
-	public void setTableOid(int tableOid) {
-		this.tableOid = tableOid;
-	}
-
-	/**
-	 * @return the tableOid
-	 */
-	public int getTableOid() {
-		return tableOid;
-	}
-
-	/**
-	 * @param i the type to set
-	 */
-	public void setType(int i) {
-		this.type = i;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public int getType() {
-		return type;
-	}
-
-	/**
-	 * @param tableName the tableName to set
+	 * @param tableName the tableName to set or alias tableName
 	 */
 	public void setTableName(String tableName) {
 		this.tableName = tableName;

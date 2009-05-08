@@ -1,6 +1,7 @@
 employee(1112,smith,5819.2).
 employee(1,john,1799).
 employee(1113,erika,8000).
+employee(1114,enrico,8000).
 
 dept(stipendi,1112).
 dept(produzione,1113).

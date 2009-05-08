@@ -3,7 +3,6 @@ package it.unibo.lmc.pjdbc.core.meta;
 
 public class MTable {
 	
-	//private ArrayList<String[]> columns = new ArrayList<String[]>();
 	String[][] tcolumns;
 	private String tname;
 	
@@ -88,6 +87,19 @@ public class MTable {
 		if ( this.tcolumns[position][1].equalsIgnoreCase("int") || this.tcolumns[position][1].equalsIgnoreCase("double") || this.tcolumns[position][1].equalsIgnoreCase("float") ) return true;
 		return false;
 			
+	}
+
+	public int containsField(String columnName) {
+		for (int i = 0; i < tcolumns.length; i++) {
+			
+			if ( tcolumns[i][0] != null ){
+				if ( tcolumns[i][0].equalsIgnoreCase(columnName) ) return i;
+			} else {
+				//TODO: non ci sono i metadati... come mi comporto??
+			}
+			
+		}
+		return -1;
 	}
 
 }
