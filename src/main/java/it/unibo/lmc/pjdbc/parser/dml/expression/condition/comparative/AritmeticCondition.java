@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.parser.dml.expression.condition;
+package it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative;
 
 import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
 

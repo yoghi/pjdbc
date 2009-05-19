@@ -1,0 +1,221 @@
+package it.unibo.lmc.pjdbc.statement;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Properties;
+
+import org.apache.log4j.PropertyConfigurator;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+public class testSelectOverNoMeta extends TestCase {
+
+	private Connection conn = null;
+	private Statement stmt = null;
+
+	/**
+	 * Costruttore 
+	 * @param testName
+	 */
+	public testSelectOverNoMeta(String testName) {
+		super(testName);
+	}
+
+	/**
+	 * Setup
+	 */
+	protected void setUp() throws Exception {
+
+		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
+		
+		// SENZA METADATI
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+		stmt = conn.createStatement();
+
+		super.setUp();
+	}
+	
+
+	/**
+	 * @return the suite of tests being tested
+	 */
+	public static Test suite() {
+		
+		/**
+		 * Properties / custumization
+		 */
+		Properties properties = new Properties();
+		
+	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+		//File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    
+	    // carico eventuali opzioni
+	    if ( propFile.exists() ) {
+	    	try {
+	    		properties.load(new FileInputStream(propFile));
+	    	} catch (Exception e) {
+	    		System.out.println("><"+e.getLocalizedMessage());
+			}
+	    	
+	    }
+	    
+	    PropertyConfigurator.configure(properties);
+		
+		TestSuite ts = new TestSuite();
+		
+//		ts.addTest(new testSelectOverNoMeta("testExecuteQuery"));
+//		ts.addTest(new testSelectOverNoMeta("testMultiVarSelect"));
+//		ts.addTest(new testSelectOverNoMeta("testVarOverSizeTableSelect"));
+//		ts.addTest(new testSelectOverNoMeta("testAliasSelect"));
+//		ts.addTest(new testSelectOverNoMeta("testAliasSelectMisc"));
+		ts.addTest(new testSelectOverNoMeta("testSelectWhere"));
+		
+		
+		return ts;
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testExecuteQuery() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testExecuteQuery      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select $0 from employee;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testMultiVarSelect() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testMultiVarSelect    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select $0,$2 from employee;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testVarOverSizeTableSelect() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testVarOverSizeTableSelect      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select $0,$5 from employee;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testAliasSelect() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testAliasSelect       ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testAliasSelectMisc() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testAliasSelectMisc       ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,$1,d.$1 from employee as e, dept as d;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectWhere() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhere       ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1);");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+}

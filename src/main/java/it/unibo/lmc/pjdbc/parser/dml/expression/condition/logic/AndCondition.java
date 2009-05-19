@@ -1,8 +1,8 @@
-package it.unibo.lmc.pjdbc.parser.dml.expression.condition;
+package it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic;
 
 import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
 
-public class EqualCondition implements ICondition {
+public class AndCondition implements ICondition {
 
 	public String eval(String t1, String t2) {
 		// TODO Auto-generated method stub
@@ -10,7 +10,7 @@ public class EqualCondition implements ICondition {
 	}
 	
 	public String toString(){
-		return "EQUAL";
+		return "AND";
 	}
 
 }

@@ -3,10 +3,12 @@ package it.unibo.lmc.pjdbc.core.dml;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
+import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +22,6 @@ import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Theory;
-import alice.tuprolog.UnknownVarException;
 import alice.tuprolog.Var;
 
 public class Pselect {
@@ -36,21 +37,23 @@ public class Pselect {
 	 */
 	private String[][] aliasTable;
 	
+	/**
+	 * Alias Nome Varibile PSQL,Nome Variabile SQL
+	 */
+	private HashMap<String, String> aliasVariable;
 	
-	public Pselect(Select sql){
-		
+	
+	public Pselect(Select sql){	
 		sl = sql;
-		
-		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
-				
+		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");		
 	}
 	
-	private void generatePsql(MSchema mschema){
+	private void generatePsql(MSchema mschema) throws SQLException{
 		
 		List<TableField> cr = this.sl.getCampiRicerca();
 		List<Table> tb = this.sl.getFromTable();
 		
-		// 0. alias table
+		// 0. alias table => Se la tabella non esiste nei metadati??
 		
 		this.aliasTable = new String[tb.size()][2];
 		for (int i = 0; i < tb.size(); i++) {
@@ -59,22 +62,23 @@ public class Pselect {
 			this.aliasTable[i][1] = tb.get(i).getName();
 		}
 		
-		// 1. assegno alle colonne senza tabella  , la prima tabella usata nella select e mi memorizzo le colonne da cercare suddivise per tabella
-		
+		// 1. mi memorizzo le colonne da cercare suddivise per tabella
 		HashMap<String, TableField[]> selectT = new HashMap<String, TableField[]>();
 		
 		String tname;
-		TableField[] c;
+		TableField[] c = null;
 		
 		for (TableField tf : cr) {
 			
 			if ( tf.getTableName() == null ) {
-				tname = this.nameFromAlias(tb.get(0).getName());
+				tname = this.nameFromAlias(tb.get(0).getName());		// lo associo alla prima tabella dopo FROM
 			} else {
-				tname = tf.getTableName();
+				tname = this.nameFromAlias(tf.getTableName());
 			}
 			
 			MTable f = mschema.getMetaTableInfo(tname);
+			
+			if ( f == null ) throw new SQLException("Table "+tname+" not exist in this schema.","SQLSTATE");
 			
 			if ( selectT.containsKey(tname) ){
 				c = selectT.get(tname);
@@ -101,68 +105,73 @@ public class Pselect {
 				log.warn("richiesto campo "+tf.getColumnName()+" non valido sulla tabella "+tname);
 			}
 			
+			
 		}
 		
-		// 2. comincio a creare le singole stringhe di richiesta
+		// 2. sistemo secondo la clausola WHERE i campi di richiesta
 		
-		String sql_select = "";	//TODO converti in BufferedString
-		MTable mTable;
+		this.aliasVariable = new HashMap<String, String>();
+		Expression whereExp = this.sl.getWhereClausole();
 		
-		for (Table tselect : tb) {
+		// uso il fatto di avere gia i campi divisi per tabelle come struttura della richiesta e poi vi aggiungo in caso le clausole del where aggiuntive 
+		// e manipolo le variaibli assegnando correttamente gli alias poi per la risposta! 
+		// employee(X0,X1,X2),X1<29. e non X1<29,employee(X0,X1,X2) quindi le aggiunte vanno messe come parti sucessive!!! 
+		// quindi non è piu un semplice array di tabelle ma deve essere qualcosa di piu... o meglio si deve aggiungere una strauttura aggiuntiva.. da usare 
+		// quando converto in psql dopo la conversione delle tabelle... tipo "coldVar"
+		
+		if ( null != whereExp ) {
 			
-			mTable = mschema.getMetaTableInfo(tselect.getName());
+			String[] clausole = whereExp.eval(selectT,mschema,this.aliasVariable);
+
+			System.out.println(whereExp.toString());
 			
-			TableField[] ftb = selectT.get(tselect.getName());
+			System.out.println(whereExp.numClausole());
+		}
+		
+		// 3. converto in psql
+		
+		StringBuffer tmp_select = new StringBuffer();
+		
+		for (String tableName : selectT.keySet()) {
 			
-			sql_select = tselect.getName()+"(";
+			TableField[] ftb = selectT.get(tableName);
+			
+			tmp_select.append(tableName);
+			tmp_select.append("(");
 			
 			for (int i = 0; i < ftb.length; i++) {
+                
 				if ( ftb[i] == null ){
-					
-					//devo correggere ... $0...$X sono i possibili campi di richiesta e poi devo mettere quelli necessari per completare 
-					//la tabella
-					sql_select += "_,";
-					
+                	tmp_select.append("_");
 				} else {
-					
-					if ( ftb[i].getColumnName().startsWith("$") ) {				// a. converto $N => XN
-						sql_select += "X"+ftb[i].getColumnName().substring(1)+",";
-					} else {
-						int pos = mTable.containsField(ftb[i].getColumnName()); // b. converto nome campo => XN
-						if ( pos >= 0){
-							sql_select += "X"+pos+",";
-						}
-					}
-					
+                
+	                if ( ftb[i].getColumnName().startsWith("$") ) {                         // a. converto $N => XN
+	                	
+	                	String t = tableName.toUpperCase()+ftb[i].getColumnName().substring(1);
+	                	tmp_select.append(t); 
+	                	this.aliasVariable.put(t,ftb[i].getColumnName());
+	                	
+	                	
+	                } else {
+	                	tmp_select.append(ftb[i].getColumnName());
+	                	this.aliasVariable.put(ftb[i].getColumnName(), ftb[i].getColumnName());
+	                }
 				}
+				
+				if ( i < ftb.length - 1  ) tmp_select.append(",");
+			
 			}
 			
-			this.psql = sql_select.substring(0, sql_select.length()-1)+"),";
-			
+			tmp_select.append(")");
+			tmp_select.append(",");
+        
 		}
 
-		this.psql = this.psql.substring(0,this.psql.length()-1)+".";
+		tmp_select.replace(tmp_select.length()-1, tmp_select.length(), ".");
 		
-		// 3. sistemo secondo la clausola WHERE i campi di richiesta 
+		this.psql = tmp_select.toString();
 		
-		
-
-//		MTable metaTable = schema.getMetaTableInfo(this.campiRicerca[0][0]);
-//		
-//		//metaTable.numColum(); ho queste colonne
-//		
-//		//psql = this.tables[0] +"(";
-//		
-//		StringBuffer buff = new StringBuffer();
-//		for ( int i = 0; i < this.campiRicerca.length; i++ ){
-//			buff.append(this.campiRicerca[i]);
-//			buff.append(",");
-//		}
-//		
-//		String campi = buff.toString();
-//		psql += campi.substring(0, campi.length()-1)+").";
-		
-		log.info("Psql generato: "+psql);
+		log.info("Psql generato: "+this.psql);
 	}
 
 	/**
@@ -181,46 +190,55 @@ public class Pselect {
 	 * 
 	 * @param current_theory la teoria su cui eseguire la richiesta
 	 * @param schema le meta-informazioni sulla teoria passata (quindi di tutte le tabelle presenti)
-	 * @return
-	 * @throws InvalidTheoryException
-	 * @throws MalformedGoalException
-	 * @throws NoSolutionException
-	 * @throws UnknownVarException
+	 * @return un PrologResultSet  
+	 * @throws SQLException 
 	 */
-	public PrologResultSet execute(Theory current_theory, MSchema schema) throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException {
+	public PrologResultSet execute(Theory current_theory, MSchema schema) throws SQLException {
 		
-		this.generatePsql(schema);
+		try {
 		
-		List<SolveInfo> rows = new ArrayList<SolveInfo>();
-		
-		Prolog p = new Prolog();
-		
-		p.setTheory(current_theory);
-		
-		SolveInfo info = p.solve(this.psql);
-		
-		while (info.isSuccess()){ 
+			this.generatePsql(schema);
 			
-			List<Var> vars = info.getBindingVars();
-			for (Var var : vars) {
-				log.debug(var.getName()+" => "+var.getTerm());
-			}
+			List<SolveInfo> rows = new ArrayList<SolveInfo>();
 			
-			rows.add(info);
+			Prolog p = new Prolog();
 			
-			if (p.hasOpenAlternatives()){ 
-				try {
-					info=p.solveNext();
-				} catch (NoMoreSolutionException e) {
+			p.setTheory(current_theory);
+			
+			SolveInfo info = p.solve(this.psql);
+			
+			while (info.isSuccess()){ 
+				
+				List<Var> vars = info.getBindingVars();
+				for (Var var : vars) {
+//					log.debug(var.getName()+" => "+var.getTerm());
+				}
+				
+//				log.debug("--");
+				
+				rows.add(info);
+				
+				if (p.hasOpenAlternatives()){ 
+					try {
+						info=p.solveNext();
+					} catch (NoMoreSolutionException e) {
+						break;
+					} 
+				} else { 
 					break;
-				} 
-			} else { 
-				break;
+				}
+				
 			}
 			
+			return null;
+	
+		} catch (InvalidTheoryException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		} catch (MalformedGoalException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		} catch (NoSolutionException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
 		}
-
-		return null;
 	}
 	
 	

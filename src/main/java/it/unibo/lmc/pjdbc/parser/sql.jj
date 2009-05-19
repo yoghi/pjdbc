@@ -527,23 +527,20 @@ TableField ColumnReference():
 }
 
 
-Token ComparisonItem() :
+String ComparisonItem() :
 { 
 	Token tk;
+	TableField tf;
 }
 {
 	(
-		
-		tk=<S_CHAR_LITERAL>
-		|
 		tk=<S_DOUBLE>
 		|
 		tk=<S_INTEGER>
-		|
-		tk=<S_IDENTIFIER>
+		
 	)
 	{
-		return tk;
+		return tk.image;
 	}
 }
 
@@ -593,7 +590,9 @@ ICondition ComparisonCondition():
 		| 
 		">=" { cond = new MajorCondition(true); } 
 		|  
-		"==" { cond = new EqualCondition(); } 
+		"=" { cond = new EqualCondition(); }
+		|
+		"!=" { cond = new EqualCondition(true); } 
 	)
 	{
 		return cond;
@@ -622,7 +621,8 @@ ICondition AritmeticCondition():
 Expression Expression():
 {
 	Expression result = null;
-	Token item;
+	String item;
+	TableField tf;
 }
 {
 	( 
@@ -632,6 +632,8 @@ Expression Expression():
 		result = SimpleExpression() { return result; }
 		|
 		item = ComparisonItem() { return new Expression(item);  }
+		|
+		tf = Column() { return new Expression(tf); }
 	)
 
 }
@@ -640,11 +642,17 @@ Expression DirectExpression():
 {
 	Expression result,right;
 	ICondition cond;
-	Token item;
+	String item;
+	TableField tf;
 }
 {
 	
-	<S_LPAR> item = ComparisonItem() { result = new Expression(item); }
+	<S_LPAR>
+	(
+		item = ComparisonItem() { result = new Expression(item); } 
+		| 
+		tf = Column() { result = new Expression(tf); }
+	) 
 	( 
 		LOOKAHEAD ( Condition() ) 
 		cond = Condition()

@@ -48,13 +48,19 @@ public class Main {
 			
 			PrologStatement stmt = (PrologStatement)conn.createStatement();
 			
-			ResultSet rs = stmt.executeQuery("select $0,$3 from employee;");
+			//ResultSet rs = stmt.executeQuery("select $0,$3 from employee;");
 			
-			ResultSet rs3 = stmt.executeQuery("select pippo from employee;");
+			//ResultSet rs3 = stmt.executeQuery("select pippo from employee;");
 
-			ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
+			//ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
 			
-			ResultSet rs4 = stmt.executeQuery("select e.$0,d.$1 from employee as e, adept as d;");
+			//ResultSet rs5 = stmt.executeQuery("select $0 as pippo,$1,$2 from employee;");
+			
+			//ResultSet rs4 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d;");
+			
+			//ResultSet rs6 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1);");
+			
+			ResultSet rs7 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = (7 * 3 + d.$1) );");
 			
 			/*
 			while(rs.next()) {
@@ -80,8 +86,8 @@ public class Main {
 		 */
 		Properties properties = new Properties();
 		
-	    //File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
-		File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+		//File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {
@@ -103,15 +109,15 @@ public class Main {
 //
 //ResultSet rs21 = stmt.executeQuery("select id from employee where (true);");
 
-//ResultSet rs22 = stmt.executeQuery("select id from employee where (id == 1);");
+//ResultSet rs22 = stmt.executeQuery("select id from employee where (id = 1);");
 //
-//ResultSet rs2bis = stmt.executeQuery("select id,idRef from employee where (id == idRef);");	//cerco i figli che sono anche padri...
+//ResultSet rs2bis = stmt.executeQuery("select id,idRef from employee where (id = idRef);");	//cerco i figli che sono anche padri...
 //
-//ResultSet rs2bis3 = stmt.executeQuery("select id from employee where (id == 1) ;");
+//ResultSet rs2bis3 = stmt.executeQuery("select id from employee where (id = 1) ;");
 //
-//ResultSet rs2bis2 = stmt.executeQuery("select id,idRef from employee where ( (id == 1) AND (idRef > 2) );");
+//ResultSet rs2bis2 = stmt.executeQuery("select id,idRef from employee where ( (id = 1) AND (idRef > 2) );");
 //
-//ResultSet rs2bis4 = stmt.executeQuery("select id,idRef from employee where ( ( (id == 1) OR (idRef > 2) ) AND (idRef + 1) ) limit 5 ;");
+//ResultSet rs2bis4 = stmt.executeQuery("select id,idRef from employee where ( ( (id = 1) OR (idRef > 2) ) AND (idRef + 1) ) limit 5 ;");
 //
 //ResultSet rs3 = stmt.executeQuery("select * from employee limit 5;");
 //

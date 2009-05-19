@@ -149,23 +149,10 @@ public class PSchema implements IDml {
 	
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
-		
 		Pselect result = new Pselect(request);
-		
-		try {
-			
-			return result.execute(this.current_theory,this.metaSchema);
-			
-		} catch (InvalidTheoryException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		} catch (MalformedGoalException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		} catch (NoSolutionException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		} catch (UnknownVarException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		}
-		
+
+		return result.execute(this.current_theory,this.metaSchema);
+
 	}
 	
 	public int applyCommand(Insert request) throws SQLException {
