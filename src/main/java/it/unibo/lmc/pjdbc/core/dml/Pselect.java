@@ -2,7 +2,6 @@ package it.unibo.lmc.pjdbc.core.dml;
 
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
-import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
@@ -15,54 +14,101 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import alice.tuprolog.InvalidTheoryException;
-import alice.tuprolog.MalformedGoalException;
-import alice.tuprolog.NoMoreSolutionException;
-import alice.tuprolog.NoSolutionException;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Theory;
-import alice.tuprolog.Var;
-
 public class Pselect {
 
-	private String psql;
-
+	/**
+	 * Logger di sistema
+	 */
 	private Logger log;
 
-	private Select sl;
+	/**
+	 * Query Sql Parsed
+	 */
+	private Select sql;
 	
 	/**
-	 * Alias, Nome Tabella
+	 * Meta Schema
 	 */
-	private String[][] aliasTable;
+	private MSchema mschema;
+	
+	/**
+	 * Alias Nome Tabella Breve, Nome Tabella
+	 */
+	private HashMap<String, String> aliasTable;
 	
 	/**
 	 * Alias Nome Varibile PSQL,Nome Variabile SQL
 	 */
 	private HashMap<String, String> aliasVariable;
 	
-	
-	public Pselect(Select sql){	
-		sl = sql;
-		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");		
+	/**
+	 * Converto l'alias di una tabella con il nome per esteso della tabella
+	 * @param aliasName l'alias
+	 * @return il nome della tabella per esteso
+	 */
+	private String nameFromAlias(String aliasName) {
+		String a = this.aliasTable.get(aliasName);
+		if ( null == a) return aliasName;
+		return a;
 	}
 	
-	private void generatePsql(MSchema mschema) throws SQLException{
+	/**
+	 * Clone di questa istanza
+	 * @return un clone dell'istanza corrente
+	 */
+	public Pselect duplicate(){
+		Pselect p = new Pselect(this.sql,this.mschema);
+		p.setAliasTable(this.aliasTable);
+		p.setAliasVariable(this.aliasVariable);
+		return p;
+	}
+
+	/**
+	 * @param aliasTable the aliasTable to set
+	 */
+	private void setAliasTable(HashMap<String, String> aliasTable) {
+		this.aliasTable = aliasTable;
+	}
+
+	/**
+	 * @param aliasVariable the aliasVariable to set
+	 */
+	private void setAliasVariable(HashMap<String, String> aliasVariable) {
+		this.aliasVariable = aliasVariable;
+	}
+	
+	/**
+	 * Costruttore 
+	 * @param request richiesta generata con il parsing dell'sql
+	 * @param metaSchema meta informazioni sul database su cui si dovrà agire
+	 */
+	public Pselect(Select request, MSchema metaSchema) {
+		this.sql = request;
+		this.mschema = metaSchema;
+		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
+	}
+
+	/**
+	 * Generazione prolog request in base alle informazioni attuali
+	 * @return stringa/e contenente la richiesta prolog da eseguire
+	 * @throws SQLException
+	 */
+	public String[] generatePsql() throws SQLException{
 		
-		List<TableField> cr = this.sl.getCampiRicerca();
-		List<Table> tb = this.sl.getFromTable();
+		ArrayList<String> psql = new ArrayList<String>();
 		
-		// 0. alias table => Se la tabella non esiste nei metadati??
+		List<TableField> cr = this.sql.getCampiRicerca();
+		List<Table> tb = this.sql.getFromTable();
 		
-		this.aliasTable = new String[tb.size()][2];
+		/** 0. alias table => Se la tabella non esiste nei metadati?? */
+		
+		this.aliasTable = new HashMap<String, String>();
 		for (int i = 0; i < tb.size(); i++) {
-			if ( tb.get(i).getAlias() != null ) this.aliasTable[i][0] = tb.get(i).getAlias();	// se non c'è alias metto il nome della tabella
-			else this.aliasTable[i][0] = tb.get(i).getName();
-			this.aliasTable[i][1] = tb.get(i).getName();
+			if ( tb.get(i).getAlias() != null ) this.aliasTable.put(tb.get(i).getAlias(), tb.get(i).getName());	
+			else this.aliasTable.put(tb.get(i).getName(), tb.get(i).getName());	// se non c'è alias metto il nome della tabella
 		}
 		
-		// 1. mi memorizzo le colonne da cercare suddivise per tabella
+		/** 1. mi memorizzo le colonne da cercare suddivise per tabella */
 		HashMap<String, TableField[]> selectT = new HashMap<String, TableField[]>();
 		
 		String tname;
@@ -105,30 +151,29 @@ public class Pselect {
 				log.warn("richiesto campo "+tf.getColumnName()+" non valido sulla tabella "+tname);
 			}
 			
-			
 		}
 		
-		// 2. sistemo secondo la clausola WHERE i campi di richiesta
+		/** 2. sistemo secondo la clausola WHERE i campi di richiesta */
 		
 		this.aliasVariable = new HashMap<String, String>();
-		Expression whereExp = this.sl.getWhereClausole();
-		
-		// uso il fatto di avere gia i campi divisi per tabelle come struttura della richiesta e poi vi aggiungo in caso le clausole del where aggiuntive 
-		// e manipolo le variaibli assegnando correttamente gli alias poi per la risposta! 
-		// employee(X0,X1,X2),X1<29. e non X1<29,employee(X0,X1,X2) quindi le aggiunte vanno messe come parti sucessive!!! 
-		// quindi non è piu un semplice array di tabelle ma deve essere qualcosa di piu... o meglio si deve aggiungere una strauttura aggiuntiva.. da usare 
-		// quando converto in psql dopo la conversione delle tabelle... tipo "coldVar"
+		Expression whereExp = this.sql.getWhereClausole();
 		
 		if ( null != whereExp ) {
 			
-			String[] clausole = whereExp.eval(selectT,mschema,this.aliasVariable);
+			//whereExp.eval(this);
+			
+			// uso il fatto di avere gia i campi divisi per tabelle come struttura della richiesta e poi vi aggiungo in caso le clausole del where aggiuntive 
+			// e manipolo le variaibli assegnando correttamente gli alias poi per la risposta! 
+			// employee(X0,X1,X2),X1<29. e non X1<29,employee(X0,X1,X2) quindi le aggiunte vanno messe come parti sucessive!!! 
+			// quindi non è piu un semplice array di tabelle ma deve essere qualcosa di piu... o meglio si deve aggiungere una strauttura aggiuntiva.. da usare 
+			// quando converto in psql dopo la conversione delle tabelle... tipo "coldVar"
 
 			System.out.println(whereExp.toString());
 			
 			System.out.println(whereExp.numClausole());
 		}
 		
-		// 3. converto in psql
+		/** 3. converto in psql */
 		
 		StringBuffer tmp_select = new StringBuffer();
 		
@@ -169,78 +214,11 @@ public class Pselect {
 
 		tmp_select.replace(tmp_select.length()-1, tmp_select.length(), ".");
 		
-		this.psql = tmp_select.toString();
+		log.info("Psql generato: "+tmp_select.toString());
 		
-		log.info("Psql generato: "+this.psql);
-	}
-
-	/**
-	 * Converto l'alias di una tabella con il nome per esteso della tabella
-	 * @param aliasName l'alias
-	 * @return il nome della tabella per esteso
-	 */
-	private String nameFromAlias(String aliasName) {
-		for (int i = 0; i < aliasTable.length; i++) {
-			if ( aliasTable[i][0].equalsIgnoreCase(aliasName) ) return aliasTable[i][1];
-		}
-		return aliasName;
-	}
-
-	/**
-	 * 
-	 * @param current_theory la teoria su cui eseguire la richiesta
-	 * @param schema le meta-informazioni sulla teoria passata (quindi di tutte le tabelle presenti)
-	 * @return un PrologResultSet  
-	 * @throws SQLException 
-	 */
-	public PrologResultSet execute(Theory current_theory, MSchema schema) throws SQLException {
+		psql.add(tmp_select.toString());
 		
-		try {
-		
-			this.generatePsql(schema);
-			
-			List<SolveInfo> rows = new ArrayList<SolveInfo>();
-			
-			Prolog p = new Prolog();
-			
-			p.setTheory(current_theory);
-			
-			SolveInfo info = p.solve(this.psql);
-			
-			while (info.isSuccess()){ 
-				
-				List<Var> vars = info.getBindingVars();
-				for (Var var : vars) {
-//					log.debug(var.getName()+" => "+var.getTerm());
-				}
-				
-//				log.debug("--");
-				
-				rows.add(info);
-				
-				if (p.hasOpenAlternatives()){ 
-					try {
-						info=p.solveNext();
-					} catch (NoMoreSolutionException e) {
-						break;
-					} 
-				} else { 
-					break;
-				}
-				
-			}
-			
-			return null;
-	
-		} catch (InvalidTheoryException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		} catch (MalformedGoalException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		} catch (NoSolutionException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-		}
+		return psql.toArray(new String[1]);
 	}
-	
-	
 	
 }

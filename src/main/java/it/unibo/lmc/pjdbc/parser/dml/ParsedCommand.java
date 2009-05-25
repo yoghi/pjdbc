@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.parser.dml;
 
 
-public abstract class ParsedCommand implements IRequest {
+public abstract class ParsedCommand {
 	
 	protected String defaultSchema;
 	

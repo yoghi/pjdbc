@@ -17,12 +17,14 @@ package it.unibo.lmc.pjdbc.parser;
 //EXPRESSIONI 
 import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.AritmeticCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.AndCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.EqualCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.MajorCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.MinorCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.OrCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.ILogicCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.IComparativeCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.AndCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.OrCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.AritmeticCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.EqualCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.MajorCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.MinorCondition;
 
 //OPZIONI sui DML
 import it.unibo.lmc.pjdbc.parser.options.Limit;
@@ -563,7 +565,7 @@ ICondition Condition():
 
 ICondition LogicCondition():
 {
-	ICondition cond;
+	ILogicCondition cond;
 }
 {
 	(
@@ -578,7 +580,7 @@ ICondition LogicCondition():
 
 ICondition ComparisonCondition():
 {
-	ICondition cond;
+	IComparativeCondition cond;
 }
 {
 	(

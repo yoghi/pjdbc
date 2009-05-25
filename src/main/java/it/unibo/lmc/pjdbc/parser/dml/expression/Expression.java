@@ -2,6 +2,8 @@ package it.unibo.lmc.pjdbc.parser.dml.expression;
 
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.parser.Token;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.IComparativeCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.ILogicCondition;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.util.HashMap;
@@ -45,13 +47,27 @@ public class Expression {
 	 */
 	public String[] eval(HashMap<String, TableField[]> tables, MSchema mschema, HashMap<String, String> aliasVariables){
 
-		if ( this.right.numClausole > 1 ){	
+		
+		if ( this.condition instanceof ILogicCondition ) {
 			
-			String[] right_clausole = this.right.eval(tables, mschema, aliasVariables);
-			
-			
+			System.out.println("logic");
 			
 		}
+		
+		if ( this.condition instanceof IComparativeCondition ) {
+			
+			System.out.println("comparative = <= >= < > ");
+			
+			if ( this.right.numClausole > 1 ){	
+				
+				String[] right_clausole = this.right.eval(tables, mschema, aliasVariables);
+				
+			}
+			
+			//TODO: e mo?? qui che comparazione faccio? quali sono i casi che possono capitare??
+			
+		}
+		
 		
 
 		return null;

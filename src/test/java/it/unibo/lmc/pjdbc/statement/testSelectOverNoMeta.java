@@ -75,6 +75,9 @@ public class testSelectOverNoMeta extends TestCase {
 //		ts.addTest(new testSelectOverNoMeta("testAliasSelect"));
 //		ts.addTest(new testSelectOverNoMeta("testAliasSelectMisc"));
 		ts.addTest(new testSelectOverNoMeta("testSelectWhere"));
+		ts.addTest(new testSelectOverNoMeta("testSelectWhere2"));
+		ts.addTest(new testSelectOverNoMeta("testSelectWhereAND"));
+		ts.addTest(new testSelectOverNoMeta("testSelectWhereOR"));
 		
 		
 		return ts;
@@ -207,6 +210,75 @@ public class testSelectOverNoMeta extends TestCase {
 		try {
 			
 			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1);");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectWhere2() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhere2      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = ( d.$1 + 1) );");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectWhereAND() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhereAND    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where ( (e.$0 = d.$1) AND (e.$0 > 1) ) ;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectWhereOR() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhereOR    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where ( (e.$0 > 1000) OR (d.$1 > 1) ) ;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			

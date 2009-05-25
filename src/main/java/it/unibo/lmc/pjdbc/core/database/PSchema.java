@@ -19,10 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 
 import alice.tuprolog.InvalidTheoryException;
-import alice.tuprolog.MalformedGoalException;
-import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Theory;
-import alice.tuprolog.UnknownVarException;
 
 public class PSchema implements IDml {
 	
@@ -142,6 +139,59 @@ public class PSchema implements IDml {
 	
 	// eseguire comandi sul database
 	
+	private PrologResultSet execute(IDml dml) {
+	
+		//TODO: cosa accetto in ingresso??
+		
+//		try {
+//			
+//			List<SolveInfo> rows = new ArrayList<SolveInfo>();
+//			
+//			Prolog p = new Prolog();
+//			
+//			p.setTheory(current_theory);
+//			
+//			SolveInfo info = p.solve(this.psql);
+//			
+//			while (info.isSuccess()){ 
+//				
+//				List<Var> vars = info.getBindingVars();
+//				for (Var var : vars) {
+////					log.debug(var.getName()+" => "+var.getTerm());
+//				}
+//				
+////				log.debug("--");
+//				
+//				rows.add(info);
+//				
+//				if (p.hasOpenAlternatives()){ 
+//					try {
+//						info=p.solveNext();
+//					} catch (NoMoreSolutionException e) {
+//						break;
+//					} 
+//				} else { 
+//					break;
+//				}
+//				
+//			}
+//			
+//			return null;
+//	
+//		} catch (InvalidTheoryException e) {
+//			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+//		} catch (MalformedGoalException e) {
+//			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+//		} catch (NoSolutionException e) {
+//			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+//		}
+		
+		
+		
+		
+		return null;
+		
+	}
 	
 	/*
 	 * A.P.I. di accesso al database
@@ -149,12 +199,21 @@ public class PSchema implements IDml {
 	
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
-		Pselect result = new Pselect(request);
+		Pselect pselect = new Pselect(request,this.metaSchema);
+		
+		String[] reqs = pselect.generatePsql();
+		
+		for (int i = 0; i < reqs.length; i++) {
+			
+		}
 
-		return result.execute(this.current_theory,this.metaSchema);
+		// return this.execute(result);
+		// this.current_theory, 
+		
+		return null;
 
 	}
-	
+
 	public int applyCommand(Insert request) throws SQLException {
 		
 		/**
