@@ -1,17 +1,22 @@
 package it.unibo.lmc.pjdbc.parser;
 
+import it.unibo.lmc.pjdbc.driver.PrologStatement;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.statement.testSelectOverNoMeta;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.StringReader;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Properties;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 public class testParser extends TestCase {
@@ -28,7 +33,6 @@ public class testParser extends TestCase {
 	 * Setup
 	 */
 	protected void setUp() throws Exception {
-
 		super.setUp();
 	}
 	
@@ -60,10 +64,40 @@ public class testParser extends TestCase {
 		
 		TestSuite ts = new TestSuite();
 		
-		ts.addTest(new testSelectOverNoMeta("testSelectWhereOR2"));
+		ts.addTest(new testParser("testSelectWhereOR"));
+		ts.addTest(new testParser("testSelectWhereOR2"));
 		
 		
 		return ts;
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectWhereOR() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhereOR    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "select e.$1,d.$0 from employee as e , dept as d , eta as et where (  (e.$0 = d.$1) AND ( e.$1 = et.$0 )  AND  (et.$1 < 40) OR ( e.$2 > 2000 ) ) ;";
+			
+			ParsedCommand pRequest = null;
+			
+			Psql parse = new Psql(new StringReader(query));
+			pRequest = parse.parseIt("");
+			
+			System.out.println(pRequest);
+			
+			
+		} catch (Exception e) {
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+		
 	}
 	
 	/**
@@ -79,7 +113,12 @@ public class testParser extends TestCase {
 			
 			String query = "select e.$1,d.$0 from employee as e , dept as d , eta as et where ( ( (e.$0 = d.$1) AND ( e.$1 = et.$0 ) ) AND ( (et.$1 < 40) OR ( e.$2 > 2000 ) ) ) ;";
 			
+			ParsedCommand pRequest = null;
 			
+			Psql parse = new Psql(new StringReader(query));
+			pRequest = parse.parseIt("");
+			
+			System.out.println(pRequest);
 			
 			
 		} catch (Exception e) {

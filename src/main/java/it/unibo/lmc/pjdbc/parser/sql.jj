@@ -21,7 +21,7 @@ import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.ILogicCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.IComparativeCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.AndCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.OrCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.AritmeticCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.aritmetic.AritmeticCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.EqualCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.MajorCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.MinorCondition;
@@ -629,9 +629,9 @@ Expression Expression():
 {
 	( 
 		LOOKAHEAD ( 4 ) 
-		result = DirectExpression() { return result; }
+		result = ListExpression() { return result; }
 		|
-		result = SimpleExpression() { return result; }
+		result = DirectExpression() { return result; }
 		|
 		item = ComparisonItem() { return new Expression(item);  }
 		|
@@ -647,8 +647,7 @@ Expression DirectExpression():
 	String item;
 	TableField tf;
 }
-{
-	
+{	
 	<S_LPAR>
 	(
 		item = ComparisonItem() { result = new Expression(item); } 
@@ -661,7 +660,7 @@ Expression DirectExpression():
 		right = Expression()
 		{
 			result = new Expression(result,right,cond);
-		}		
+		}
 	)*
 	<S_RPAR>
 	
@@ -670,27 +669,32 @@ Expression DirectExpression():
 	}
 }
 
-Expression SimpleExpression():
+Expression ListExpression():
 {
 	Expression left,right,result;
 	ICondition cond;
 }
-{
+{	
 	<S_LPAR>
-	left = LeftExpression() { result = left; }
-	(
-		LOOKAHEAD( Condition() ) 
+		left = LeftExpression() { result = left; }
+		cond = Condition()
+		right = LeftExpression()
+		{
+			result = new Expression(left,right,cond);
+		}
+		(
+			LOOKAHEAD( Condition() )
 			cond = Condition()
 			right = LeftExpression()
 			{
-				result = new Expression(left,right,cond);
-			}	
-	
-	)*
+				result = new Expression(result,right,cond);
+			}
+		)*
 	<S_RPAR>
 	{
 		return result;
 	}
+
 }
 
 Expression LeftExpression():

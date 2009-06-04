@@ -31,5 +31,10 @@ public class MinorCondition implements IComparativeCondition {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public String toString(){
+		if ( !this.equals ) return "MINOR";
+		else return "MINOR EQUAL";
+	}
 
 }
