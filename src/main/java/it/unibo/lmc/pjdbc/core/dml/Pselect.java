@@ -8,7 +8,6 @@ import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,21 +41,48 @@ public class Pselect {
 	private HashMap<String, String> aliasVariable;
 	
 	/**
-	 * Converto l'alias di una tabella con il nome per esteso della tabella
-	 * @param aliasName l'alias
-	 * @return il nome della tabella per esteso
+	 * Clausole PSQL
+	 * 	tabella1 => campo1,campo2,campo3
+	 *  tabella2 => campo1
+	 *  clausola 1 => null 
 	 */
-	private String nameFromAlias(String aliasName) {
-		String a = this.aliasTable.get(aliasName);
-		if ( null == a) return aliasName;
-		return a;
+	private HashMap<String,String[]> clausolePsql; 
+	
+	/**
+	 * Tabella primaria
+	 */
+	private String primaryTable;
+	
+	/**
+	 * Costruttore
+	 * @param metaSchema meta informazioni sul database su cui si dovrà agire 
+	 */
+	public Pselect(MSchema metaSchema) {
+		this.mschema = metaSchema;
+		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
+		log.debug("valuto lo schema "+metaSchema.toString());
 	}
 	
 	/**
+	 * Costruttore interno per la duplicazione
+	 * @param sqlS
+	 * @param metaSchema
+	 */
+
+	private Pselect(Select sqlS, MSchema metaSchema) {
+		this.mschema = metaSchema;
+		this.sql = sqlS;
+		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
+		log.debug("valuto lo schema "+metaSchema.toString());
+	}
+
+
+	/**
 	 * Clone di questa istanza
 	 * @return un clone dell'istanza corrente
+	 * @throws SQLException 
 	 */
-	public Pselect duplicate(){
+	public Pselect duplicate() throws SQLException{
 		Pselect p = new Pselect(this.sql,this.mschema);
 		p.setAliasTable(this.aliasTable);
 		p.setAliasVariable(this.aliasVariable);
@@ -64,49 +90,47 @@ public class Pselect {
 	}
 
 	/**
-	 * @param aliasTable the aliasTable to set
-	 */
-	private void setAliasTable(HashMap<String, String> aliasTable) {
-		this.aliasTable = aliasTable;
-	}
-
-	/**
-	 * @param aliasVariable the aliasVariable to set
-	 */
-	private void setAliasVariable(HashMap<String, String> aliasVariable) {
-		this.aliasVariable = aliasVariable;
-	}
-	
-	/**
-	 * Costruttore 
+	 * Valuto la richiesta SELECT  
 	 * @param request richiesta generata con il parsing dell'sql
-	 * @param metaSchema meta informazioni sul database su cui si dovrà agire
+	 * @throws SQLException 
 	 */
-	public Pselect(Select request, MSchema metaSchema) {
-		this.sql = request;
-		this.mschema = metaSchema;
-		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
-	}
+	public void evalSql(Select request) throws SQLException {
 
-	/**
-	 * Generazione prolog request in base alle informazioni attuali
-	 * @return stringa/e contenente la richiesta prolog da eseguire
-	 * @throws SQLException
-	 */
-	public String[] generatePsql() throws SQLException{
+		this.sql = request;
+
+		/** 0. alias table => Se la tabella non esiste nei metadati?? */
 		
-		ArrayList<String> psql = new ArrayList<String>();
-		
-		List<TableField> cr = this.sql.getCampiRicerca();
 		List<Table> tb = this.sql.getFromTable();
 		
-		/** 0. alias table => Se la tabella non esiste nei metadati?? */
+		this.primaryTable = tb.get(0).getName();
 		
 		this.aliasTable = new HashMap<String, String>();
 		for (int i = 0; i < tb.size(); i++) {
 			if ( tb.get(i).getAlias() != null ) this.aliasTable.put(tb.get(i).getAlias(), tb.get(i).getName());	
 			else this.aliasTable.put(tb.get(i).getName(), tb.get(i).getName());	// se non c'è alias metto il nome della tabella
 		}
+		
+		// genera clausole primarie (info a partire da FROM e dai campi di SELECT
+		this.analisiClausolePrimarie();
+		
+		// controllo clausole WHERE
+		this.analisiClausoleSecondarie();
+		
+	}
+	
+	private void analisiClausoleSecondarie() {
+		
+		Expression whereExp = this.sql.getWhereClausole();
+		
+		log.debug(whereExp.toString());
+		
+	}
+
+	private void analisiClausolePrimarie() throws SQLException{
+		
+		this.clausolePsql = new HashMap<String, String[]>();
+		
+		List<TableField> cr = this.sql.getCampiRicerca();
 		
 		/** 1. mi memorizzo le colonne da cercare suddivise per tabella */
 		HashMap<String, TableField[]> selectT = new HashMap<String, TableField[]>();
@@ -117,7 +141,7 @@ public class Pselect {
 		for (TableField tf : cr) {
 			
 			if ( tf.getTableName() == null ) {
-				tname = this.nameFromAlias(tb.get(0).getName());		// lo associo alla prima tabella dopo FROM
+				tname = this.nameFromAlias(this.primaryTable);		// lo associo alla prima tabella dopo FROM
 			} else {
 				tname = this.nameFromAlias(tf.getTableName());
 			}
@@ -153,72 +177,36 @@ public class Pselect {
 			
 		}
 		
-		/** 2. sistemo secondo la clausola WHERE i campi di richiesta */
-		
-		this.aliasVariable = new HashMap<String, String>();
-		Expression whereExp = this.sql.getWhereClausole();
-		
-		if ( null != whereExp ) {
-			
-			//whereExp.eval(this);
-			
-			// uso il fatto di avere gia i campi divisi per tabelle come struttura della richiesta e poi vi aggiungo in caso le clausole del where aggiuntive 
-			// e manipolo le variaibli assegnando correttamente gli alias poi per la risposta! 
-			// employee(X0,X1,X2),X1<29. e non X1<29,employee(X0,X1,X2) quindi le aggiunte vanno messe come parti sucessive!!! 
-			// quindi non è piu un semplice array di tabelle ma deve essere qualcosa di piu... o meglio si deve aggiungere una strauttura aggiuntiva.. da usare 
-			// quando converto in psql dopo la conversione delle tabelle... tipo "coldVar"
+	}
 
-			System.out.println(whereExp.toString());
-			
-			System.out.println(whereExp.numClausole());
-		}
-		
-		/** 3. converto in psql */
-		
-		StringBuffer tmp_select = new StringBuffer();
-		
-		for (String tableName : selectT.keySet()) {
-			
-			TableField[] ftb = selectT.get(tableName);
-			
-			tmp_select.append(tableName);
-			tmp_select.append("(");
-			
-			for (int i = 0; i < ftb.length; i++) {
-                
-				if ( ftb[i] == null ){
-                	tmp_select.append("_");
-				} else {
-                
-	                if ( ftb[i].getColumnName().startsWith("$") ) {                         // a. converto $N => XN
-	                	
-	                	String t = tableName.toUpperCase()+ftb[i].getColumnName().substring(1);
-	                	tmp_select.append(t); 
-	                	this.aliasVariable.put(t,ftb[i].getColumnName());
-	                	
-	                	
-	                } else {
-	                	tmp_select.append(ftb[i].getColumnName());
-	                	this.aliasVariable.put(ftb[i].getColumnName(), ftb[i].getColumnName());
-	                }
-				}
-				
-				if ( i < ftb.length - 1  ) tmp_select.append(",");
-			
-			}
-			
-			tmp_select.append(")");
-			tmp_select.append(",");
-        
-		}
+	public String[] generatePsql() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/**
+	 * @param aliasTable the aliasTable to set
+	 */
+	private void setAliasTable(HashMap<String, String> aliasTable) {
+		this.aliasTable = aliasTable;
+	}
 
-		tmp_select.replace(tmp_select.length()-1, tmp_select.length(), ".");
-		
-		log.info("Psql generato: "+tmp_select.toString());
-		
-		psql.add(tmp_select.toString());
-		
-		return psql.toArray(new String[1]);
+	/**
+	 * @param aliasVariable the aliasVariable to set
+	 */
+	private void setAliasVariable(HashMap<String, String> aliasVariable) {
+		this.aliasVariable = aliasVariable;
+	}
+	
+	/**
+	 * Converto l'alias di una tabella con il nome per esteso della tabella
+	 * @param aliasName l'alias
+	 * @return il nome della tabella per esteso
+	 */
+	private String nameFromAlias(String aliasName) {
+		String a = this.aliasTable.get(aliasName);
+		if ( null == a) return aliasName;
+		return a;
 	}
 	
 }

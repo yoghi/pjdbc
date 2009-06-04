@@ -31,7 +31,7 @@ public class PSchema implements IDml {
 	/**
 	 * Metadati dello schema
 	 */
-	protected MSchema metaSchema = new MSchema();
+	protected MSchema metaSchema;
 
 	/**
 	 * Logger 
@@ -80,6 +80,8 @@ public class PSchema implements IDml {
 	    }
 	    
 	    this.schemaFile = filePrologDB.getAbsolutePath();
+	    
+	    this.metaSchema = new MSchema(filePrologDB.getName());	//TODO solo il nome o tutto il direttorio??
 	    
 		this.logger_init();
 		
@@ -199,9 +201,11 @@ public class PSchema implements IDml {
 	
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
-		Pselect pselect = new Pselect(request,this.metaSchema);
+		Pselect prq = new Pselect(this.metaSchema);
 		
-		String[] reqs = pselect.generatePsql();
+		prq.evalSql(request);
+
+		String[] reqs = prq.generatePsql();
 		
 		for (int i = 0; i < reqs.length; i++) {
 			

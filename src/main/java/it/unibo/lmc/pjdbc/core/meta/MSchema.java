@@ -30,9 +30,15 @@ public class MSchema {
 	 * tabelle presenti nello schema
 	 */
 	HashMap<String, MTable> tables = new HashMap<String, MTable>();
+
+	/**
+	 * Nome dello schema
+	 */
+	private String name;
 	
-	public MSchema() {
+	public MSchema(String schemaName) {
 		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.meta");
+		this.name = schemaName;
 	}
 	
 	public void loadFromTheory(Theory th) {
@@ -157,6 +163,10 @@ public class MSchema {
 			stream.println("==\\"+tname+"/==");
 			stream.println(this.tables.get(tname).toString());
 		}
+	}
+	
+	public String getSchemaName(){
+		return this.name;
 	}
 	
 }

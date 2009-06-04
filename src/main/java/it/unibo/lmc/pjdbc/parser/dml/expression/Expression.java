@@ -60,7 +60,7 @@ public class Expression {
 			
 			if ( this.right.numClausole > 1 ){	
 				
-				String[] right_clausole = this.right.eval(tables, mschema, aliasVariables);
+//				String[] right_clausole = this.right.eval(tables, mschema, aliasVariables);
 				
 			}
 			

@@ -1,6 +1,6 @@
 employee(1112,smith,5819.2).
 employee(1,john,1799).
-employee(1113,erika,8000).
+employee(1113,erika,7000).
 employee(1114,enrico,8000).
 
 dept(stipendi,1112).
@@ -8,14 +8,23 @@ dept(produzione,1113).
 dept(produzione,1114).
 dept(dirigenti,1).
 
+age(smith,30).
+age(erika,50).
+age(john,25).
+age(enrico,70).
 
 %metabase('dept','').
 %metabase('employee','/home/workspace...').
 
-%le colonne sono numerate come 1 , 2 ... e lo 0???
 
-metabase('dept',1,'d-name','string').
-metabase('dept',2,'id-emp','int').
+
+%NB: le colonne PARTONO DA 0
+
+metabase('age',0,'name','string').
+metabase('age',1,'age','int').
+
+metabase('dept',1,'department','string').
+metabase('dept',2,'id','int').
 
 metabase('employee',0,'id','int').
 metabase('employee',1,'nome','string').
