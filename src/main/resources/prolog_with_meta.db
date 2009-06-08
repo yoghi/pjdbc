@@ -27,5 +27,5 @@ metabase('dept',1,'department','string').
 metabase('dept',2,'id','int').
 
 metabase('employee',0,'id','int').
-metabase('employee',1,'nome','string').
+metabase('employee',1,'name','string').
 metabase('employee',5,'salary','string').
