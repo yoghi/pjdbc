@@ -1,9 +1,12 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression;
 
+import it.unibo.lmc.pjdbc.core.dml.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.parser.Token;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.IComparativeCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.AndCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.ILogicCondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.OrCondition;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.util.HashMap;
@@ -38,41 +41,6 @@ public class Expression {
 		this.numClausole = left.numClausole + right.numClausole;
 	}
 	
-	/**
-	 * Eseguo l'espressione
-	 * @param tables le tabelle con i campi richiesti nell'espressione
-	 * @param mschema metadati
-	 * @param aliasVariables associazioni variabili PSQL => SQL 
-	 * @return clausole aggiuntive da mettere nella interrogazione prolog
-	 */
-	public String[] eval(HashMap<String, TableField[]> tables, MSchema mschema, HashMap<String, String> aliasVariables){
-
-		
-		if ( this.condition instanceof ILogicCondition ) {
-			
-			System.out.println("logic");
-			
-		}
-		
-		if ( this.condition instanceof IComparativeCondition ) {
-			
-			System.out.println("comparative = <= >= < > ");
-			
-			if ( this.right.numClausole > 1 ){	
-				
-//				String[] right_clausole = this.right.eval(tables, mschema, aliasVariables);
-				
-			}
-			
-			//TODO: e mo?? qui che comparazione faccio? quali sono i casi che possono capitare??
-			
-		}
-		
-		
-
-		return null;
-	}
-	
 	public String toString(){
 		if ( null != condition  ) return "[" + left.toString() + " " + this.condition.toString()  + " " + right.toString() + "]";
 		else return "["+valore+"]";
@@ -80,6 +48,53 @@ public class Expression {
 
 	public int numClausole() {
 		return this.numClausole;
+	}
+
+	/**
+	 * Modifico la richiesta per rispettare le informazioni presenti in Expression
+	 * @param requestPsql la richiesta attuale
+	 */
+	public void eval(PRequest requestPsql) {
+		
+		if ( null == this.condition ) {
+			
+			// ... è solo un valore che ci faccio???
+			//requestPsql.AND(this.valore);
+			
+		} else {
+		
+			if ( this.condition instanceof ILogicCondition ) {
+				
+				if ( this.condition instanceof AndCondition ){
+					
+					this.left.eval(requestPsql);
+					this.right.eval(requestPsql);
+					
+				} else if ( this.condition instanceof OrCondition ){
+					
+					PRequest tempRequestA = requestPsql.duplicate();
+					//PRequest tempRequestB = requestPsql.duplicate();
+					
+					this.left.eval(requestPsql);
+					
+					this.right.eval(tempRequestA);
+					
+					requestPsql.OR(tempRequestA.getPsql());
+					
+				}
+				
+			}
+			
+			if ( this.condition instanceof IComparativeCondition ) {
+				
+				System.out.println("comparative = <= >= < > ");
+				
+				// qui metto in AND la clausola X1<=10+D2 etc etc 
+				
+			}
+		
+		}
+		
 	}
 	
 }

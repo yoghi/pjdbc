@@ -40,13 +40,15 @@ public class Pselect {
 	 */
 	private HashMap<String, String> aliasVariable;
 	
-	/**
-	 * Clausole PSQL
-	 * 	tabella1 => campo1,campo2,campo3
-	 *  tabella2 => campo1
-	 *  clausola 1 => null 
-	 */
-	private HashMap<String,String[]> clausolePsql; 
+//	/**
+//	 * Clausole PSQL
+//	 * 	tabella1 => campo1,campo2,campo3
+//	 *  tabella2 => campo1
+//	 *  clausola 1 => null 
+//	 */
+//	private HashMap<String,String[]> clausolePsql; 
+	
+	private PRequest requestPsql;
 	
 	/**
 	 * Tabella primaria
@@ -122,13 +124,16 @@ public class Pselect {
 		
 		Expression whereExp = this.sql.getWhereClausole();
 		
-		log.debug(whereExp.toString());
+		//whereExp.eval(this.requestPsql);
+		
+		// NON LE COSIDERO PER ORA!!!!
 		
 	}
 
 	private void analisiClausolePrimarie() throws SQLException{
 		
-		this.clausolePsql = new HashMap<String, String[]>();
+		//this.clausolePsql = new HashMap<String, String[]>();
+		this.requestPsql = new PRequest();
 		
 		List<TableField> cr = this.sql.getCampiRicerca();
 		
@@ -175,12 +180,31 @@ public class Pselect {
 				log.warn("richiesto campo "+tf.getColumnName()+" non valido sulla tabella "+tname);
 			}
 			
+		}	//for
+		
+		StringBuilder str = new StringBuilder();
+		for (String tableName : selectT.keySet()) {
+			
+			TableField[] field = selectT.get(tableName);
+			
+			str.append(tableName);
+			str.append('(');
+			for(int i=0; i < field.length; i++){
+				if ( field[i] == null ) str.append('_');
+				else str.append(field[i]);
+				str.append(',');
+			}
+			String clausola = str.toString().substring(0, str.capacity()-1);
+			this.requestPsql.AND(clausola);
+
 		}
 		
 	}
 
 	public String[] generatePsql() {
-		// TODO Auto-generated method stub
+		
+		// prendo le clausole e le restituisco
+		
 		return null;
 	}
 	
