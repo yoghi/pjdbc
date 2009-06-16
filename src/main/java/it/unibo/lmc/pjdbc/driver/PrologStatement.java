@@ -111,7 +111,7 @@ public class PrologStatement implements Statement {
 		}
 		
 		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
-		//log.debug(pRequest.toString());
+		log.debug(pRequest.toString());
 		
 		if ( pRequest instanceof Select ) return this.currentSchema.applyCommand((Select)pRequest);
 		

@@ -161,7 +161,7 @@ public class TableField {
 	}
 	
 	public String toString(){
-		if ( !this.tableName.equals("") ) {
+		if ( null != this.tableName ) {
 			return "["+this.tableName+"."+this.columnName+"]";
 		} else {
 			return "["+this.columnName+"]";

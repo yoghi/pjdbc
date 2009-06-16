@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.dml.IDml;
+import it.unibo.lmc.pjdbc.core.dml.PRequest;
 import it.unibo.lmc.pjdbc.core.dml.Pselect;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -14,12 +15,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 
 import alice.tuprolog.InvalidTheoryException;
+import alice.tuprolog.MalformedGoalException;
+import alice.tuprolog.NoMoreSolutionException;
+import alice.tuprolog.NoSolutionException;
+import alice.tuprolog.Prolog;
+import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Theory;
+import alice.tuprolog.Var;
 
 public class PSchema implements IDml {
 	
@@ -205,16 +214,52 @@ public class PSchema implements IDml {
 		
 		prq.evalSql(request);
 
-		String[] reqs = prq.generatePsql();
-		
-		for (int i = 0; i < reqs.length; i++) {
-			
-		}
+		PRequest reqs = prq.generatePsql();
 
-		// return this.execute(result);
-		// this.current_theory, 
+		try {
 		
-		return null;
+			List<SolveInfo> rows = new ArrayList<SolveInfo>();
+			
+			Prolog p = new Prolog();
+			
+			p.setTheory(this.current_theory);
+			
+			SolveInfo info = p.solve(reqs.getPsql());
+			
+			while (info.isSuccess()){ 
+				
+				List<Var> vars = info.getBindingVars();
+				for (Var var : vars) {
+					log.debug(var.getName()+" => "+var.getTerm());
+				}
+				
+	//			log.debug("--");
+				
+				rows.add(info);
+				
+				if (p.hasOpenAlternatives()){ 
+					try {
+						info=p.solveNext();
+					} catch (NoMoreSolutionException e) {
+						break;
+					} 
+				} else { 
+					break;
+				}
+				
+			}
+			
+			return new PrologResultSet();
+	
+		} catch (InvalidTheoryException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		} catch (MalformedGoalException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		} catch (NoSolutionException e) {
+			//throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+			// non ho soluzionio 
+			return new PrologResultSet();
+		}
 
 	}
 

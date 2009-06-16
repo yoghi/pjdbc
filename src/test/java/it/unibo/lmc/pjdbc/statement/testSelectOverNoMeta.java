@@ -52,8 +52,8 @@ public class testSelectOverNoMeta extends TestCase {
 		 */
 		Properties properties = new Properties();
 		
-	    File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
-		//File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+	    //File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
+		File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {
@@ -69,7 +69,7 @@ public class testSelectOverNoMeta extends TestCase {
 		
 		TestSuite ts = new TestSuite();
 		
-//		ts.addTest(new testSelectOverNoMeta("testExecuteQuery"));
+		ts.addTest(new testSelectOverNoMeta("testExecuteQuery"));
 //		ts.addTest(new testSelectOverNoMeta("testMultiVarSelect"));
 //		ts.addTest(new testSelectOverNoMeta("testVarOverSizeTableSelect"));
 //		ts.addTest(new testSelectOverNoMeta("testAliasSelect"));
@@ -78,7 +78,7 @@ public class testSelectOverNoMeta extends TestCase {
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhere2"));
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhereAND"));
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhereOR"));
-		ts.addTest(new testSelectOverNoMeta("testSelectWhereOR2"));
+//		ts.addTest(new testSelectOverNoMeta("testSelectWhereOR2"));
 		
 		
 		return ts;

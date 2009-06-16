@@ -201,11 +201,9 @@ public class Pselect {
 		
 	}
 
-	public String[] generatePsql() {
+	public PRequest generatePsql() {
 		
-		// prendo le clausole e le restituisco
-		
-		return null;
+		return this.requestPsql;
 	}
 	
 	/**
