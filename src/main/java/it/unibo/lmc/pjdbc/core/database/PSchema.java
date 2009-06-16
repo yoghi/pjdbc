@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -150,60 +151,6 @@ public class PSchema implements IDml {
 	
 	// eseguire comandi sul database
 	
-	private PrologResultSet execute(IDml dml) {
-	
-		//TODO: cosa accetto in ingresso??
-		
-//		try {
-//			
-//			List<SolveInfo> rows = new ArrayList<SolveInfo>();
-//			
-//			Prolog p = new Prolog();
-//			
-//			p.setTheory(current_theory);
-//			
-//			SolveInfo info = p.solve(this.psql);
-//			
-//			while (info.isSuccess()){ 
-//				
-//				List<Var> vars = info.getBindingVars();
-//				for (Var var : vars) {
-////					log.debug(var.getName()+" => "+var.getTerm());
-//				}
-//				
-////				log.debug("--");
-//				
-//				rows.add(info);
-//				
-//				if (p.hasOpenAlternatives()){ 
-//					try {
-//						info=p.solveNext();
-//					} catch (NoMoreSolutionException e) {
-//						break;
-//					} 
-//				} else { 
-//					break;
-//				}
-//				
-//			}
-//			
-//			return null;
-//	
-//		} catch (InvalidTheoryException e) {
-//			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-//		} catch (MalformedGoalException e) {
-//			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-//		} catch (NoSolutionException e) {
-//			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
-//		}
-		
-		
-		
-		
-		return null;
-		
-	}
-	
 	/*
 	 * A.P.I. di accesso al database
 	 */
@@ -215,6 +162,8 @@ public class PSchema implements IDml {
 		prq.evalSql(request);
 
 		PRequest reqs = prq.generatePsql();
+		
+		log.debug("psql da eseguire: "+reqs.getPsql());
 
 		try {
 		
@@ -228,12 +177,7 @@ public class PSchema implements IDml {
 			
 			while (info.isSuccess()){ 
 				
-				List<Var> vars = info.getBindingVars();
-				for (Var var : vars) {
-					log.debug(var.getName()+" => "+var.getTerm());
-				}
-				
-	//			log.debug("--");
+				log.debug(info.getBindingVars().toString());
 				
 				rows.add(info);
 				
@@ -249,16 +193,15 @@ public class PSchema implements IDml {
 				
 			}
 			
-			return new PrologResultSet();
+			return new PrologResultSet(rows,reqs);
 	
 		} catch (InvalidTheoryException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
 		} catch (MalformedGoalException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
 		} catch (NoSolutionException e) {
-			//throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
 			// non ho soluzionio 
-			return new PrologResultSet();
+			return new PrologResultSet(null);
 		}
 
 	}

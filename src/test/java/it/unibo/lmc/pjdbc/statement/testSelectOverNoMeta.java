@@ -97,6 +97,17 @@ public class testSelectOverNoMeta extends TestCase {
 			
 			ResultSet rs = stmt.executeQuery("select $0 from employee;");
 			
+			while (rs.next()) {
+				
+				int x = rs.getInt(1);
+				int x2 = rs.getInt("$0");
+
+				assertEquals(x, x2);
+				
+//			    float price = srs.getFloat("PRICE");
+//			    System.out.println(name + "     " + price);
+			}
+			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (Exception e) {

@@ -169,4 +169,8 @@ public class MSchema {
 		return this.name;
 	}
 	
+	public String toString(){
+		return this.name;
+	}
+	
 }

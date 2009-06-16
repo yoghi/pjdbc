@@ -1,5 +1,9 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import it.unibo.lmc.pjdbc.core.dml.PRequest;
+import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.core.meta.MTable;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -19,17 +23,49 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
+
+import alice.tuprolog.NoSolutionException;
+import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Term;
+import alice.tuprolog.Var;
 
 public class PrologResultSet implements ResultSet {
 
-	private LinkedList<ArrayList<Object>> row_data = new LinkedList<ArrayList<Object>>();
 	
-	private int currentPosition = 0;
+	
+	private int currentPosition = -1;
 	private int insertPosition = 0;
 	
-	//TODO: costruttore
+	private List<SolveInfo> row_data;
 	
+	private UUID code = UUID.randomUUID();
+	private Logger log;
+	
+	private PRequest pRequest;
+	
+	
+	/**
+	 * Costrauttore
+	 * @param solutions le soluzioni da usare
+	 */
+	public PrologResultSet(List<SolveInfo> solutions) {
+		if ( null != solutions ) this.row_data = solutions;
+		else this.row_data = new LinkedList<SolveInfo>();
+		
+		log = Logger.getLogger(PrologResultSet.class.toString()+"."+this.code);
+	}
+	
+	public PrologResultSet(List<SolveInfo> solutions,PRequest reqs){
+		this(solutions);
+		this.pRequest = reqs;
+	}
+
+
 	public boolean absolute(int row) throws SQLException {
 		
 		return false;
@@ -303,16 +339,67 @@ public class PrologResultSet implements ResultSet {
 		return 0;
 	}
 
-	
 	public int getInt(int columnIndex) throws SQLException {
-		ArrayList<Object> o = this.row_data.get(this.currentPosition);
-		return Integer.parseInt(o.get(columnIndex).toString());
+		
+		SolveInfo info = this.row_data.get(this.currentPosition);
+		
+		try {
+		
+			Var vresult = (Var)info.getBindingVars().get(columnIndex-1);
+			
+			if ( vresult.getTerm() instanceof alice.tuprolog.Number ) {
+				return Integer.parseInt( vresult.getTerm().toString() );
+			} else {
+				throw new SQLException("Data into Column isn't number","SQLSTATE");
+			} 
+			
+		} catch (NoSolutionException e) {
+			throw new SQLException("Column "+columnIndex+"not exist","SQLSTATE");
+		}
+		
 	}
 
 	
 	public int getInt(String columnLabel) throws SQLException {
 		
-		return 0;
+		if ( null == columnLabel ) throw new SQLException("columLabel cann't nullable ");
+		
+		SolveInfo info = this.row_data.get(this.currentPosition);
+		
+		try {
+		
+			if ( columnLabel.startsWith("$") ){
+				
+				
+				String prologLabel = null;
+				if ( this.pRequest != null )
+					prologLabel = this.pRequest.getVarAliasSqltoProlog(columnLabel); 
+				
+				if ( null == prologLabel ) prologLabel = columnLabel;
+				
+//				int index = Integer.parseInt( columnLabel.substring(1) );
+//				Var vresult = (Var)info.getBindingVars().get(index);
+				
+				Term value = info.getVarValue(prologLabel);
+
+				if ( value instanceof alice.tuprolog.Number ) {
+					return Integer.parseInt( value.toString() );
+				} else {
+					throw new SQLException("Data into Column isn't number","SQLSTATE");
+				}
+				 
+			
+			} else {
+				 
+				Term t = (Term)info.getVarValue(columnLabel);
+				return Integer.parseInt(t.toString());
+			}
+			
+			
+		} catch (NoSolutionException e) {
+			throw new SQLException("Column "+columnLabel+"not exist","SQLSTATE");
+		}
+		
 	}
 
 	

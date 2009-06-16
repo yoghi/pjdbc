@@ -132,8 +132,11 @@ public class Pselect {
 
 	private void analisiClausolePrimarie() throws SQLException{
 		
-		//this.clausolePsql = new HashMap<String, String[]>();
+		this.aliasVariable = new HashMap<String, String>();
+		
 		this.requestPsql = new PRequest();
+		this.requestPsql.setSchemaInfo(this.mschema);
+		this.requestPsql.setVarInfo(this.aliasVariable); 
 		
 		List<TableField> cr = this.sql.getCampiRicerca();
 		
@@ -182,27 +185,34 @@ public class Pselect {
 			
 		}	//for
 		
-		StringBuilder str = new StringBuilder();
+		boolean first = true;
 		for (String tableName : selectT.keySet()) {
 			
 			TableField[] field = selectT.get(tableName);
 			
+			StringBuilder str = new StringBuilder();
 			str.append(tableName);
 			str.append('(');
 			for(int i=0; i < field.length; i++){
 				if ( field[i] == null ) str.append('_');
-				else str.append(field[i]);
+				else {
+					if ( field[i].getColumnName().startsWith("$") ){
+						String num = field[i].getColumnName().substring(1);
+						String psql_var = tableName.toUpperCase()+num;
+						str.append(psql_var);
+						this.aliasVariable.put( psql_var , field[i].getColumnName() );
+					}
+				}
 				str.append(',');
 			}
-			String clausola = str.toString().substring(0, str.capacity()-1);
-			this.requestPsql.AND(clausola);
+			str.replace(str.length()-1, str.length(), ")");
+			this.requestPsql.AND(str.toString());
 
 		}
 		
 	}
 
 	public PRequest generatePsql() {
-		
 		return this.requestPsql;
 	}
 	

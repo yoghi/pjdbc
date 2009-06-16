@@ -110,7 +110,6 @@ public class PrologStatement implements Statement {
 			throw new SQLException(e.getMessage());
 		}
 		
-		//TODO: EXECUTE QUERY CODE... reutrn a resultset...
 		log.debug(pRequest.toString());
 		
 		if ( pRequest instanceof Select ) return this.currentSchema.applyCommand((Select)pRequest);
@@ -131,6 +130,8 @@ public class PrologStatement implements Statement {
 		}
 		
 		ParsedCommand pRequest = null;
+		
+		//TODO: ... da verificare .. con il codice della Select
 		
 		try {
 			pRequest = parse.parseIt("");	//TODO: su quale schema/db eseguo la query??
