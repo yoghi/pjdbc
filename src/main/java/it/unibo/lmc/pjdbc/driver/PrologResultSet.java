@@ -1,8 +1,6 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.dml.PRequest;
-import it.unibo.lmc.pjdbc.core.meta.MSchema;
-import it.unibo.lmc.pjdbc.core.meta.MTable;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -20,7 +18,6 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
@@ -320,17 +317,66 @@ public class PrologResultSet implements ResultSet {
 		// devo ricordarmi di togliere la riga che uso per gli inserimenti
 		return this.row_data.size()-1;
 	}
+	
+	public String getValue(int columnIndex) throws SQLException{
+		SolveInfo info = this.row_data.get(this.currentPosition);
+		
+		try {
+		
+			List<Var> results = info.getBindingVars();
+			
+			if ( columnIndex > results.size() ) {
+				throw new SQLException("Column "+columnIndex+" not valid");
+			}
+			
+			Var vresult = results.get(columnIndex-1);
+			
+			if ( vresult.getTerm() instanceof alice.tuprolog.Number ) {
+				return vresult.getTerm().toString();
+			} else {
+				throw new SQLException("Data into Column "+columnIndex+" isn't number","SQLSTATE");
+			} 
+			
+		} catch (NoSolutionException e) {
+			throw new SQLException("Column "+columnIndex+"not exist","SQLSTATE");
+		}
+	}
+	
+	public String getValue(String columnLabel) throws SQLException {
+		
+		if ( null == columnLabel ) throw new SQLException("columLabel cann't nullable ");
+		
+		SolveInfo info = this.row_data.get(this.currentPosition);
+		
+		try {
+		
+			String prologLabel = null;
+			if ( this.pRequest != null )
+				prologLabel = this.pRequest.getVarAliasSqltoProlog(columnLabel); 
+			
+			if ( null == prologLabel ) prologLabel = columnLabel;
+
+			Term value = info.getVarValue(prologLabel);
+
+			if ( value instanceof alice.tuprolog.Number ) {
+				return value.toString();
+			} else {
+				throw new SQLException("Data into Column "+columnLabel+" isn't number","SQLSTATE");
+			}
+
+		} catch (NoSolutionException e) {
+			throw new SQLException("Column "+columnLabel+"not exist","SQLSTATE");
+		}
+	}
 
 	
 	public float getFloat(int columnIndex) throws SQLException {
-		
-		return 0;
+		return Float.parseFloat( this.getValue(columnIndex) );
 	}
 
 	
 	public float getFloat(String columnLabel) throws SQLException {
-		
-		return 0;
+		return Float.parseFloat( this.getValue(columnLabel) );
 	}
 
 	
@@ -340,66 +386,12 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public int getInt(int columnIndex) throws SQLException {
-		
-		SolveInfo info = this.row_data.get(this.currentPosition);
-		
-		try {
-		
-			Var vresult = (Var)info.getBindingVars().get(columnIndex-1);
-			
-			if ( vresult.getTerm() instanceof alice.tuprolog.Number ) {
-				return Integer.parseInt( vresult.getTerm().toString() );
-			} else {
-				throw new SQLException("Data into Column isn't number","SQLSTATE");
-			} 
-			
-		} catch (NoSolutionException e) {
-			throw new SQLException("Column "+columnIndex+"not exist","SQLSTATE");
-		}
-		
+		return Integer.parseInt(this.getValue(columnIndex));
 	}
 
 	
 	public int getInt(String columnLabel) throws SQLException {
-		
-		if ( null == columnLabel ) throw new SQLException("columLabel cann't nullable ");
-		
-		SolveInfo info = this.row_data.get(this.currentPosition);
-		
-		try {
-		
-			if ( columnLabel.startsWith("$") ){
-				
-				
-				String prologLabel = null;
-				if ( this.pRequest != null )
-					prologLabel = this.pRequest.getVarAliasSqltoProlog(columnLabel); 
-				
-				if ( null == prologLabel ) prologLabel = columnLabel;
-				
-//				int index = Integer.parseInt( columnLabel.substring(1) );
-//				Var vresult = (Var)info.getBindingVars().get(index);
-				
-				Term value = info.getVarValue(prologLabel);
-
-				if ( value instanceof alice.tuprolog.Number ) {
-					return Integer.parseInt( value.toString() );
-				} else {
-					throw new SQLException("Data into Column isn't number","SQLSTATE");
-				}
-				 
-			
-			} else {
-				 
-				Term t = (Term)info.getVarValue(columnLabel);
-				return Integer.parseInt(t.toString());
-			}
-			
-			
-		} catch (NoSolutionException e) {
-			throw new SQLException("Column "+columnLabel+"not exist","SQLSTATE");
-		}
-		
+		return Integer.parseInt(this.getValue(columnLabel));
 	}
 
 	
@@ -507,8 +499,7 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public String getString(int columnIndex) throws SQLException {
-		ArrayList<Object> o = this.row_data.get(this.currentPosition);
-		return (String) o.get(columnIndex);
+		return null;
 	}
 
 	
@@ -655,7 +646,7 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void moveToInsertRow() throws SQLException {
-		this.row_data.add(this.insertPosition, new ArrayList<Object>());
+		//this.row_data.add(this.insertPosition, new ArrayList<Object>());
 		this.currentPosition = this.insertPosition;
 	}
 
@@ -1020,9 +1011,9 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void updateInt(int columnIndex, int x) throws SQLException {
-		ArrayList<Object> f = this.row_data.get(this.currentPosition);
-		if ( columnIndex < f.size() ) f.set(columnIndex,x);
-		else f.add(columnIndex,x);
+//		ArrayList<Object> f = this.row_data.get(this.currentPosition);
+//		if ( columnIndex < f.size() ) f.set(columnIndex,x);
+//		else f.add(columnIndex,x);
 	}
 
 	
@@ -1126,8 +1117,8 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void updateObject(int columnIndex, Object x) throws SQLException {
-		ArrayList<Object> f = this.row_data.get(this.currentPosition);
-		f.add(columnIndex,x);
+//		ArrayList<Object> f = this.row_data.get(this.currentPosition);
+//		f.add(columnIndex,x);
 	}
 
 	
@@ -1182,9 +1173,9 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public void updateString(int columnIndex, String x) throws SQLException {
-		ArrayList<Object> f = this.row_data.get(this.currentPosition);
-		if (columnIndex < f.size()) f.set(columnIndex,x); 
-		else f.add(columnIndex,x);
+//		ArrayList<Object> f = this.row_data.get(this.currentPosition);
+//		if (columnIndex < f.size()) f.set(columnIndex,x); 
+//		else f.add(columnIndex,x);
 	}
 
 	

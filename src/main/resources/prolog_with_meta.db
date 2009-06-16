@@ -18,14 +18,14 @@ age(enrico,70).
 
 
 
-%NB: le colonne PARTONO DA 0
+%NB: le colonne PARTONO DA 1
 
 metabase('age',0,'name','string').
 metabase('age',1,'age','int').
 
-metabase('dept',1,'department','string').
-metabase('dept',2,'id','int').
+metabase('dept',0,'department','string').
+metabase('dept',1,'id','int').
 
 metabase('employee',0,'id','int').
 metabase('employee',1,'name','string').
-metabase('employee',5,'salary','string').
+metabase('employee',2,'salary','string').

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -70,8 +71,8 @@ public class testSelectOverNoMeta extends TestCase {
 		TestSuite ts = new TestSuite();
 		
 		ts.addTest(new testSelectOverNoMeta("testExecuteQuery"));
-//		ts.addTest(new testSelectOverNoMeta("testMultiVarSelect"));
-//		ts.addTest(new testSelectOverNoMeta("testVarOverSizeTableSelect"));
+		ts.addTest(new testSelectOverNoMeta("testMultiVarSelect"));
+		ts.addTest(new testSelectOverNoMeta("testVarOverSizeTableSelect"));
 //		ts.addTest(new testSelectOverNoMeta("testAliasSelect"));
 //		ts.addTest(new testSelectOverNoMeta("testAliasSelectMisc"));
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhere"));
@@ -98,14 +99,12 @@ public class testSelectOverNoMeta extends TestCase {
 			ResultSet rs = stmt.executeQuery("select $0 from employee;");
 			
 			while (rs.next()) {
-				
+
+				//NB: le colonne si contano da 1
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("$0");
-
 				assertEquals(x, x2);
-				
-//			    float price = srs.getFloat("PRICE");
-//			    System.out.println(name + "     " + price);
+
 			}
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
@@ -131,6 +130,19 @@ public class testSelectOverNoMeta extends TestCase {
 			
 			ResultSet rs = stmt.executeQuery("select $0,$2 from employee;");
 			
+			while (rs.next()) {
+
+				//NB: le colonne si contano da 1
+				int x = rs.getInt(1);
+				int x2 = rs.getInt("$0");
+				assertEquals(x, x2);
+				
+				float y = rs.getFloat(3);
+				float y2 = rs.getFloat("$2");
+				assertEquals(y, y2);
+
+			}
+			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (Exception e) {
@@ -150,9 +162,16 @@ public class testSelectOverNoMeta extends TestCase {
 		System.out.println("  testVarOverSizeTableSelect      ");
  		System.out.println(" ====================== ");
 		
+ 		ResultSet rs = null;
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select $0,$5 from employee;");
+			rs = stmt.executeQuery("select $0,$5 from employee;");
+			
+			rs.next();
+			//NB: le colonne si contano da 1
+			int x = rs.getInt(1);
+			int x2 = rs.getInt("$0");
+			assertEquals(x, x2);
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -160,7 +179,18 @@ public class testSelectOverNoMeta extends TestCase {
 			fail(" ExecuteQuery ha ritornato: " + e);
 		}
 		
-		assertTrue(true);
+		try {
+			
+			int y = rs.getInt(6);
+			int y2 = rs.getInt("$5");
+			assertEquals(y, y2);
+			
+		} catch (SQLException e) {
+			assertTrue(true);
+			return;
+		}
+		
+		fail("errore non propagato");
 		
 	}
 	
