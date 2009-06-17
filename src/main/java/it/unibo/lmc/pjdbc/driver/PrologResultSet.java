@@ -30,6 +30,7 @@ import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Term;
 import alice.tuprolog.Var;
+import alice.tuprologx.runtime.corba.SolveInfoHolder;
 
 public class PrologResultSet implements ResultSet {
 
@@ -318,7 +319,7 @@ public class PrologResultSet implements ResultSet {
 		return this.row_data.size()-1;
 	}
 	
-	public String getValue(int columnIndex) throws SQLException{
+	protected String getValue(int columnIndex) throws SQLException{
 		SolveInfo info = this.row_data.get(this.currentPosition);
 		
 		try {
@@ -331,18 +332,16 @@ public class PrologResultSet implements ResultSet {
 			
 			Var vresult = results.get(columnIndex-1);
 			
-			if ( vresult.getTerm() instanceof alice.tuprolog.Number ) {
-				return vresult.getTerm().toString();
-			} else {
-				throw new SQLException("Data into Column "+columnIndex+" isn't number","SQLSTATE");
-			} 
+			return vresult.getTerm().toString();
+			
+			//if ( vresult.getTerm() instanceof alice.tuprolog.Number ) 
 			
 		} catch (NoSolutionException e) {
 			throw new SQLException("Column "+columnIndex+"not exist","SQLSTATE");
 		}
 	}
 	
-	public String getValue(String columnLabel) throws SQLException {
+	protected String getValue(String columnLabel) throws SQLException {
 		
 		if ( null == columnLabel ) throw new SQLException("columLabel cann't nullable ");
 		
@@ -358,25 +357,32 @@ public class PrologResultSet implements ResultSet {
 
 			Term value = info.getVarValue(prologLabel);
 
-			if ( value instanceof alice.tuprolog.Number ) {
-				return value.toString();
-			} else {
-				throw new SQLException("Data into Column "+columnLabel+" isn't number","SQLSTATE");
-			}
+			if ( null == value ) throw new SQLException("Column "+columnLabel+" not exist","SQLSTATE");
+			
+			return value.toString();
 
 		} catch (NoSolutionException e) {
 			throw new SQLException("Column "+columnLabel+"not exist","SQLSTATE");
 		}
+	
 	}
 
 	
 	public float getFloat(int columnIndex) throws SQLException {
-		return Float.parseFloat( this.getValue(columnIndex) );
+		try {
+			return Float.parseFloat( this.getValue(columnIndex) );
+		} catch(NumberFormatException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		}
 	}
 
 	
 	public float getFloat(String columnLabel) throws SQLException {
-		return Float.parseFloat( this.getValue(columnLabel) );
+		try {
+			return Float.parseFloat( this.getValue(columnLabel) );
+		} catch(NumberFormatException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		}	
 	}
 
 	
@@ -386,12 +392,20 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public int getInt(int columnIndex) throws SQLException {
-		return Integer.parseInt(this.getValue(columnIndex));
+		try {
+			return Integer.parseInt(this.getValue(columnIndex));
+		} catch(NumberFormatException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		}
 	}
 
 	
 	public int getInt(String columnLabel) throws SQLException {
-		return Integer.parseInt(this.getValue(columnLabel));
+		try {
+			return Integer.parseInt(this.getValue(columnLabel));
+		} catch(NumberFormatException e) {
+			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+		}
 	}
 
 	
@@ -499,13 +513,12 @@ public class PrologResultSet implements ResultSet {
 
 	
 	public String getString(int columnIndex) throws SQLException {
-		return null;
+		return this.getValue(columnIndex);
 	}
 
 	
 	public String getString(String columnLabel) throws SQLException {
-		
-		return null;
+		return this.getValue(columnLabel);
 	}
 
 	
@@ -647,6 +660,7 @@ public class PrologResultSet implements ResultSet {
 	
 	public void moveToInsertRow() throws SQLException {
 		//this.row_data.add(this.insertPosition, new ArrayList<Object>());
+		// devo creare un nuovo solveinfo???
 		this.currentPosition = this.insertPosition;
 	}
 

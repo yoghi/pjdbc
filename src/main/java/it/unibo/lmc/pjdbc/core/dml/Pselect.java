@@ -136,11 +136,12 @@ public class Pselect {
 		
 		this.requestPsql = new PRequest();
 		this.requestPsql.setSchemaInfo(this.mschema);
-		this.requestPsql.setVarInfo(this.aliasVariable); 
+		this.requestPsql.setVarInfo(this.aliasVariable);
+		this.requestPsql.setTableInto(this.aliasTable);
 		
 		List<TableField> cr = this.sql.getCampiRicerca();
 		
-		/** 1. mi memorizzo le colonne da cercare suddivise per tabella */
+		/** 1. mi memorizzo le colonne da cercare suddivise per tabella , l'ordine delle tabelle non è quello che compare nella select */
 		HashMap<String, TableField[]> selectT = new HashMap<String, TableField[]>();
 		
 		String tname;
@@ -161,16 +162,17 @@ public class Pselect {
 			if ( selectT.containsKey(tname) ){
 				c = selectT.get(tname);
 			} else {
-				
 				c = new TableField[f.numColum()];
 				selectT.put(tname, c);
 			}
 			
+			
+			String columnName = tf.getColumnName();
 			int pos = -1;
-			if ( tf.getColumnName().startsWith("$")  ) {
-				pos = Integer.parseInt(tf.getColumnName().substring(1));
+			if ( columnName.startsWith("$")  ) {
+				pos = Integer.parseInt(columnName.substring(1));
 			} else {
-				pos = f.containsField(tf.getColumnName());
+				pos = f.containsField(columnName);
 			}
 			
 			if ( pos >= 0 ){
@@ -186,7 +188,10 @@ public class Pselect {
 		}	//for
 		
 		boolean first = true;
-		for (String tableName : selectT.keySet()) {
+		
+		for ( Table table : this.sql.getFromTable() ){
+			
+			String tableName = table.getName();
 			
 			TableField[] field = selectT.get(tableName);
 			
@@ -201,11 +206,12 @@ public class Pselect {
 						String num = field[i].getColumnName().substring(1);
 						psql_var += num;
 					} else {
-						//il campo esiste l'ho controllato prima
 						psql_var += field[i].getColumnName().toUpperCase();
 					}
 					str.append(psql_var);
-					this.aliasVariable.put( psql_var , field[i].getColumnName() );
+					
+					String sql_var = ( null != field[i].getAlias() ) ? field[i].getAlias() : tableName.toUpperCase()+"."+field[i].getColumnName(); 
+					this.aliasVariable.put( psql_var , sql_var ); //posso avere gli alias anche delle var a livello di select!!!
 				}
 				str.append(',');
 			}

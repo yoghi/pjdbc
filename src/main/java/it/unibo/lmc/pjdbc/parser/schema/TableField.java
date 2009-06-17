@@ -22,7 +22,7 @@ public class TableField {
     private String schema;						// Schema name;
 //    private int type;							// type 
     private boolean dinstinct;					// distinct field
-    
+    private String alias;
     
     public TableField(){
     	this.setColumnName("*");
@@ -161,11 +161,22 @@ public class TableField {
 	}
 	
 	public String toString(){
+		
+		String aliasT = (null !=  this.alias) ? " AS " +this.alias : "";
+		
 		if ( null != this.tableName ) {
-			return "["+this.tableName+"."+this.columnName+"]";
+			return "["+this.tableName+"."+this.columnName+ aliasT + "]";
 		} else {
-			return "["+this.columnName+"]";
+			return "["+this.columnName+ aliasT + "]";
 		}
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+	
+	public String getAlias(){
+		return this.alias;
 	}
     
 }

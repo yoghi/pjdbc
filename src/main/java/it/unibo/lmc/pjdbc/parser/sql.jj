@@ -303,13 +303,14 @@ TableField Column():
 	String name1 = null;
 	String name2 = null;
 	String name3 = null;
-	
+	String alias = null;
 	TableField field;
 	boolean distinct = false;
+	
 }
 {
     // [schema.][tabella.]colonna
-    [ <K_DISTINCT> {distinct = true;} ] name1=RelObjectName() [ "." name2=RelObjectName() ["." name3=RelObjectName()]]
+    [ <K_DISTINCT> {distinct = true;} ] name1=RelObjectName() [ "." name2=RelObjectName() ["." name3=RelObjectName()]] [ alias=Alias() ]
     {
     
     	if (name3 != null) {
@@ -322,7 +323,8 @@ TableField Column():
     	} else {
     		field = new TableField(name1);
     	}
-    	
+    
+    	field.setAlias(alias);	
     	field.setDistinct(distinct);
     	return field;
    	}
