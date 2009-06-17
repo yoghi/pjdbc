@@ -196,13 +196,13 @@ public class Pselect {
 			for(int i=0; i < field.length; i++){
 				if ( field[i] == null ) str.append('_');
 				else {
-					String psql_var = null;
+					String psql_var = tableName.toUpperCase()+"_";
 					if ( field[i].getColumnName().startsWith("$") ){
 						String num = field[i].getColumnName().substring(1);
-						psql_var = tableName.toUpperCase()+num;
+						psql_var += num;
 					} else {
 						//il campo esiste l'ho controllato prima
-						psql_var = field[i].getColumnName().toUpperCase();
+						psql_var += field[i].getColumnName().toUpperCase();
 					}
 					str.append(psql_var);
 					this.aliasVariable.put( psql_var , field[i].getColumnName() );
