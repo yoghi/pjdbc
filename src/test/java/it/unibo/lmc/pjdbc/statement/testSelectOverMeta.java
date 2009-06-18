@@ -2,6 +2,7 @@ package it.unibo.lmc.pjdbc.statement;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -75,6 +76,7 @@ public class testSelectOverMeta extends TestCase {
 		ts.addTest(new testSelectOverMeta("testVarOverSizeTableSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelectMisc"));
+		ts.addTest(new testSelectOverMeta("testGetArray"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhereAND"));
@@ -150,6 +152,32 @@ public class testSelectOverMeta extends TestCase {
 		}
 		
 		assertTrue(true);
+		
+	}
+	
+	public void testGetArray(){
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testGetArray          ");
+ 		System.out.println(" ====================== ");
+		
+ 		ResultSet rs = null;
+		try {
+			
+			rs = stmt.executeQuery("select ... from employee;");
+			
+			rs.next();
+			//NB: le colonne si contano da 1
+			Array x = rs.getArray(1);
+			Array x2 = rs.getArray("sa");
+			
+			assertEquals(x, x2);
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
 		
 	}
 	

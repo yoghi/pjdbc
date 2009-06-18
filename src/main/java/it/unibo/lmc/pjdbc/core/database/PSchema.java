@@ -1,7 +1,6 @@
 package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.dml.IDml;
-import it.unibo.lmc.pjdbc.core.dml.PRequest;
 import it.unibo.lmc.pjdbc.core.dml.Pselect;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -111,7 +110,6 @@ public class PSchema implements IDml {
 		return new PSchema(this.current_theory,this.metaSchema);
 	}
 	
-	
 	/**
 	 * Inizializzo il sistema di logging
 	 */
@@ -144,30 +142,18 @@ public class PSchema implements IDml {
 		this.metaSchema.loadFromTheory(this.current_theory);
 		this.metaSchema.printMetaInfo(System.out);
 	}
-	
-	// devo avere informazioni su come è fatto il database
-	
-	// deve tenere traccia delle transazioni
-	
-	// eseguire comandi sul database
-	
-	/*
-	 * A.P.I. di accesso al database
-	 */
-	
+
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
 		Pselect prq = new Pselect(this.metaSchema);
 		
-		prq.evalSql(request);
+		PRequest reqs = prq.evalSql(request);
 
-		PRequest reqs = prq.generatePsql();
-		
 		log.debug("psql da eseguire: "+reqs.getPsql());
 
 		try {
 		
-			List<SolveInfo> rows = new ArrayList<SolveInfo>();
+			List<SolveInfo> rows = new ArrayList<SolveInfo>();	//QUI CAMBIO E CREO UNA MIA STRUTTURA DATI!!!
 			
 			Prolog p = new Prolog();
 			

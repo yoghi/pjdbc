@@ -1,10 +1,8 @@
-package it.unibo.lmc.pjdbc.core.dml;
-
-import java.util.HashMap;
-import java.util.List;
+package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
-import it.unibo.lmc.pjdbc.parser.schema.Table;
+
+import java.util.HashMap;
 
 public class PRequest {
 
