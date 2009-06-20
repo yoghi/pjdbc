@@ -92,6 +92,7 @@ public class MSchema {
 						 * se c'è qualcosa diverso da (!|[a-z][a-zA-Z_0-9]*) allora non è atomico e compare tra '
 						 */
 						t.addField( ((Number) field_position).intValue() , field_name.toString().replace("'", ""), field_type.toString() ) ;
+						log.debug("tabella : "+table_name.toString()+" campo : "+((Number) field_position).intValue()+" "+field_name.toString()+" "+field_type.toString());
 						
 
 					} else {

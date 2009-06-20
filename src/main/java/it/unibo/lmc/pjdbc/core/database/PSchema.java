@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,7 +27,6 @@ import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Theory;
-import alice.tuprolog.Var;
 
 public class PSchema implements IDml {
 	
@@ -75,25 +73,20 @@ public class PSchema implements IDml {
 		File filePrologDB = new File(sourceUrl);
 		boolean exists = filePrologDB.exists();
 	    
-	    if ( exists ) {
-	    	String userDir = System.getProperty("user.dir");
-	    	if ( !(new File(userDir+File.separator+sourceUrl)).exists() ){
-	    		throw new FileNotFoundException("File "+sourceUrl+" and "+userDir+File.separator+sourceUrl+" doesn't exist");
-	    	} else {
-	    		sourceUrl = userDir + File.separator + sourceUrl;
-	    	}
-	    } else {
-	    	log.info("Impossibile caricare il db: "+filePrologDB.getAbsolutePath());
-	    	if ( !filePrologDB.createNewFile() ) throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
-	    	log.info("Creato database vuoto: "+filePrologDB.getAbsolutePath());
-	    }
+		this.logger_init();
+		
+	   if ( exists ) {
+		   log.info("Open file : "+filePrologDB.getAbsolutePath());
+	   } else {
+		   log.info("Impossibile caricare lo schema: "+filePrologDB.getAbsolutePath());
+//		   if ( !filePrologDB.createNewFile() ) throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
+//		   log.info("Creato schema vuoto: "+filePrologDB.getAbsolutePath());
+	   }
 	    
 	    this.schemaFile = filePrologDB.getAbsolutePath();
 	    
 	    this.metaSchema = new MSchema(filePrologDB.getName());	//TODO solo il nome o tutto il direttorio??
 	    
-		this.logger_init();
-		
 		this.load_theory();
 
 		this.load_meta();
@@ -114,13 +107,14 @@ public class PSchema implements IDml {
 	 * Inizializzo il sistema di logging
 	 */
 	protected void logger_init() {
-		log = Logger.getLogger("it.unibo.lmc.pjdbc");
+		log = Logger.getLogger(PSchema.class);
 	}
 	
 	/**
 	 * Carico la teoria prolog
+	 * @throws IOException 
 	 */
-	protected void load_theory()  {
+	protected void load_theory() throws IOException  {
 		
 		try {
 			this.current_theory = new Theory(new FileInputStream(this.schemaFile));
@@ -140,16 +134,16 @@ public class PSchema implements IDml {
 	
 	protected void load_meta() {
 		this.metaSchema.loadFromTheory(this.current_theory);
-		this.metaSchema.printMetaInfo(System.out);
+//		this.metaSchema.printMetaInfo(System.out);
 	}
 
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
-		Pselect prq = new Pselect(this.metaSchema);
+		Pselect prq = new Pselect(this.metaSchema,request);
 		
-		PRequest reqs = prq.evalSql(request);
+//		PRequest reqs = prq.evalSql(request);
 
-		log.debug("psql da eseguire: "+reqs.getPsql());
+//		log.debug("psql da eseguire: "+reqs.getPsql());
 
 		try {
 		
@@ -159,7 +153,7 @@ public class PSchema implements IDml {
 			
 			p.setTheory(this.current_theory);
 			
-			SolveInfo info = p.solve(reqs.getPsql());
+			SolveInfo info = p.solve("");	//reqs.getPsql()
 			
 			while (info.isSuccess()){ 
 				
@@ -179,7 +173,8 @@ public class PSchema implements IDml {
 				
 			}
 			
-			return new PrologResultSet(rows,reqs);
+			//return new PrologResultSet(rows,reqs);
+			return new PrologResultSet(null);
 	
 		} catch (InvalidTheoryException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
@@ -219,6 +214,10 @@ public class PSchema implements IDml {
 		 */
 		
 		return 0;
+	}
+
+	public void close() {
+		//TODO: devo rilasciare le risorse : theory e quant'altro a esso collegata
 	}
 	
 	

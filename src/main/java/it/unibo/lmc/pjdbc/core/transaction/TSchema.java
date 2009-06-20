@@ -60,6 +60,10 @@ public abstract class TSchema implements IDml {
 	public abstract int applyCommand(Insert request) throws SQLException;
 	public abstract int applyCommand(Update request) throws SQLException;
 	public abstract int applyCommand(Delete request) throws SQLException;
+
+	public void close() {
+		this.realSchema.close();
+	}
 	
 	
 }

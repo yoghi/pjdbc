@@ -1,5 +1,9 @@
 package it.unibo.lmc.pjdbc.core.dml;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+
 import it.unibo.lmc.pjdbc.core.database.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
@@ -8,129 +12,44 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 
-import org.apache.log4j.Logger;
+public class Pselect extends PRequest {
 
-public class Pselect {
+	private Object primaryTable;
 
-	/**
-	 * Logger di sistema
-	 */
-	private Logger log;
-
-	/**
-	 * Query Sql Parsed
-	 */
-	private Select metadatiRequest;
-	
-	/**
-	 * Meta Schema
-	 */
-	private MSchema mschema;
-	
-	/**
-	 * Alias Nome Tabella Breve, Nome Tabella
-	 */
-	private HashMap<String, String> aliasTable;
-	
-	/**
-	 * Alias Nome Varibile PSQL,Nome Variabile SQL
-	 */
-	private HashMap<String, String> aliasVariable;
-	
-//	/**
-//	 * Clausole PSQL
-//	 * 	tabella1 => campo1,campo2,campo3
-//	 *  tabella2 => campo1
-//	 *  clausola 1 => null 
-//	 */
-//	private HashMap<String,String[]> clausolePsql; 
-	
-	private PRequest requestPsql;
-	
-	/**
-	 * Tabella primaria
-	 */
-	private String primaryTable;
-	
-	/**
-	 * Costruttore
-	 * @param metaSchema meta informazioni sul database su cui si dovrà agire 
-	 */
-	public Pselect(MSchema metaSchema) {
-		this.mschema = metaSchema;
-		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
-		log.debug("valuto lo schema "+metaSchema.toString());
-	}
-	
-	/**
-	 * Costruttore interno per la duplicazione
-	 * @param sqlS
-	 * @param metaSchema
-	 */
-
-	private Pselect(Select sqlS, MSchema metaSchema) {
-		this.mschema = metaSchema;
-		this.metadatiRequest = sqlS;
-		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");
-		log.debug("valuto lo schema "+metaSchema.toString());
+	public Pselect(MSchema ms, Select req) {
+		super(ms, req);
 	}
 
-	/**
-	 * Valuto la richiesta SELECT  
-	 * @param request richiesta generata con il parsing dell'sql
-	 * @return 
-	 * @throws SQLException 
-	 */
-	public PRequest evalSql(Select request) throws SQLException {
-
-		this.metadatiRequest = request;
-
+	@Override
+	public String generatePrologRequest() throws SQLException {
+		
 		/** 0. alias table => Se la tabella non esiste nei metadati?? */
 		
-		List<Table> tb = this.metadatiRequest.getFromTable();
+		List<Table> tb = ((Select)this.mcommand).getFromTable();
 		
-		this.primaryTable = tb.get(0).getName();
+		String primaryTableName = tb.get(0).getName();
 		
-		this.aliasTable = new HashMap<String, String>();
+		
 		for (int i = 0; i < tb.size(); i++) {
-			if ( tb.get(i).getAlias() != null ) this.aliasTable.put(tb.get(i).getAlias(), tb.get(i).getName());	
-			else this.aliasTable.put(tb.get(i).getName(), tb.get(i).getName());	// se non c'è alias metto il nome della tabella
+			if ( tb.get(i).getAlias() != null ) this.aliasTables.put(tb.get(i).getAlias(), tb.get(i).getName());	
+			else this.aliasTables.put(tb.get(i).getName(), tb.get(i).getName());	// se non c'è alias metto il nome della tabella
 		}
 		
 		// genera clausole primarie (info a partire da FROM e dai campi di SELECT
 		this.analisiClausolePrimarie();
 		
 		// controllo clausole WHERE
-		this.analisiClausoleSecondarie();
+//		this.analisiClausoleSecondarie();
 		
-		return this.requestPsql;
-		
-	}
-	
-	private void analisiClausoleSecondarie() {
-		
-		Expression whereExp = this.metadatiRequest.getWhereClausole();
-		
-		//whereExp.eval(this.requestPsql);
-		
-		// NON LE COSIDERO PER ORA!!!!
+//		return this.requestPsql;
+		return "";
 		
 	}
 
 	private void analisiClausolePrimarie() throws SQLException{
 		
-		this.aliasVariable = new HashMap<String, String>();
-		
-		this.requestPsql = new PRequest();
-		this.requestPsql.setSchemaInfo(this.mschema);
-		this.requestPsql.setVarInfo(this.aliasVariable);
-		this.requestPsql.setTableInto(this.aliasTable);
-		
-		List<TableField> cr = this.metadatiRequest.getCampiRicerca();
+		List<TableField> cr = ((Select)this.mcommand).getCampiRicerca();
 		
 		/** 1. mi memorizzo le colonne da cercare suddivise per tabella , l'ordine delle tabelle non è quello che compare nella select */
 		HashMap<String, TableField[]> selectT = new HashMap<String, TableField[]>();
@@ -180,7 +99,7 @@ public class Pselect {
 		
 		boolean first = true;
 		
-		for ( Table table : this.metadatiRequest.getFromTable() ){
+		for ( Table table : ((Select)this.mcommand).getFromTable() ){
 			
 			String tableName = table.getName();
 			
@@ -210,6 +129,15 @@ public class Pselect {
 			this.requestPsql.AND(str.toString());
 
 		}
+	}
+	
+	private void analisiClausoleSecondarie() {
+		
+		Expression whereExp = ((Select)this.mcommand).getWhereClausole();
+		
+		//whereExp.eval(this.requestPsql);
+		
+		// NON LE COSIDERO PER ORA!!!!
 		
 	}
 	
@@ -219,9 +147,10 @@ public class Pselect {
 	 * @return il nome della tabella per esteso
 	 */
 	private String nameFromAlias(String aliasName) {
-		String a = this.aliasTable.get(aliasName);
+		String a = this.aliasTables.get(aliasName);
 		if ( null == a) return aliasName;
 		return a;
 	}
+	
 	
 }

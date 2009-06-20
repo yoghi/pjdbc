@@ -1,24 +1,24 @@
 package it.unibo.lmc.pjdbc.core;
 
-import it.unibo.lmc.pjdbc.core.database.PSchema;
+import it.unibo.lmc.pjdbc.core.database.PrologDatabase;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class PrologDatabase {
+public class PrologDaemon {
 	
 	/**
 	 * TODO: dovrei controllare se le proprietà del sistema di log sono stati correttamente settati!!!
 	 * import org.apache.log4j.PropertyConfigurator;
 	 */
 
-	static HashMap<String, PSchema> attivi = new HashMap<String, PSchema>();
+	static HashMap<String, PrologDatabase> attivi = new HashMap<String, PrologDatabase>();
 	
 	//TODO MONITOR da usare per le transizioni.....
 	//static 
 	
-	public static PSchema openDatabase(String url) throws FileNotFoundException, IOException{
+	public static PrologDatabase openDatabase(String url) throws FileNotFoundException, IOException{
 		
 		/**
 		 * TODO: capire come è url e come è la key da usare per memorizzare il database
@@ -28,9 +28,9 @@ public class PrologDatabase {
 		
 		String key = "";
 		
-		PSchema p;
+		PrologDatabase p;
 		if ( !attivi.containsKey(key) ){
-			p = new PSchema(url);
+			p = PrologDatabase.getInstance(url);
 			attivi.put(key, p);
 		}
 		
@@ -47,7 +47,7 @@ public class PrologDatabase {
 		
 		String key = "";
 		
-		PSchema p = attivi.get(key);
+		PrologDatabase p = attivi.get(key);
 		
 		if ( p != null ) {
 			
@@ -55,14 +55,14 @@ public class PrologDatabase {
 			 * TODO: Come chiudo il database/schema??
 			 */
 			
-			//p.close();
+			p.close();
 		}
 		
 		
 	}
 	
 	
-	public static void startDaemon(String configFile){
+	public static void start(String configFile){
 		
 		/**
 		 * Nel config file c'è la directory dove sono localizzati i database
@@ -76,7 +76,7 @@ public class PrologDatabase {
 		
 	}
 	
-	public static void stopDaemon(){
+	public static void stop(){
 		
 		/**
 		 * Chiudo Daemon 

@@ -36,6 +36,6 @@ public class Table {
 	}
 	
 	public String toString(){
-		return "["+this.name+""+this.schemaName+"]";
+		return "["+this.schemaName+"."+this.name+"]";
 	}
 }

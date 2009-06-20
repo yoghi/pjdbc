@@ -1,8 +1,9 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.IDatabase;
-import it.unibo.lmc.pjdbc.core.PrologDatabase;
+import it.unibo.lmc.pjdbc.core.PrologDaemon;
 import it.unibo.lmc.pjdbc.core.database.PSchema;
+import it.unibo.lmc.pjdbc.core.database.PrologDatabase;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class PrologConnection implements Connection {
 	/**
 	 * Database
 	 */
-	private PSchema db;
+	private PrologDatabase db;
 	
 	/**
 	 * The transaction isolation level for this
@@ -93,7 +94,7 @@ public class PrologConnection implements Connection {
 				//this.db = new PrologRemoteDB();
 			} else {
 				//file
-				this.db = PrologDatabase.openDatabase(this.sourceUrl); 
+				this.db = PrologDaemon.openDatabase(this.sourceUrl); 
 				//new PrologLocalDB(this.sourceUrl);
 			}
 			
@@ -114,7 +115,7 @@ public class PrologConnection implements Connection {
 
 	
 	public void close() throws SQLException {
-		PrologDatabase.close(this.sourceUrl);
+		PrologDaemon.close(this.sourceUrl);
 	}
 
 	

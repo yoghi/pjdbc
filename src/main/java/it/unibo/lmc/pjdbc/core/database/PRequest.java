@@ -1,70 +1,67 @@
 package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 
-import java.util.HashMap;
+import java.sql.SQLException;
+import java.util.Hashtable;
 
-public class PRequest {
+import org.apache.log4j.Logger;
 
+public abstract class PRequest {
+
+	/**
+	 * Logger di sistema
+	 */
+	protected Logger log;
+	
 	/**
 	 * Metadati sullo schema corrente
 	 */
-	private MSchema mschema;
+	protected MSchema mschema;
 	
 	/**
-	 * Nuove clausole 
+	 * Metadati della richiesta
 	 */
-	private String clausole;
-
-	/**
-	 * Var PSQL - Var SQL
-	 */
-	private HashMap<String, String> aliasVariable;
+	protected ParsedCommand mcommand;
+	
 	
 	/**
-	 * Table Alias - Table Name
+	 * Var : (k)Psql to Sql 
 	 */
-	private HashMap<String, String> aliasTable;
+	protected Hashtable<String,String> aliasVariables = new Hashtable<String, String>();
 	
-
-	public PRequest( MSchema schema, String clausola  ) {
-		this.mschema = schema;
-		this.clausole = clausola; 
-	}
+	/**
+	 * Table: (k)Psql to Sql 
+	 */
+	protected Hashtable<String,String> aliasTables = new Hashtable<String, String>();
 	
-	public PRequest() {}
-
+//	/**
+//	 * Clausole PSQL
+//	 * 	tabella1 => campo1,campo2,campo3
+//	 *  tabella2 => campo1
+//	 *  clausola 1 => null 
+//	 */
+//	private HashMap<String,String[]> clausolePsql; 
+	
+//	/**
+//	 * Aggiungo una clausola a quelle da eseguire
+//	 * @param clausola
+//	 */
+//	public void AND(String clausola) {
+//		if ( null == this.clausole ) this.clausole = clausola;
+//		else this.clausole += ","+clausola;
+//	}
+	
 	/**
-	 * Aggiungo una clausola a quelle da eseguire
-	 * @param clausola
+	 * Costruttore 
+	 * @param ms sono i metadati dello schema su cui si lavora
+	 * @param req sono le metainformazioni sul comando che si deve eseguire
 	 */
-	public void AND(String clausola) {
-		if ( null == this.clausole ) this.clausole = clausola;
-		else this.clausole += ","+clausola;
-	}
-
-	/**
-	 * Ritorno la richiesta sql in prolog
-	 * @return string prolog request
-	 */
-	public String getPsql() {
-		return this.clausole+".";
-	}
-
-	/**
-	 * Lego alla richiesta informazioni su come è strutturato il database
-	 * @param mschema2
-	 */
-	public void setSchemaInfo(MSchema mschema2) {
-		this.mschema = mschema2;
-	}
-
-	public HashMap<String, String> getVarList() {
-		return this.aliasVariable;
-	}
-
-	public void setVarInfo(HashMap<String, String> aliasVariable) {
-		this.aliasVariable = aliasVariable;
+	public PRequest(MSchema ms, ParsedCommand req) {
+		this.mschema = ms;
+		this.mcommand = req;
+		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");	//forzo in modo da poter riunire tutte le dml request in un solo log
 	}
 	
 	/**
@@ -73,32 +70,32 @@ public class PRequest {
 	 * @return
 	 */
 	public String getVarAliasSqltoProlog(String var){
-		if ( null != this.aliasVariable ) {
+		if ( null != this.aliasVariables ) {
 			
 			if ( !var.contains(".") ){
 			
 				//posso aver inserito direttamente un alias
 				// oppure
 				//ho omesso il fatto che è un campo della prima tabella utilizzata
-				String table_name = (String)this.aliasTable.values().toArray()[0];
+				String table_name = (String)this.aliasTables.values().toArray()[0];
 				String var_research = table_name+"."+var;
 				
 				//controllo se var esiste
-				for (String key : this.aliasVariable.keySet()) {
-					if ( this.aliasVariable.get(key).equalsIgnoreCase(var_research) ) return key;
-					if ( this.aliasVariable.get(key).equalsIgnoreCase(var) ) return key;
+				for (String key : this.aliasVariables.keySet()) {
+					if ( this.aliasVariables.get(key).equalsIgnoreCase(var_research) ) return key;
+					if ( this.aliasVariables.get(key).equalsIgnoreCase(var) ) return key;
 				}
 				
 			} else {
 			
 				String[] var_research = var.split("\\.");
-				String table_name = this.aliasTable.get(var_research[0]);
+				String table_name = this.aliasTables.get(var_research[0]);
 				String var2 = table_name+"."+var_research[1];
 				
 				//controllo se var esiste
-				for (String key : this.aliasVariable.keySet()) {
-					if ( this.aliasVariable.get(key).equalsIgnoreCase(var2) ) return key;
-					if ( this.aliasVariable.get(key).equalsIgnoreCase(var) ) return key;
+				for (String key : this.aliasVariables.keySet()) {
+					if ( this.aliasVariables.get(key).equalsIgnoreCase(var2) ) return key;
+					if ( this.aliasVariables.get(key).equalsIgnoreCase(var) ) return key;
 				}
 				
 			}		
@@ -106,20 +103,10 @@ public class PRequest {
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Trasforma la var usata in prolog in quella usata nell'sql
-	 * @param var
-	 * @return
+	 * Valuto la richiesta corrente e ne genero una richiesta Prolog 
 	 */
-	public String getVarAliasPrologToSql(String var){
-		if ( null != this.aliasVariable ) return this.aliasVariable.get(var);
-		return null; 
-	}
-
-
-	public void setTableInto(HashMap<String, String> aliasTable) {
-		this.aliasTable = aliasTable;
-	}
+	abstract public String generatePrologRequest() throws SQLException;
 	
 }

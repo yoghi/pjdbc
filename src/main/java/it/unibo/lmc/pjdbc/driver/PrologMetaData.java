@@ -7,27 +7,13 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 
-import org.apache.log4j.Logger;
-
-import alice.tuprolog.MalformedGoalException;
-import alice.tuprolog.NoMoreSolutionException;
-import alice.tuprolog.NoSolutionException;
-import alice.tuprolog.Number;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Struct;
-import alice.tuprolog.Term;
 import alice.tuprolog.Theory;
-import alice.tuprolog.UnknownVarException;
 
 
 public class PrologMetaData implements DatabaseMetaData {
 
-	private Hashtable<String, ArrayList<TableSpecificField>> table = new Hashtable<String, ArrayList<TableSpecificField>>();
+//	private Hashtable<String, ArrayList<TableSpecificField>> table = new Hashtable<String, ArrayList<TableSpecificField>>();
 
 	/**
 	 * Costruttore
@@ -221,40 +207,42 @@ public class PrologMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
 
-		//schema e catalog possono essere null, table e colum NO!
+//		//schema e catalog possono essere null, table e colum NO!
+//		
+//		PrologResultSet res = new PrologResultSet();
+//
+//		ArrayList t = (ArrayList) this.table.get(tableNamePattern);
+//
+//		for (int i = 0; i < t.size(); i++) {
+//
+//			res.moveToInsertRow();
+//			TableSpecificField f = (TableSpecificField) t.get(i);
+//			res.updateString(0, null);
+//			res.updateString(1, null);
+//			res.updateString(2, tableNamePattern);
+//			res.updateString(3, f.getColumnName());
+//			res.updateInt(4, f.getType());
+//			res.updateObject(5, null);
+//			res.updateObject(6, null);
+//			res.updateObject(7, null);
+//			res.updateObject(8, null);
+//			res.updateObject(9, null);
+//			res.updateObject(10, null);
+//			res.updateObject(11, null);
+//			res.updateObject(12, null);
+//			res.updateObject(13, null);
+//			res.updateObject(14, null);
+//			res.updateObject(15, null);
+//			res.updateInt(16, f.getPositionInTable());
+//			res.insertRow();
+//
+//		}
+//
+//		res.moveToCurrentRow();
+
+//		return res;
 		
-		PrologResultSet res = new PrologResultSet();
-
-		ArrayList t = (ArrayList) this.table.get(tableNamePattern);
-
-		for (int i = 0; i < t.size(); i++) {
-
-			res.moveToInsertRow();
-			TableSpecificField f = (TableSpecificField) t.get(i);
-			res.updateString(0, null);
-			res.updateString(1, null);
-			res.updateString(2, tableNamePattern);
-			res.updateString(3, f.getColumnName());
-			res.updateInt(4, f.getType());
-			res.updateObject(5, null);
-			res.updateObject(6, null);
-			res.updateObject(7, null);
-			res.updateObject(8, null);
-			res.updateObject(9, null);
-			res.updateObject(10, null);
-			res.updateObject(11, null);
-			res.updateObject(12, null);
-			res.updateObject(13, null);
-			res.updateObject(14, null);
-			res.updateObject(15, null);
-			res.updateInt(16, f.getPositionInTable());
-			res.insertRow();
-
-		}
-
-		res.moveToCurrentRow();
-
-		return res;
+		return null;
 	}
 
 	/*
