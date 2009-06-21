@@ -312,7 +312,6 @@ TableField Column():
     // [schema.][tabella.]colonna
     [ <K_DISTINCT> {distinct = true;} ] name1=RelObjectName() [ "." name2=RelObjectName() ["." name3=RelObjectName()]] [ alias=Alias() ]
     {
-    
     	if (name3 != null) {
     		field = new TableField(name3);
     		field.setTableName(name2);
@@ -320,8 +319,10 @@ TableField Column():
     	} else if (name2 != null) {
     		field = new TableField(name2);
     		field.setTableName(name1);
+    		field.setSchema(this.defaultSchema);
     	} else {
     		field = new TableField(name1);
+    		field.setSchema(this.defaultSchema);
     	}
     
     	field.setAlias(alias);	
@@ -373,7 +374,7 @@ Table Table():
 		|
 		name=RelObjectName() { table = new Table(this.defaultSchema,name); } 
 	)	
-	{		
+	{
 		return table;
 	}
 	
