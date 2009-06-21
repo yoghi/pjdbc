@@ -1,22 +1,40 @@
 package it.unibo.lmc.pjdbc.core.dml;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-
 import it.unibo.lmc.pjdbc.core.database.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
-import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
+import java.sql.SQLException;
+import java.util.Hashtable;
+import java.util.List;
+
 
 public class Pselect extends PRequest {
 
-	private Object primaryTable;
-
+	/**
+	 * Tabella di default
+	 */
+	private String primaryTable;
+	
+	/**
+	 * Table: (k)Alias Table Name Sql to Extended Table Name Sql 
+	 */
+	protected Hashtable<String,String> aliasTables = new Hashtable<String, String>();
+	
+	/**
+	 * Var: (k)Alias Var Name to Extended Var Name Sql 
+	 */
+	protected Hashtable<String,String> aliasVariables = new Hashtable<String, String>();
+	
+	
+	/**
+	 * Prolog Request di tipo Select (MONO-SCHEMA)
+	 * @param ms metadati schema
+	 * @param req metadati richiesta
+	 */
 	public Pselect(MSchema ms, Select req) {
 		super(ms, req);
 	}
@@ -24,133 +42,65 @@ public class Pselect extends PRequest {
 	@Override
 	public String generatePrologRequest() throws SQLException {
 		
-		/** 0. alias table => Se la tabella non esiste nei metadati?? */
+		this.generateAlias();
 		
-		List<Table> tb = ((Select)this.mcommand).getFromTable();
-		
-		String primaryTableName = tb.get(0).getName();
-		
-		
-		for (int i = 0; i < tb.size(); i++) {
-			if ( tb.get(i).getAlias() != null ) this.aliasTables.put(tb.get(i).getAlias(), tb.get(i).getName());	
-			else this.aliasTables.put(tb.get(i).getName(), tb.get(i).getName());	// se non c'è alias metto il nome della tabella
-		}
-		
-		// genera clausole primarie (info a partire da FROM e dai campi di SELECT
-		this.analisiClausolePrimarie();
-		
-		// controllo clausole WHERE
-//		this.analisiClausoleSecondarie();
-		
-//		return this.requestPsql;
 		return "";
 		
 	}
 
-	private void analisiClausolePrimarie() throws SQLException{
-		
-		List<TableField> cr = ((Select)this.mcommand).getCampiRicerca();
-		
-		/** 1. mi memorizzo le colonne da cercare suddivise per tabella , l'ordine delle tabelle non è quello che compare nella select */
-		HashMap<String, TableField[]> selectT = new HashMap<String, TableField[]>();
-		
-		String tname;
-		TableField[] c = null;
-		
-		for (TableField tf : cr) {
-			
-			if ( tf.getTableName() == null ) {
-				tname = this.nameFromAlias(this.primaryTable);		// lo associo alla prima tabella dopo FROM
-			} else {
-				tname = this.nameFromAlias(tf.getTableName());
-			}
-			
-			MTable f = mschema.getMetaTableInfo(tname);
-			
-			if ( f == null ) throw new SQLException("Table "+tname+" not exist in this schema.","SQLSTATE");
-			
-			if ( selectT.containsKey(tname) ){
-				c = selectT.get(tname);
-			} else {
-				c = new TableField[f.numColum()];
-				selectT.put(tname, c);
-			}
-			
-			
-			String columnName = tf.getColumnName();
-			int pos = -1;
-			if ( columnName.startsWith("$")  ) {
-				pos = Integer.parseInt(columnName.substring(1));
-			} else {
-				pos = f.containsField(columnName);
-			}
-			
-			if ( pos >= 0 ){
-				if ( pos < c.length ){
-					c[pos] = tf;
-				} else {
-					log.warn("richiesto campo "+tf.getColumnName()+" non valido sulla tabella "+tname);
-				}
-			} else {
-				log.warn("richiesto campo "+tf.getColumnName()+" non valido sulla tabella "+tname);
-			}
-			
-		}	//for
-		
-		boolean first = true;
-		
-		for ( Table table : ((Select)this.mcommand).getFromTable() ){
-			
-			String tableName = table.getName();
-			
-			TableField[] field = selectT.get(tableName);
-			
-			StringBuilder str = new StringBuilder();
-			str.append(tableName);
-			str.append('(');
-			for(int i=0; i < field.length; i++){
-				if ( field[i] == null ) str.append('_');
-				else {
-					String psql_var = tableName.toUpperCase()+"_";
-					if ( field[i].getColumnName().startsWith("$") ){
-						String num = field[i].getColumnName().substring(1);
-						psql_var += num;
-					} else {
-						psql_var += field[i].getColumnName().toUpperCase();
-					}
-					str.append(psql_var);
-					
-					String sql_var = ( null != field[i].getAlias() ) ? field[i].getAlias() : tableName.toUpperCase()+"."+field[i].getColumnName(); 
-					this.aliasVariable.put( psql_var , sql_var ); //posso avere gli alias anche delle var a livello di select!!!
-				}
-				str.append(',');
-			}
-			str.replace(str.length()-1, str.length(), ")");
-			this.requestPsql.AND(str.toString());
 
-		}
-	}
-	
-	private void analisiClausoleSecondarie() {
-		
-		Expression whereExp = ((Select)this.mcommand).getWhereClausole();
-		
-		//whereExp.eval(this.requestPsql);
-		
-		// NON LE COSIDERO PER ORA!!!!
-		
-	}
-	
 	/**
-	 * Converto l'alias di una tabella con il nome per esteso della tabella
-	 * @param aliasName l'alias
-	 * @return il nome della tabella per esteso
+	 * Analizzo i metadati della richiesta e genero la tabella degli Alias (Table and Var) se presenti
+	 * @throws SQLException 
 	 */
-	private String nameFromAlias(String aliasName) {
-		String a = this.aliasTables.get(aliasName);
-		if ( null == a) return aliasName;
-		return a;
+	private void generateAlias() throws SQLException {
+		
+		/**  
+		 * 0. sql alias table
+		 *
+		 * 	FROM table AS table_alias, ...
+		 * 
+		 */
+		List<Table> tb = ((Select)this.mcommand).getFromTable();
+		
+		for (int i = 0; i < tb.size(); i++) {
+			
+			/** check metadati */
+			MTable mTableInfo = this.mschema.getMetaTableInfo( tb.get(i).getName() );
+			
+			if ( null == mTableInfo ) throw new SQLException(" invalid table : "+tb.get(i).getName()+" found");
+			
+			if ( tb.get(i).getAlias() != null ) this.aliasTables.put(tb.get(i).getAlias(), tb.get(i).getName());
+			
+		}
+		
+		/** 
+		 * 1. sql alias var || Riscrivo la struttura in modo che tutte le variabili siano estese e non usino alias!
+		 * 
+		 *  SELECT id AS identificativo
+		 */
+		String primaryTableName = tb.get(0).getName();
+		List<TableField> fr = ((Select)this.mcommand).getCampiRicerca();
+		
+		for (int i = 0; i < fr.size(); i++) {
+			
+			TableField current_variable = fr.get(i);
+			
+			if ( current_variable.getAlias() != null ) this.aliasVariables.put(current_variable.getAlias(), current_variable.getColumnName());
+			
+			if ( current_variable.getTableName() == null ) current_variable.setTableName(primaryTableName);
+			else {
+				if ( this.aliasTables.containsKey(current_variable.getTableName()) ){
+					current_variable.setTableName( this.aliasTables.get(current_variable.getTableName())  );
+				} else {
+					/** check metadati */
+					MTable mTableInfo = this.mschema.getMetaTableInfo( current_variable.getTableName() );
+					
+					if ( null == mTableInfo ) throw new SQLException(" column with invalid table : "+tb.get(i).getName()+" specified");
+				}
+			}
+		}
+		
 	}
-	
 	
 }

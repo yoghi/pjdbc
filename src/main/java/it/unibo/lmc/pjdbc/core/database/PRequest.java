@@ -25,16 +25,10 @@ public abstract class PRequest {
 	 */
 	protected ParsedCommand mcommand;
 	
-	
 	/**
 	 * Var : (k)Psql to Sql 
 	 */
-	protected Hashtable<String,String> aliasVariables = new Hashtable<String, String>();
-	
-	/**
-	 * Table: (k)Psql to Sql 
-	 */
-	protected Hashtable<String,String> aliasTables = new Hashtable<String, String>();
+	protected Hashtable<String,String> mapVariables = new Hashtable<String, String>();
 	
 //	/**
 //	 * Clausole PSQL
@@ -70,7 +64,7 @@ public abstract class PRequest {
 	 * @return
 	 */
 	public String getVarAliasSqltoProlog(String var){
-		if ( null != this.aliasVariables ) {
+		if ( null != this.mapVariables ) {
 			
 			if ( !var.contains(".") ){
 			
@@ -81,9 +75,9 @@ public abstract class PRequest {
 				String var_research = table_name+"."+var;
 				
 				//controllo se var esiste
-				for (String key : this.aliasVariables.keySet()) {
-					if ( this.aliasVariables.get(key).equalsIgnoreCase(var_research) ) return key;
-					if ( this.aliasVariables.get(key).equalsIgnoreCase(var) ) return key;
+				for (String key : this.mapVariables.keySet()) {
+					if ( this.mapVariables.get(key).equalsIgnoreCase(var_research) ) return key;
+					if ( this.mapVariables.get(key).equalsIgnoreCase(var) ) return key;
 				}
 				
 			} else {
@@ -93,9 +87,9 @@ public abstract class PRequest {
 				String var2 = table_name+"."+var_research[1];
 				
 				//controllo se var esiste
-				for (String key : this.aliasVariables.keySet()) {
-					if ( this.aliasVariables.get(key).equalsIgnoreCase(var2) ) return key;
-					if ( this.aliasVariables.get(key).equalsIgnoreCase(var) ) return key;
+				for (String key : this.mapVariables.keySet()) {
+					if ( this.mapVariables.get(key).equalsIgnoreCase(var2) ) return key;
+					if ( this.mapVariables.get(key).equalsIgnoreCase(var) ) return key;
 				}
 				
 			}		

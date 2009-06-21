@@ -165,7 +165,11 @@ public class TableField {
 		String aliasT = (null !=  this.alias) ? " AS " +this.alias : "";
 		
 		if ( null != this.tableName ) {
-			return "["+this.tableName+"."+this.columnName+ aliasT + "]";
+			if ( this.schema != null ) {
+				return "["+ this.schema +"."+ this.tableName+"."+this.columnName+ aliasT + "]";
+			} else {
+				return "["+this.tableName+"."+this.columnName+ aliasT + "]";
+			}
 		} else {
 			return "["+this.columnName+ aliasT + "]";
 		}

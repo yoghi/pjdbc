@@ -15,7 +15,6 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -206,12 +205,10 @@ public class PrologDatabase {
 		try {
 			pRequest = parse.parseIt(schemaName);
 		} catch (ParseException e) {
-			Logger.getLogger(PrologStatement.class).error(e.getLocalizedMessage());
+			log.error(e.getLocalizedMessage());
 			throw new SQLException(e.getMessage());
 		}
-		
-		log.debug(pRequest.toString());
-		
+
 		if ( pRequest instanceof Select ) {
 			
 			TSchema tschema = this.availableSchema.get(schemaName);

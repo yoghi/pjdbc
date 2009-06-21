@@ -9,7 +9,7 @@ public abstract class ParsedCommand {
 		this.defaultSchema = schema;
 	}
 	
-	public String getSchema(){
+	public String getSchemaName(){
 		return this.defaultSchema;
 	}
 	

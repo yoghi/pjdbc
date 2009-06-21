@@ -50,9 +50,20 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+// LOG
+import org.apache.log4j.Logger;
+
 public class Psql {
 
+	/**
+	 * Default Schema
+	 */
 	private String defaultSchema;
+	
+	/**
+	 * Logger 
+	 */
+	private Logger log = null;
 	
 }
 PARSER_END(Psql)
@@ -150,6 +161,7 @@ TOKEN :
 
 ParsedCommand parseIt(String schema) : 
 {
+	log = Logger.getLogger(Psql.class);
 	this.defaultSchema = schema;
 	ParsedCommand request;
 }
@@ -172,7 +184,10 @@ ParsedCommand parseIt(String schema) :
 	    )
     )
     ";"
-    { return request; }
+    { 
+    	log.debug(request.toString());
+    	return request;
+    }
 }
 
 

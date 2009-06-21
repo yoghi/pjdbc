@@ -76,7 +76,8 @@ public class testSelectOverMeta extends TestCase {
 		ts.addTest(new testSelectOverMeta("testVarOverSizeTableSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelectMisc"));
-		ts.addTest(new testSelectOverMeta("testGetArray"));
+//		ts.addTest(new testSelectOverMeta("testGetArray"));
+		ts.addTest(new testSelectOverMeta("testInvalidAliasQuery"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhereAND"));
@@ -178,6 +179,30 @@ public class testSelectOverMeta extends TestCase {
 		} catch (Exception e) {
 			fail(" ExecuteQuery ha ritornato: " + e);
 		}
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testInvalidAliasQuery() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testInvalidAliasQuery ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.id from employee;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			assertTrue(true);
+			return;
+		}
+		fail(" Il sistema non si è accorto che la query è errata (e.id , e not exist! ) ");
+		
 		
 	}
 	

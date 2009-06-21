@@ -140,6 +140,8 @@ public class PSchema implements IDml {
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
 		Pselect prq = new Pselect(this.metaSchema,request);
+
+		prq.generatePrologRequest();
 		
 //		PRequest reqs = prq.evalSql(request);
 
