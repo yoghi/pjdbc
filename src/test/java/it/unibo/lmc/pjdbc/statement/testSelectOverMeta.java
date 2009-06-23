@@ -6,6 +6,7 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -181,6 +182,34 @@ public class testSelectOverMeta extends TestCase {
 		}
 		
 	}
+
+	/**
+	 * TEST: Count Row
+	 */
+	public void testCountRowQuery() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testCountRowQuery ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.id from employee;");
+			
+			ResultSetMetaData rsmd = rs.getMetaData();
+			
+			int NumOfCol=rsmd.getColumnCount();
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			assertTrue(true);
+			return;
+		}
+		fail(" Il sistema non si è accorto che la query è errata (e.id , e not exist! ) ");
+		
+	}
+	
 	
 	/**
 	 * TEST: Select di un campo specifico
@@ -203,8 +232,31 @@ public class testSelectOverMeta extends TestCase {
 		}
 		fail(" Il sistema non si è accorto che la query è errata (e.id , e not exist! ) ");
 		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testInvalidField() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testInvalidField ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select employee.id from dept;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			assertTrue(true);
+			return;
+		}
+		fail(" Il sistema non si è accorto che la query è errata (employee.id , employee non è la tabella presa nel from! ) ");
 		
 	}
+	
 	
 	/**
 	 * TEST: Select di un campo specifico
@@ -258,7 +310,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.id,e.name,d.department from employee as e, dept as d;");
+			ResultSet rs = stmt.executeQuery("select e.id as id,e.name as name,d.department from employee as e, dept as d;");
 			
 			while(rs.next()){
 				//NB: le colonne si contano da 1

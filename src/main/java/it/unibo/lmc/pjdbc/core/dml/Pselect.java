@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.core.dml;
 
+import it.unibo.lmc.pjdbc.core.database.PClausola;
 import it.unibo.lmc.pjdbc.core.database.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
@@ -44,10 +45,24 @@ public class Pselect extends PRequest {
 		
 		this.generateAlias();
 		
-		return "";
+		this.generateFromClausole();
+		
+		//where clausole
+		//this.generateWhereClausole();
+		
+		StringBuilder sbuilder = new StringBuilder();
+		for( String key : this.clausole.keySet()){
+			
+			sbuilder.append(this.clausole.get(key).toString());
+			sbuilder.append(",");
+			
+		}
+		
+		String pclausole = sbuilder.toString();
+		
+		return pclausole.subSequence(0,pclausole.length()-1)+".";
 		
 	}
-
 
 	/**
 	 * Analizzo i metadati della richiesta e genero la tabella degli Alias (Table and Var) se presenti
@@ -65,12 +80,18 @@ public class Pselect extends PRequest {
 		
 		for (int i = 0; i < tb.size(); i++) {
 			
+			String nome_tabella = tb.get(i).getName();
+			
 			/** check metadati */
-			MTable mTableInfo = this.mschema.getMetaTableInfo( tb.get(i).getName() );
+			MTable mTableInfo = this.mschema.getMetaTableInfo( nome_tabella );
 			
-			if ( null == mTableInfo ) throw new SQLException(" invalid table : "+tb.get(i).getName()+" found");
+			if ( null == mTableInfo ) throw new SQLException(" invalid table : "+nome_tabella+" found");
 			
-			if ( tb.get(i).getAlias() != null ) this.aliasTables.put(tb.get(i).getAlias(), tb.get(i).getName());
+			if ( !this.clausole.containsKey(nome_tabella) ) {
+				this.clausole.put(nome_tabella, new PClausola(mTableInfo));
+			}
+			
+			if ( tb.get(i).getAlias() != null ) this.aliasTables.put(tb.get(i).getAlias(), nome_tabella);
 			
 		}
 		
@@ -100,6 +121,34 @@ public class Pselect extends PRequest {
 				}
 			}
 		}
+		
+	}
+	
+	private void generateFromClausole() throws SQLException {
+		
+		List<TableField> cr = ((Select)this.mcommand).getCampiRicerca();
+		
+		for (TableField tf : cr) {
+			
+			if ( !this.clausole.containsKey(tf.getTableName()) ) throw new SQLException("field "+tf.getTableName()+"."+tf.getColumnName()+" use non a valid table");  
+			
+			PClausola prolog_clausola = this.clausole.get( tf.getTableName() );
+			
+			String columnName = tf.getColumnName();
+			
+			try {
+				if ( columnName.startsWith("$")  ) {
+					int pos = Integer.parseInt(columnName.substring(1));
+					prolog_clausola.setTerm( this.generateNewVar(columnName)  , pos, false);
+				} else {
+					prolog_clausola.setTerm( this.generateNewVar(columnName) , columnName, false);
+				}
+			} catch (ArrayIndexOutOfBoundsException e){
+				log.error("colonna "+columnName+" "+e.getLocalizedMessage());
+			}
+			
+		} //for
+		
 		
 	}
 	

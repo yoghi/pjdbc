@@ -82,7 +82,7 @@ public class MTable {
 	 * @param position posizione della colonna nella tabella
 	 * @return vero se la colonna è composta da numeri
 	 */
-	public boolean columnIsNumber(int position){
+	public boolean columnIsNumber(int position) {
 		
 		if ( this.tcolumns[position][1].equalsIgnoreCase("int") || this.tcolumns[position][1].equalsIgnoreCase("double") || this.tcolumns[position][1].equalsIgnoreCase("float") ) return true;
 		return false;
@@ -96,10 +96,19 @@ public class MTable {
 				if ( tcolumns[i][0].equalsIgnoreCase(columnName) ) return i;
 			} else {
 				//TODO: non ci sono i metadati... come mi comporto??
+				System.out.println(" MANCANO I METADATI IN MEMORIA !!!");
+				System.exit(-1);
 			}
 			
 		}
 		return -1;
+	}
+
+	/**
+	 * @return the tname
+	 */
+	public String getTname() {
+		return tname;
 	}
 
 }

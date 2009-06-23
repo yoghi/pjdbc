@@ -141,11 +141,11 @@ public class PSchema implements IDml {
 		
 		Pselect prq = new Pselect(this.metaSchema,request);
 
-		prq.generatePrologRequest();
-		
 //		PRequest reqs = prq.evalSql(request);
 
-//		log.debug("psql da eseguire: "+reqs.getPsql());
+		String gen_psql = prq.generatePrologRequest();
+		
+		log.debug("psql da eseguire: "+gen_psql);
 
 		try {
 		
@@ -155,7 +155,7 @@ public class PSchema implements IDml {
 			
 			p.setTheory(this.current_theory);
 			
-			SolveInfo info = p.solve("");	//reqs.getPsql()
+			SolveInfo info = p.solve(gen_psql);	//reqs.getPsql()
 			
 			while (info.isSuccess()){ 
 				
@@ -175,8 +175,8 @@ public class PSchema implements IDml {
 				
 			}
 			
-			//return new PrologResultSet(rows,reqs);
-			return new PrologResultSet(null);
+			return new PrologResultSet(rows,prq);
+			//return new PrologResultSet(null);
 	
 		} catch (InvalidTheoryException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");

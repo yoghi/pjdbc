@@ -126,8 +126,13 @@ public class MSchema {
 		        				log.debug("aggiunto a "+s.getName()+" la colonna "+l);
 		        			} 
 		        		} else {
-		        			this.tables.put(s.getName(), new MTable(s.getName(),l));
-		        			log.debug("trovata tabella "+s.getName()+" di dimensione "+l);
+		        			
+		        			if ( !s.getName().equalsIgnoreCase("metabase") ) {
+			        			this.tables.put(s.getName(), new MTable(s.getName(),l));
+			        			log.debug("trovata tabella "+s.getName()+" di dimensione "+l);
+		        			} else {
+		        				log.debug("filtro tabella metabase");
+		        			}
 		        		}
 		        		
 		        	}

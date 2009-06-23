@@ -9,6 +9,8 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 public abstract class PRequest {
+	
+	private int countVar = 0;
 
 	/**
 	 * Logger di sistema
@@ -26,26 +28,17 @@ public abstract class PRequest {
 	protected ParsedCommand mcommand;
 	
 	/**
+	 * Clausole della richiesta
+	 * 
+	 * 	funtore clausola => clausola 
+	 * 
+	 */
+	protected Hashtable<String,PClausola> clausole = new Hashtable<String, PClausola>();
+	
+	/**
 	 * Var : (k)Psql to Sql 
 	 */
 	protected Hashtable<String,String> mapVariables = new Hashtable<String, String>();
-	
-//	/**
-//	 * Clausole PSQL
-//	 * 	tabella1 => campo1,campo2,campo3
-//	 *  tabella2 => campo1
-//	 *  clausola 1 => null 
-//	 */
-//	private HashMap<String,String[]> clausolePsql; 
-	
-//	/**
-//	 * Aggiungo una clausola a quelle da eseguire
-//	 * @param clausola
-//	 */
-//	public void AND(String clausola) {
-//		if ( null == this.clausole ) this.clausole = clausola;
-//		else this.clausole += ","+clausola;
-//	}
 	
 	/**
 	 * Costruttore 
@@ -57,47 +50,53 @@ public abstract class PRequest {
 		this.mcommand = req;
 		log = Logger.getLogger("it.unibo.lmc.pjdbc.core.dml");	//forzo in modo da poter riunire tutte le dml request in un solo log
 	}
+
+	/**
+	 * Genero una nuova variabile da usare nelle clausole
+	 * @return variabile
+	 */
+	protected String generateNewVar(String sqlVar){
+		
+		String psql_var = "IMP"+this.countVar+"VAR";	//TODO: che metto come valore nella clausola?? che incognita metto??
+		
+		String key = this.sql2prologVar(sqlVar);
+		
+		if ( null != key ) {
+			log.warn("variabile sql : "+sqlVar+" già assegnata una volta");
+			return key;
+		}
+		
+		this.mapVariables.put(psql_var, sqlVar); 
+		countVar++;
+		return psql_var;
+	}
 	
 	/**
-	 * Trasforma la var usata in sql in quella usate nel prolog
-	 * @param var
-	 * @return
+	 * Converto una variabile sql nella sua controparte prolog
+	 * @param sqlVar variabile sql
+	 * @return variabile prolog
 	 */
-	public String getVarAliasSqltoProlog(String var){
-		if ( null != this.mapVariables ) {
-			
-			if ( !var.contains(".") ){
-			
-				//posso aver inserito direttamente un alias
-				// oppure
-				//ho omesso il fatto che è un campo della prima tabella utilizzata
-				String table_name = (String)this.aliasTables.values().toArray()[0];
-				String var_research = table_name+"."+var;
-				
-				//controllo se var esiste
-				for (String key : this.mapVariables.keySet()) {
-					if ( this.mapVariables.get(key).equalsIgnoreCase(var_research) ) return key;
-					if ( this.mapVariables.get(key).equalsIgnoreCase(var) ) return key;
+	public String sql2prologVar(String sqlVar){
+		if ( this.mapVariables.containsValue(sqlVar) ){
+			for (String key : this.mapVariables.keySet()) {
+				if ( this.mapVariables.get(key).equalsIgnoreCase(sqlVar) ){
+					return key;
 				}
-				
-			} else {
-			
-				String[] var_research = var.split("\\.");
-				String table_name = this.aliasTables.get(var_research[0]);
-				String var2 = table_name+"."+var_research[1];
-				
-				//controllo se var esiste
-				for (String key : this.mapVariables.keySet()) {
-					if ( this.mapVariables.get(key).equalsIgnoreCase(var2) ) return key;
-					if ( this.mapVariables.get(key).equalsIgnoreCase(var) ) return key;
-				}
-				
-			}		
-			
+			}
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Converto una variabile prolog nella sua controparte sql
+	 * @param prologVar variabile prolog
+	 * @return variabile sql
+	 */
+	public String prolog2sqlVar(String prologVar){		
+		return this.mapVariables.get(prologVar);
+	}
+	
+	
 	/**
 	 * Valuto la richiesta corrente e ne genero una richiesta Prolog 
 	 */

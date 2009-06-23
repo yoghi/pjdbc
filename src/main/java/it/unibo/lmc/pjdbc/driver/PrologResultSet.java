@@ -249,7 +249,7 @@ public class PrologResultSet implements ResultSet {
 
 			String prologLabel = null;
 			if (this.pRequest != null)
-				prologLabel = this.pRequest.getVarAliasSqltoProlog(columnLabel);
+				prologLabel = this.pRequest.sql2prologVar(columnLabel); 
 
 			if (null == prologLabel)
 				prologLabel = columnLabel;
