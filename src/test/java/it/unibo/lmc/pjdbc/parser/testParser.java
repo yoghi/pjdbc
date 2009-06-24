@@ -45,9 +45,9 @@ public class testParser extends TestCase {
 		 */
 		Properties properties = new Properties();
 		
-	    //File propFile = new File("/mnt/store/workspace/Java/Pjdbc/target/classes/prolog.db.properties");
-		File propFile = new File("/Users/Yoghi/Workspace/Java/Pjdbc/target/classes/prolog.db.properties");
-	    
+		String userDir = System.getProperty("user.dir");
+		File propFile = new File(userDir + "/target/classes/prolog.db.properties");
+		
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {
 	    	try {
@@ -164,6 +164,8 @@ public class testParser extends TestCase {
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt("");
 			
+			fail();	//TODO: da finire
+			
 			System.out.println(pRequest);
 			
 			
@@ -192,6 +194,8 @@ public class testParser extends TestCase {
 			
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt("");
+			
+			fail();	//TODO: da finire
 			
 			System.out.println(pRequest);
 			

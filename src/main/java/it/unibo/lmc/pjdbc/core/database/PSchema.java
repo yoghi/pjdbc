@@ -134,14 +134,11 @@ public class PSchema implements IDml {
 	
 	protected void load_meta() {
 		this.metaSchema.loadFromTheory(this.current_theory);
-//		this.metaSchema.printMetaInfo(System.out);
 	}
 
 	public PrologResultSet applyCommand(Select request) throws SQLException {
 		
 		Pselect prq = new Pselect(this.metaSchema,request);
-
-//		PRequest reqs = prq.evalSql(request);
 
 		String gen_psql = prq.generatePrologRequest();
 		
@@ -149,7 +146,7 @@ public class PSchema implements IDml {
 
 		try {
 		
-			List<SolveInfo> rows = new ArrayList<SolveInfo>();	//QUI CAMBIO E CREO UNA MIA STRUTTURA DATI!!!
+			List<PSolution> rows = new ArrayList<PSolution>();	//QUI CAMBIO E CREO UNA MIA STRUTTURA DATI!!!
 			
 			Prolog p = new Prolog();
 			
@@ -161,7 +158,7 @@ public class PSchema implements IDml {
 				
 				log.debug(info.getBindingVars().toString());
 				
-				rows.add(info);
+				rows.add(new PSolution(info));
 				
 				if (p.hasOpenAlternatives()){ 
 					try {
@@ -175,8 +172,8 @@ public class PSchema implements IDml {
 				
 			}
 			
-			return new PrologResultSet(rows,prq);
-			//return new PrologResultSet(null);
+			//return new PrologResultSet(rows,prq);
+			return new PrologResultSet(null);
 	
 		} catch (InvalidTheoryException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");

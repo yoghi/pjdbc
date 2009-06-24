@@ -61,6 +61,8 @@ public class testPrologDB extends TestCase {
  		
 // 		PrologLocalDB database = new PrologLocalDB("malformed",thMalf);
  		
+ 		fail();
+ 		
 	}
 	
 	
@@ -93,7 +95,7 @@ public class testPrologDB extends TestCase {
 //			fail(e.getLocalizedMessage());
 //		}
 		
-		
+ 		fail();
 	}
 	
 	/**
@@ -119,7 +121,7 @@ public class testPrologDB extends TestCase {
 		//System.out.println(database);
 		
 //		assertSame(1,ret.size());
-		
+ 		fail();
 	}
 	
 	/**
@@ -147,7 +149,7 @@ public class testPrologDB extends TestCase {
 //		System.out.println(database);
 //		
 //		assertSame(2,ret.size());
-		
+ 		fail();
 	}
 	
 }

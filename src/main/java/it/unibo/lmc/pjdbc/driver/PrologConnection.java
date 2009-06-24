@@ -1,8 +1,6 @@
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.IDatabase;
 import it.unibo.lmc.pjdbc.core.PrologDaemon;
-import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.core.database.PrologDatabase;
 
 import java.io.FileNotFoundException;
@@ -21,8 +19,6 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
-
-import alice.tuprolog.InvalidTheoryException;
 
 public class PrologConnection implements Connection {
 

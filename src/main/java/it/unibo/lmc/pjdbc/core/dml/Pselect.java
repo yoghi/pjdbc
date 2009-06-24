@@ -124,6 +124,10 @@ public class Pselect extends PRequest {
 		
 	}
 	
+	/**
+	 * Genero le clausole riguardanti il campo FROM
+	 * @throws SQLException
+	 */
 	private void generateFromClausole() throws SQLException {
 		
 		List<TableField> cr = ((Select)this.mcommand).getCampiRicerca();

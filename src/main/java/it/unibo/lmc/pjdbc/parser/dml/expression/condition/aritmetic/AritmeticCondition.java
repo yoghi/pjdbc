@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression.condition.aritmetic;
 
-import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.ICondition;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 

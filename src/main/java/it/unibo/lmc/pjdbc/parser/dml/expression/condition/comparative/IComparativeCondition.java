@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative;
 
-import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.ICondition;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 public interface IComparativeCondition extends ICondition {

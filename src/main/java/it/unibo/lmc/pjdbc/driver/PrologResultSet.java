@@ -217,10 +217,13 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	protected String getValue(int columnIndex) throws SQLException {
+		
 		SolveInfo info = this.row_data.get(this.currentPosition);
 
 		try {
 
+			
+			
 			List<Var> results = info.getBindingVars();
 
 			if (columnIndex > results.size()) {

@@ -70,7 +70,8 @@ public class testMultiSchema extends TestCase {
 		
 		ts.addTest(new testMultiSchema("testSimpleQuery"));
 		ts.addTest(new testMultiSchema("testExplicitTableQuery"));
-		ts.addTest(new testMultiSchema("testExplicitSchemaQuery"));		
+		ts.addTest(new testMultiSchema("testExplicitSchemaQuery"));
+		ts.addTest(new testMultiSchema("testExplicitMultiSchemaQuery"));	
 		
 		return ts;
 	}
@@ -146,6 +147,28 @@ public class testMultiSchema extends TestCase {
 		
 	}
 	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testExplicitMultiSchemaQuery() {
+		
+		System.out.println(" =========================     ");
+		System.out.println("  testExplicitMultiSchemaQuery ");
+ 		System.out.println(" =========================     ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select prolog_with_meta.employee.id, prolog.dept.$0 from prolog_with_meta.employee , prolog.dept;");
 
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
 	
 }
