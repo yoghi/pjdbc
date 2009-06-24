@@ -1,15 +1,25 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 import junit.framework.TestCase;
 
 public class PrologMetaDataTest extends TestCase {
 
+	private Connection c;
+	private DatabaseMetaData dbMeta;
+	
 	public PrologMetaDataTest(String name) {
 		super(name);
 	}
 
 	protected void setUp() throws Exception {
 		super.setUp();
+	     this.c  = DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+	     this.dbMeta = c.getMetaData();
 	}
 
 	public final void testPrologMetaData() {

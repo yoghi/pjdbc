@@ -39,6 +39,22 @@ public class Pselect extends PRequest {
 	public Pselect(MSchema ms, Select req) {
 		super(ms, req);
 	}
+	
+	/**
+	 * Converto l'alias di una tabella nel suo nome per esteso
+	 * @param aliasTable
+	 * @return nome esteso se l'alias esiste, null altrimenti
+	 */
+	public String alias2nameTable(String aliasTable){
+		return this.aliasTables.get(aliasTable);
+	}
+	
+	//TODO funzione contraria data una tabella esiste il suo alias??
+	
+	public String alias2nameVar(String columnLabel) {
+		return this.aliasVariables.get(columnLabel);
+	}
+	
 
 	@Override
 	public String generatePrologRequest() throws SQLException {
@@ -107,19 +123,23 @@ public class Pselect extends PRequest {
 			
 			TableField current_variable = fr.get(i);
 			
-			if ( current_variable.getAlias() != null ) this.aliasVariables.put(current_variable.getAlias(), current_variable.getColumnName());
-			
-			if ( current_variable.getTableName() == null ) current_variable.setTableName(primaryTableName);
-			else {
-				if ( this.aliasTables.containsKey(current_variable.getTableName()) ){
+			if ( current_variable.getTableName() == null ) {	// id
+				current_variable.setTableName(primaryTableName);
+				if ( current_variable.getAlias() == null ) current_variable.setAlias(current_variable.getColumnName());
+			}
+			else {	//NOTA: mi aspetto sempre 1 solo schema alla volta!!! per quello uso tablename.columname senza schema specificato!!
+				if ( current_variable.getAlias() == null ) current_variable.setAlias(current_variable.getTableName()+"."+current_variable.getColumnName());
+				if ( this.aliasTables.containsKey(current_variable.getTableName()) ){	// e.id
 					current_variable.setTableName( this.aliasTables.get(current_variable.getTableName())  );
-				} else {
+				} else {	//employee.id
 					/** check metadati */
 					MTable mTableInfo = this.mschema.getMetaTableInfo( current_variable.getTableName() );
-					
 					if ( null == mTableInfo ) throw new SQLException(" column with invalid table : "+tb.get(i).getName()+" specified");
 				}
 			}
+
+			this.aliasVariables.put(current_variable.getAlias(), current_variable.getSchema()+"."+current_variable.getTableName()+"."+current_variable.getColumnName());
+			
 		}
 		
 	}
@@ -134,7 +154,7 @@ public class Pselect extends PRequest {
 		
 		for (TableField tf : cr) {
 			
-			log.debug("analizzo : "+tf);
+			log.debug("analizzo - monoschema : "+tf);
 			
 			if ( !this.clausole.containsKey(tf.getTableName()) ) throw new SQLException("field "+tf.getTableName()+"."+tf.getColumnName()+" use non a valid table");  
 			

@@ -20,9 +20,7 @@ public class PrologStatement implements Statement {
 	private StringReader currentQuery = null;
 	
 	private Logger log;
-	
-	
-	
+
 	public PrologStatement(PrologConnection connection,PrologDatabase schema) {
 		this.conn = connection;
 		this.currentSchema = schema;

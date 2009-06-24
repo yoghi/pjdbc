@@ -104,7 +104,7 @@ public class testSelectOverMeta extends TestCase {
 			
 			while (rs.next()) {
 
-				//NB: le colonne si contano da 1
+				//NB: le colonne del resultset si contano da 1
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("id");
 				assertEquals(x, x2);
@@ -136,12 +136,12 @@ public class testSelectOverMeta extends TestCase {
 			
 			while (rs.next()) {
 
-				//NB: le colonne si contano da 1
+				//NB: le colonne del resultset si contano da 1
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("id");
 				assertEquals(x, x2);
 				
-				float y = rs.getFloat(3);
+				float y = rs.getFloat(2);
 				float y2 = rs.getFloat("salary");
 				assertEquals(y, y2);
 
@@ -169,7 +169,7 @@ public class testSelectOverMeta extends TestCase {
 			rs = stmt.executeQuery("select ... from employee;");
 			
 			rs.next();
-			//NB: le colonne si contano da 1
+			//NB: le colonne del resultset si contano da 1
 			Array x = rs.getArray(1);
 			Array x2 = rs.getArray("sa");
 			
@@ -273,7 +273,7 @@ public class testSelectOverMeta extends TestCase {
 			rs = stmt.executeQuery("select id,$5 from employee;");
 			
 			rs.next();
-			//NB: le colonne si contano da 1
+			//NB: le colonne del resultset si contano da 1
 			int x = rs.getInt(1);
 			int x2 = rs.getInt("id");
 			assertEquals(x, x2);
@@ -313,12 +313,12 @@ public class testSelectOverMeta extends TestCase {
 			ResultSet rs = stmt.executeQuery("select e.id as id,e.name as name,d.department from employee as e, dept as d;");
 			
 			while(rs.next()){
-				//NB: le colonne si contano da 1
+				//NB: le colonne del resultset si contano da 1
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("id");
 				assertEquals(x, x2);
 				
-				//NB: le colonne si contano da 1
+				//NB: le colonne del resultset si contano da 1
 				String s = rs.getString(2);
 				String s2 = rs.getString("name");
 				assertEquals(s, s2);
@@ -349,14 +349,16 @@ public class testSelectOverMeta extends TestCase {
 			ResultSet rs = stmt.executeQuery("select e.id,name,d.department from employee as e, dept as d;");
 			
 			while(rs.next()){
-				//NB: le colonne si contano da 1
+				//NB: le colonne del resultset si contano da 1
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("e.id");
 				assertEquals(x, x2);
 				
-				//NB: le colonne si contano da 1
-				String s = rs.getString(4);
-				String s2 = rs.getString("department");
+				String name = rs.getString("name"); 
+				
+				//NB: le colonne del resultset si contano da 1
+				String s = rs.getString(3);
+				String s2 = rs.getString("d.department");
 				assertEquals(s, s2);
 				
 			}

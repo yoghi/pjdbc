@@ -144,15 +144,15 @@ public class PSchema implements IDml {
 		
 		log.debug("psql da eseguire: "+gen_psql);
 
+		List<PSolution> rows = new ArrayList<PSolution>();
+		
 		try {
 		
-			List<PSolution> rows = new ArrayList<PSolution>();	//QUI CAMBIO E CREO UNA MIA STRUTTURA DATI!!!
-			
 			Prolog p = new Prolog();
 			
 			p.setTheory(this.current_theory);
 			
-			SolveInfo info = p.solve(gen_psql);	//reqs.getPsql()
+			SolveInfo info = p.solve(gen_psql);
 			
 			while (info.isSuccess()){ 
 				
@@ -172,8 +172,7 @@ public class PSchema implements IDml {
 				
 			}
 			
-			//return new PrologResultSet(rows,prq);
-			return new PrologResultSet(null);
+			return new PrologResultSet(rows,prq);
 	
 		} catch (InvalidTheoryException e) {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
@@ -181,7 +180,7 @@ public class PSchema implements IDml {
 			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
 		} catch (NoSolutionException e) {
 			// non ho soluzionio 
-			return new PrologResultSet(null);
+			return new PrologResultSet(rows,prq);
 		}
 
 	}

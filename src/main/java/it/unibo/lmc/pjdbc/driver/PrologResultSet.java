@@ -1,6 +1,8 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.database.PRequest;
+import it.unibo.lmc.pjdbc.core.database.PSolution;
+import it.unibo.lmc.pjdbc.core.dml.Pselect;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -36,7 +38,7 @@ public class PrologResultSet implements ResultSet {
 	private int currentPosition = -1;
 	private int insertPosition = 0;
 
-	private List<SolveInfo> row_data;
+	private List<PSolution> row_data;
 
 	private UUID code = UUID.randomUUID();
 	private Logger log;
@@ -44,23 +46,14 @@ public class PrologResultSet implements ResultSet {
 	private PRequest pRequest;
 
 	/**
-	 * Costrauttore
-	 * 
-	 * @param solutions
-	 *            le soluzioni da usare
+	 * Costruttore
+	 * @param rows Psolution list
+	 * @param reqs Prequest
 	 */
-	public PrologResultSet(List<SolveInfo> solutions) {
-		if (null != solutions)
-			this.row_data = solutions;
-		else
-			this.row_data = new LinkedList<SolveInfo>();
-
-		log = Logger.getLogger(PrologResultSet.class.toString() + "." + this.code);
-	}
-
-	public PrologResultSet(List<SolveInfo> solutions, PRequest reqs) {
-		this(solutions);
+	public PrologResultSet(List<PSolution> rows, PRequest reqs) {
+		this.row_data = rows;
 		this.pRequest = reqs;
+		log = Logger.getLogger(PrologResultSet.class.toString() + "." + this.code);
 	}
 
 	public void clearWarnings() throws SQLException {
@@ -218,27 +211,26 @@ public class PrologResultSet implements ResultSet {
 
 	protected String getValue(int columnIndex) throws SQLException {
 		
-		SolveInfo info = this.row_data.get(this.currentPosition);
-
+		PSolution info = this.row_data.get(this.currentPosition);
 		try {
-
+			Term t = info.getVar(columnIndex-1);
+			return t.toString();
+		} catch (IndexOutOfBoundsException e) {
+			throw new SQLException("Column " + columnIndex + "not exist", "SQLSTATE");
+		}
 			
-			
-			List<Var> results = info.getBindingVars();
-
-			if (columnIndex > results.size()) {
-				throw new SQLException("Column " + columnIndex + " not valid");
-			}
-
-			Var vresult = results.get(columnIndex - 1);
-
-			return vresult.getTerm().toString();
+//			List<Var> results = info.getBindingVars();
+//
+//			if (columnIndex > results.size()) {
+//				throw new SQLException("Column " + columnIndex + " not valid");
+//			}
+//
+//			Var vresult = results.get(columnIndex - 1);
+//
+//			return vresult.getTerm().toString();
 
 			// if ( vresult.getTerm() instanceof alice.tuprolog.Number )
 
-		} catch (NoSolutionException e) {
-			throw new SQLException("Column " + columnIndex + "not exist", "SQLSTATE");
-		}
 	}
 
 	protected String getValue(String columnLabel) throws SQLException {
@@ -246,27 +238,26 @@ public class PrologResultSet implements ResultSet {
 		if (null == columnLabel)
 			throw new SQLException("columLabel cann't nullable ");
 
-		SolveInfo info = this.row_data.get(this.currentPosition);
+		PSolution info = this.row_data.get(this.currentPosition);
 
-		try {
+		//((Pselect)this.pRequest).alias2nameTable(columnLabel)
+		
+		columnLabel = ((Pselect)this.pRequest).alias2nameVar(columnLabel);
+		
+		String prologLabel = null;
+		if (this.pRequest != null)
+			prologLabel = this.pRequest.sql2prologVar(columnLabel);
 
-			String prologLabel = null;
-			if (this.pRequest != null)
-				prologLabel = this.pRequest.sql2prologVar(columnLabel); 
+		if (null == prologLabel)
+			prologLabel = columnLabel;
 
-			if (null == prologLabel)
-				prologLabel = columnLabel;
+		Term value = info.getVar(prologLabel);
 
-			Term value = info.getVarValue(prologLabel);
+		if (null == value)
+			throw new SQLException("Column " + columnLabel + " not exist", "SQLSTATE");
 
-			if (null == value)
-				throw new SQLException("Column " + columnLabel + " not exist", "SQLSTATE");
+		return value.toString();
 
-			return value.toString();
-
-		} catch (NoSolutionException e) {
-			throw new SQLException("Column " + columnLabel + "not exist", "SQLSTATE");
-		}
 
 	}
 	
