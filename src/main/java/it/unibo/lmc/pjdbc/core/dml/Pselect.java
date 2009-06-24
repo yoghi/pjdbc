@@ -134,18 +134,23 @@ public class Pselect extends PRequest {
 		
 		for (TableField tf : cr) {
 			
+			log.debug("analizzo : "+tf);
+			
 			if ( !this.clausole.containsKey(tf.getTableName()) ) throw new SQLException("field "+tf.getTableName()+"."+tf.getColumnName()+" use non a valid table");  
 			
+			//la clausola è legata ad una sola schema.tabella
 			PClausola prolog_clausola = this.clausole.get( tf.getTableName() );
 			
 			String columnName = tf.getColumnName();
+			String columnTable = tf.getTableName();
+			String columnSchema = tf.getSchema();
 			
 			try {
 				if ( columnName.startsWith("$")  ) {
 					int pos = Integer.parseInt(columnName.substring(1));
-					prolog_clausola.setTerm( this.generateNewVar(columnName)  , pos, false);
+					prolog_clausola.setTerm( this.generateNewVar(columnSchema+"."+columnTable+"."+columnName)  , pos, false);
 				} else {
-					prolog_clausola.setTerm( this.generateNewVar(columnName) , columnName, false);
+					prolog_clausola.setTerm( this.generateNewVar(columnSchema+"."+columnTable+"."+columnName) , columnName, false);
 				}
 			} catch (ArrayIndexOutOfBoundsException e){
 				log.error("colonna "+columnName+" "+e.getLocalizedMessage());
