@@ -49,3 +49,20 @@ Questa particolare tabella non è pero necessaria, il database sarà comuque con
 \begin{lstlisting}[language=Prolog,showstringspaces=false]
 metabase("ta",1,"colonna1","string","prima colonna").
 \end{lstlisting}
+
+\begin{table}[ht]
+\caption(Prolog Types)
+\centering
+\begin{tabular}{c c c c c c c c}
+\hline
+Term& Struct& Var& Number& Atom& Atomic& Compound& List
+\hline
+a1 & true& -& -& true& true& -& -
+1 & -& -& true& -& true& -& -
+[a,b] & true& -& -& -& -& true& true
+p(a,b) & true& -& -& -& -& true& -
+_ & -& true& -& -& -& -& -
+A & -& true& -& -& -& -& -
+\hline
+\end{tabular}
+\end{table}
