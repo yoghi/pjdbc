@@ -16,7 +16,7 @@ package it.unibo.lmc.pjdbc.parser;
 
 //EXPRESSIONI 
 import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
-import it.unibo.lmc.pjdbc.parser.dml.expression.ICondition;
+import it.unibo.lmc.pjdbc.parser.dml.expression.condition.ICondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.ILogicCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.IComparativeCondition;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.AndCondition;
