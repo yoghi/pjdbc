@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core;
+package it.unibo.lmc.pjdbc.core.service;
 
 import it.unibo.lmc.pjdbc.core.database.PrologDatabase;
 

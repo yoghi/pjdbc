@@ -96,7 +96,7 @@ public class MSchema {
 						
 
 					} else {
-						//throw new SQLException("Malformed metabase");
+						//throw new PSQLException("Malformed metabase");
 						System.out.println("Malformed metabase");
 						//TODO gestire il caso di metabase malformato!
 					}

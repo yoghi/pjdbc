@@ -2,13 +2,14 @@ package it.unibo.lmc.pjdbc.core.dml;
 
 import it.unibo.lmc.pjdbc.core.database.PClausola;
 import it.unibo.lmc.pjdbc.core.database.PRequest;
+import it.unibo.lmc.pjdbc.core.database.PSQLState;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
 
-import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class Pselect extends PRequest {
 	
 
 	@Override
-	public String generatePrologRequest() throws SQLException {
+	public String generatePrologRequest() throws PSQLException {
 		
 		this.generateAlias();
 		
@@ -84,7 +85,7 @@ public class Pselect extends PRequest {
 	 * Analizzo i metadati della richiesta e genero la tabella degli Alias (Table and Var) se presenti
 	 * @throws SQLException 
 	 */
-	private void generateAlias() throws SQLException {
+	private void generateAlias() throws PSQLException {
 		
 		/**  
 		 * 0. sql alias table
@@ -101,7 +102,7 @@ public class Pselect extends PRequest {
 			/** check metadati */
 			MTable mTableInfo = this.mschema.getMetaTableInfo( nome_tabella );
 			
-			if ( null == mTableInfo ) throw new SQLException(" invalid table : "+nome_tabella+" found");
+			if ( null == mTableInfo ) throw new PSQLException("table : "+nome_tabella+" not found", PSQLState.UNDEFINED_TABLE);
 			
 			if ( !this.clausole.containsKey(nome_tabella) ) {
 				this.clausole.put(nome_tabella, new PClausola(mTableInfo));
@@ -134,7 +135,7 @@ public class Pselect extends PRequest {
 				} else {	//employee.id
 					/** check metadati */
 					MTable mTableInfo = this.mschema.getMetaTableInfo( current_variable.getTableName() );
-					if ( null == mTableInfo ) throw new SQLException(" column with invalid table : "+tb.get(i).getName()+" specified");
+					if ( null == mTableInfo ) throw new PSQLException(" column with undefined table : "+tb.get(i).getName()+" specified",PSQLState.UNDEFINED_COLUMN);
 				}
 			}
 
@@ -148,7 +149,7 @@ public class Pselect extends PRequest {
 	 * Genero le clausole riguardanti il campo FROM
 	 * @throws SQLException
 	 */
-	private void generateFromClausole() throws SQLException {
+	private void generateFromClausole() throws PSQLException {
 		
 		List<TableField> cr = ((Select)this.mcommand).getCampiRicerca();
 		
@@ -156,7 +157,7 @@ public class Pselect extends PRequest {
 			
 			log.debug("analizzo - monoschema : "+tf);
 			
-			if ( !this.clausole.containsKey(tf.getTableName()) ) throw new SQLException("field "+tf.getTableName()+"."+tf.getColumnName()+" use non a valid table");  
+			if ( !this.clausole.containsKey(tf.getTableName()) ) throw new PSQLException("field "+tf.getTableName()+"."+tf.getColumnName()+" use non a valid table",PSQLState.UNDEFINED_COLUMN);  
 			
 			//la clausola è legata ad una sola schema.tabella
 			PClausola prolog_clausola = this.clausole.get( tf.getTableName() );

@@ -1,9 +1,5 @@
 package it.unibo.lmc.pjdbc.core.transaction;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.UUID;
-
 import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.core.dml.IDml;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -12,6 +8,10 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Transaction Schema
@@ -56,10 +56,10 @@ public abstract class TSchema implements IDml {
 	/*
 	 * A.P.I DML 
 	 */
-	public abstract PrologResultSet applyCommand(Select request) throws SQLException;
-	public abstract int applyCommand(Insert request) throws SQLException;
-	public abstract int applyCommand(Update request) throws SQLException;
-	public abstract int applyCommand(Delete request) throws SQLException;
+	public abstract PrologResultSet applyCommand(Select request) throws PSQLException;
+	public abstract int applyCommand(Insert request) throws PSQLException;
+	public abstract int applyCommand(Update request) throws PSQLException;
+	public abstract int applyCommand(Delete request) throws PSQLException;
 
 	public void close() {
 		this.realSchema.close();

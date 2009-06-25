@@ -5,8 +5,8 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
 
-import java.sql.SQLException;
 
 public interface IDml {
 
@@ -16,7 +16,7 @@ public interface IDml {
 	 * @return
 	 * @throws SQLException
 	 */
-	PrologResultSet applyCommand(Select request) throws SQLException;
+	PrologResultSet applyCommand(Select request) throws PSQLException;
 	
 	/**
 	 * INSERT
@@ -24,7 +24,7 @@ public interface IDml {
 	 * @return
 	 * @throws SQLException
 	 */
-	int applyCommand(Insert request) throws SQLException;
+	int applyCommand(Insert request) throws PSQLException;
 	
 	/**
 	 * UPDATE
@@ -32,7 +32,7 @@ public interface IDml {
 	 * @return
 	 * @throws SQLException
 	 */
-	int applyCommand(Update request) throws SQLException;
+	int applyCommand(Update request) throws PSQLException;
 	
 	/**
 	 * DELETE
@@ -40,6 +40,6 @@ public interface IDml {
 	 * @return
 	 * @throws SQLException
 	 */
-	int applyCommand(Delete request) throws SQLException;
+	int applyCommand(Delete request) throws PSQLException;
 	
 }

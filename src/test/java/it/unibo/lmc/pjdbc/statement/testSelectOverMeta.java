@@ -1,5 +1,7 @@
 package it.unibo.lmc.pjdbc.statement;
 
+import it.unibo.lmc.pjdbc.utils.PSQLException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Array;
@@ -77,7 +79,7 @@ public class testSelectOverMeta extends TestCase {
 		ts.addTest(new testSelectOverMeta("testVarOverSizeTableSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelectMisc"));
-//		ts.addTest(new testSelectOverMeta("testGetArray"));
+		ts.addTest(new testSelectOverMeta("testGetArray"));
 		ts.addTest(new testSelectOverMeta("testInvalidAliasQuery"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
@@ -108,7 +110,8 @@ public class testSelectOverMeta extends TestCase {
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("id");
 				assertEquals(x, x2);
-
+				assertNotNull(x);
+				
 			}
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
@@ -140,10 +143,12 @@ public class testSelectOverMeta extends TestCase {
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("id");
 				assertEquals(x, x2);
+				assertNotNull(x);
 				
 				float y = rs.getFloat(2);
 				float y2 = rs.getFloat("salary");
 				assertEquals(y, y2);
+				assertNotNull(y);
 
 			}
 			
@@ -164,24 +169,59 @@ public class testSelectOverMeta extends TestCase {
  		System.out.println(" ====================== ");
 		
  		ResultSet rs = null;
+ 		int i = 1;
 		try {
 			
-			rs = stmt.executeQuery("select ... from employee;");
+			rs = stmt.executeQuery("select $1 from multiarray;");
 			
-			rs.next();
-			//NB: le colonne del resultset si contano da 1
-			Array x = rs.getArray(1);
-			Array x2 = rs.getArray("sa");
-			
-			assertEquals(x, x2);
+			while ( rs.next() ) {
+				//NB: le colonne del resultset si contano da 1
+				Array x = rs.getArray(1);
+				Array x2 = rs.getArray("$1");
+				i++;
+				
+//				assertEquals(x, x2);
+//				assertNotNull(x);
+			}
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (Exception e) {
-			fail(" ExecuteQuery ha ritornato: " + e);
+			fail(" ExecuteQuery<"+i+"> ha ritornato: " + e);
 		}
 		
 	}
+	
+	public void testGetInvalidArray(){
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testGetInvalidArray   ");
+ 		System.out.println(" ====================== ");
+		
+ 		ResultSet rs = null;
+		try {
+			
+			rs = stmt.executeQuery("select $1 from noarray;");
+			
+			while ( rs.next() ) {
+
+				Array x = rs.getArray(1);
+				Array x2 = rs.getArray("$1");
+			}
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (PSQLException e) {
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		fail(" getArray non si è accorto che non è un array ");
+		
+	}
+	
 
 	/**
 	 * TEST: Count Row
@@ -277,6 +317,7 @@ public class testSelectOverMeta extends TestCase {
 			int x = rs.getInt(1);
 			int x2 = rs.getInt("id");
 			assertEquals(x, x2);
+			assertNotNull(x);
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -288,7 +329,6 @@ public class testSelectOverMeta extends TestCase {
 			
 			int y = rs.getInt(6);
 			int y2 = rs.getInt("$5");
-			assertEquals(y, y2);
 			
 		} catch (SQLException e) {
 			assertTrue(true);
@@ -317,12 +357,13 @@ public class testSelectOverMeta extends TestCase {
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("id");
 				assertEquals(x, x2);
+				assertNotNull(x);
 				
 				//NB: le colonne del resultset si contano da 1
 				String s = rs.getString(2);
 				String s2 = rs.getString("name");
 				assertEquals(s, s2);
-				
+				assertNotNull(s);
 			}
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
@@ -353,6 +394,7 @@ public class testSelectOverMeta extends TestCase {
 				int x = rs.getInt(1);
 				int x2 = rs.getInt("e.id");
 				assertEquals(x, x2);
+				assertNotNull(x);
 				
 				String name = rs.getString("name"); 
 				
@@ -360,6 +402,7 @@ public class testSelectOverMeta extends TestCase {
 				String s = rs.getString(3);
 				String s2 = rs.getString("d.department");
 				assertEquals(s, s2);
+				assertNotNull(s);
 				
 			}
 			

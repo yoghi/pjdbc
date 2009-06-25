@@ -2,8 +2,8 @@ package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
 
-import java.sql.SQLException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
@@ -100,6 +100,6 @@ public abstract class PRequest {
 	/**
 	 * Valuto la richiesta corrente e ne genero una richiesta Prolog 
 	 */
-	abstract public String generatePrologRequest() throws SQLException;
+	abstract public String generatePrologRequest() throws PSQLException;
 	
 }

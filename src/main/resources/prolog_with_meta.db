@@ -13,6 +13,16 @@ age(erika,50).
 age(john,25).
 age(enrico,70).
 
+multiarray(1,[a,b]).
+multiarray(2,[b,c]).
+multiarray(3,[c,d]).
+multiarray(4,[[a,c],d]).
+multiarray(5,[pippo(a,b),pippo(c,d)]).
+multiarray(6,pippo(a,b)).
+
+noarray(5,pippo(a,b),c).
+
+
 %metabase('dept','').
 %metabase('employee','/home/workspace...').
 
@@ -29,3 +39,6 @@ metabase('dept',1,'id','int').
 metabase('employee',0,'id','int').
 metabase('employee',1,'name','string').
 metabase('employee',2,'salary','string').
+
+metabase('multiarray',0,'id','int').
+metabase('multiarray',1,'value','array').

@@ -2,18 +2,17 @@ package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.transaction.TSchema;
 import it.unibo.lmc.pjdbc.core.transaction.TSchemaRU;
-import it.unibo.lmc.pjdbc.driver.PrologStatement;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
@@ -176,7 +175,7 @@ public class PrologDatabase {
 	 * @return
 	 * @throws SQLException
 	 */
-	public ResultSet executeSelect(String sql) throws SQLException {
+	public ResultSet executeSelect(String sql) throws PSQLException {
 		String nameSchema = this.availableSchema.keys().nextElement();
 		return this.executeSelect(sql,nameSchema);
 	}
@@ -188,7 +187,7 @@ public class PrologDatabase {
 	 * @return
 	 * @throws SQLException
 	 */
-	public ResultSet executeSelect(String sql, String schemaName) throws SQLException {
+	public ResultSet executeSelect(String sql, String schemaName) throws PSQLException {
 		
 		log.info("query: \""+sql+"\"");
 		
@@ -206,7 +205,7 @@ public class PrologDatabase {
 			pRequest = parse.parseIt(schemaName);
 		} catch (ParseException e) {
 			log.error(e.getLocalizedMessage());
-			throw new SQLException(e.getMessage());
+			throw new PSQLException(e.getMessage(),PSQLState.SYNTAX_ERROR);
 		}
 
 		if ( pRequest instanceof Select ) {
@@ -223,16 +222,16 @@ public class PrologDatabase {
 						 * MULTI-SCHEMA
 						 * dovrei prendere più lock e poi fare la join delle due theory prima di tutto!
 						 */
-						throw new SQLException("not implemented yet!");
+						throw new PSQLException("not implemented yet!",PSQLState.NOT_IMPLEMENTED);
 					}
 				}
 				
 				return tschema.applyCommand( selectReq );
 			} else {
-				throw new SQLException("Invalid Schema : "+schemaName);
+				throw new PSQLException("Invalid Schema : "+schemaName,PSQLState.SYNTAX_ERROR);
 			}
 
-		} else throw new SQLException("Invalid Select : "+pRequest.toString());
+		} else throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
 		
 	}
 	

@@ -8,12 +8,12 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -136,7 +136,7 @@ public class PSchema implements IDml {
 		this.metaSchema.loadFromTheory(this.current_theory);
 	}
 
-	public PrologResultSet applyCommand(Select request) throws SQLException {
+	public PrologResultSet applyCommand(Select request) throws PSQLException {
 		
 		Pselect prq = new Pselect(this.metaSchema,request);
 
@@ -172,20 +172,20 @@ public class PSchema implements IDml {
 				
 			}
 			
-			return new PrologResultSet(rows,prq);
+			return new PrologResultSet(prq,rows);
 	
 		} catch (InvalidTheoryException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
 		} catch (MalformedGoalException e) {
-			throw new SQLException(e.getLocalizedMessage(),"SQLSTATE");
+			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
 		} catch (NoSolutionException e) {
 			// non ho soluzionio 
-			return new PrologResultSet(rows,prq);
+			return new PrologResultSet(prq,rows);
 		}
 
 	}
 
-	public int applyCommand(Insert request) throws SQLException {
+	public int applyCommand(Insert request) throws PSQLException {
 		
 		/**
 		 * Assert
@@ -194,7 +194,7 @@ public class PSchema implements IDml {
 		return 0;
 	}
 	
-	public int applyCommand(Update request) throws SQLException {
+	public int applyCommand(Update request) throws PSQLException {
 		
 		/**
 		 * Retract => select delle righe che matchano con la where e loro rimozione
@@ -205,7 +205,7 @@ public class PSchema implements IDml {
 		return 0;
 	}
 	
-	public int applyCommand(Delete request) throws SQLException {
+	public int applyCommand(Delete request) throws PSQLException {
 		
 		/**
 		 * Retract

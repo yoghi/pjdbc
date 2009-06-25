@@ -3,7 +3,6 @@ package it.unibo.lmc.pjdbc.driver;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 import junit.framework.TestCase;
 
@@ -320,6 +319,13 @@ public class PrologMetaDataTest extends TestCase {
 
 	public final void testGetTables() {
 		fail("Not yet implemented"); // TODO
+		
+//		String catalog = "myCatalog";
+//		String schema  = "mySchema";
+//		String table   = "myTable%"; // % indicates search pattern
+//		String types[]  = {"TABLE", "VIEW", "SYSTEM TABLE"};
+//		ResultSet rs = dbMeta.getTables(catalog, schema, table, types);
+
 	}
 
 	public final void testGetTimeDateFunctions() {
