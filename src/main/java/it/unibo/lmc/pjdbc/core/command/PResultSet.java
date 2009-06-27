@@ -1,7 +1,7 @@
-package it.unibo.lmc.pjdbc.core.database;
+package it.unibo.lmc.pjdbc.core.command;
 
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 
 import java.util.List;
 import java.util.UUID;

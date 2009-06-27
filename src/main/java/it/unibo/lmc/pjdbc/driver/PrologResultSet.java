@@ -1,10 +1,10 @@
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.database.PResultSet;
-import it.unibo.lmc.pjdbc.core.database.PSQLState;
+import it.unibo.lmc.pjdbc.core.command.PResultSet;
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.udt.PArray;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 
 import java.io.InputStream;
 import java.io.Reader;

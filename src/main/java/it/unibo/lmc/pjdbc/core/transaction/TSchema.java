@@ -1,15 +1,15 @@
 package it.unibo.lmc.pjdbc.core.transaction;
 
-import it.unibo.lmc.pjdbc.core.database.PResultSet;
-import it.unibo.lmc.pjdbc.core.database.PSchema;
-import it.unibo.lmc.pjdbc.core.dml.IDml;
+import it.unibo.lmc.pjdbc.core.PSchema;
+import it.unibo.lmc.pjdbc.core.command.PResultSet;
+import it.unibo.lmc.pjdbc.core.command.dml.IDml;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.util.ArrayList;
 import java.util.UUID;

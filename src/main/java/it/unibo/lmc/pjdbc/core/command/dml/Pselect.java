@@ -1,15 +1,15 @@
-package it.unibo.lmc.pjdbc.core.dml;
+package it.unibo.lmc.pjdbc.core.command.dml;
 
-import it.unibo.lmc.pjdbc.core.database.PClausola;
-import it.unibo.lmc.pjdbc.core.database.PRequest;
-import it.unibo.lmc.pjdbc.core.database.PSQLState;
+import it.unibo.lmc.pjdbc.core.command.PClausola;
+import it.unibo.lmc.pjdbc.core.command.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.util.Enumeration;
 import java.util.HashMap;

@@ -1,6 +1,5 @@
-package it.unibo.lmc.pjdbc.utils;
+package it.unibo.lmc.pjdbc.core.utils;
 
-import it.unibo.lmc.pjdbc.core.database.PSQLState;
 
 import java.sql.SQLException;
 

@@ -1,8 +1,8 @@
-package it.unibo.lmc.pjdbc.core.database;
+package it.unibo.lmc.pjdbc.core.command;
 
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.util.Hashtable;
 

@@ -1,9 +1,9 @@
-package it.unibo.lmc.pjdbc.core.ddl;
+package it.unibo.lmc.pjdbc.core.command.ddl;
 
-import it.unibo.lmc.pjdbc.core.database.PRequest;
+import it.unibo.lmc.pjdbc.core.command.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 public class PCreate extends PRequest {
 

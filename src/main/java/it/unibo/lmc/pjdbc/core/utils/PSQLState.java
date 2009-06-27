@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core.database;
+package it.unibo.lmc.pjdbc.core.utils;
 
 public class PSQLState {
 

@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression;
 
-import it.unibo.lmc.pjdbc.core.database.PRequest;
+import it.unibo.lmc.pjdbc.core.command.PRequest;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.parser.Token;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.ICondition;

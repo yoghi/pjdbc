@@ -1,16 +1,15 @@
 package it.unibo.lmc.pjdbc.core;
 
-import it.unibo.lmc.pjdbc.core.database.PResultSet;
-import it.unibo.lmc.pjdbc.core.database.PSQLState;
-import it.unibo.lmc.pjdbc.core.database.PSchema;
+import it.unibo.lmc.pjdbc.core.command.PResultSet;
 import it.unibo.lmc.pjdbc.core.transaction.TSchema;
 import it.unibo.lmc.pjdbc.core.transaction.TSchemaRU;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.io.File;
 import java.io.IOException;

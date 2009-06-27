@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core.database;
+package it.unibo.lmc.pjdbc.core.command;
 
 import it.unibo.lmc.pjdbc.core.meta.MTable;
 

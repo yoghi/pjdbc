@@ -1,16 +1,18 @@
-package it.unibo.lmc.pjdbc.core.database;
+package it.unibo.lmc.pjdbc.core;
 
-import it.unibo.lmc.pjdbc.core.dml.IDml;
-import it.unibo.lmc.pjdbc.core.dml.Pselect;
+import it.unibo.lmc.pjdbc.core.command.PResultSet;
+import it.unibo.lmc.pjdbc.core.command.dml.IDml;
+import it.unibo.lmc.pjdbc.core.command.dml.Pselect;
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.core.udt;
 
-import it.unibo.lmc.pjdbc.core.database.PSQLState;
-import it.unibo.lmc.pjdbc.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 
 import java.sql.Array;
 import java.sql.ResultSet;
