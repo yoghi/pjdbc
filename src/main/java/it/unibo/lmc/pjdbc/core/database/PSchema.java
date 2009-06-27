@@ -146,16 +146,19 @@ public class PSchema implements IDml {
 		this.metaSchema.loadFromTheory(this.current_theory);
 	}
 
-	public PrologResultSet applyCommand(Select request) throws PSQLException {
+	public PResultSet applyCommand(Select request) throws PSQLException {
 		
 		Pselect prq = new Pselect(this.metaSchema,request);
-
 		String gen_psql = prq.generatePrologRequest();
 		
 		log.debug("psql da eseguire: "+gen_psql);
 
 		List<Term[]> rows = new Vector<Term[]>();
 		
+//		queste info le ha già usate PRequest e la sa usare meglio
+//		List<TableField> field_req = request.getCampiRicerca();
+		
+		List<MColumn> fields = prq.getFieldList();
 		
 		
 		try {
@@ -166,10 +169,6 @@ public class PSchema implements IDml {
 			
 			SolveInfo info = p.solve(gen_psql);
 			
-			List<TableField> field_req = request.getCampiRicerca();
-			
-			List<MColumn> fields = null;	//PSelect ha tutto il metaSchema info
-			
 			while (info.isSuccess()){ 
 				
 				log.debug("soluzione"+info.getBindingVars().toString());
@@ -178,11 +177,8 @@ public class PSchema implements IDml {
 				int i=0;
 				
 				for (MColumn column : fields) {
-					String varSql = column.getFullName();
+					String varSql = column.getQualifiedName();
 					String varName = prq.sql2prologVar(varSql);
-					
-					field_req.get(i).setOID(column.getOID());
-					
 					Term t = info.getVarValue(varName);
 					row[i] = t;
 					i++;

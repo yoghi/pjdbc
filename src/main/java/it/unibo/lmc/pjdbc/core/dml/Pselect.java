@@ -185,6 +185,15 @@ public class Pselect extends PRequest {
 		
 	}
 
+	public List<MColumn> getFieldList() {
+		
+		//FieldName => Column Info
+		HashMap<String, MColumn> t = new HashMap<String, MColumn>();
+		
+		
+		
+	}
+
 //	public HashMap getMapVar() {
 //
 //		HashMap<String, MColumn> t = new HashMap<String, MColumn>();

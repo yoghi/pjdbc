@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.core.transaction;
 
+import it.unibo.lmc.pjdbc.core.database.PResultSet;
 import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.core.dml.IDml;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -56,7 +57,7 @@ public abstract class TSchema implements IDml {
 	/*
 	 * A.P.I DML 
 	 */
-	public abstract PrologResultSet applyCommand(Select request) throws PSQLException;
+	public abstract PResultSet applyCommand(Select request) throws PSQLException;
 	public abstract int applyCommand(Insert request) throws PSQLException;
 	public abstract int applyCommand(Update request) throws PSQLException;
 	public abstract int applyCommand(Delete request) throws PSQLException;

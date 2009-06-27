@@ -1,5 +1,8 @@
-package it.unibo.lmc.pjdbc.core.database;
+package it.unibo.lmc.pjdbc.core;
 
+import it.unibo.lmc.pjdbc.core.database.PResultSet;
+import it.unibo.lmc.pjdbc.core.database.PSQLState;
+import it.unibo.lmc.pjdbc.core.database.PSchema;
 import it.unibo.lmc.pjdbc.core.transaction.TSchema;
 import it.unibo.lmc.pjdbc.core.transaction.TSchemaRU;
 import it.unibo.lmc.pjdbc.parser.ParseException;
@@ -175,7 +178,7 @@ public class PrologDatabase {
 	 * @return
 	 * @throws SQLException
 	 */
-	public ResultSet executeSelect(String sql) throws PSQLException {
+	public PResultSet executeSelect(String sql) throws PSQLException {
 		String nameSchema = this.availableSchema.keys().nextElement();
 		return this.executeSelect(sql,nameSchema);
 	}
@@ -187,7 +190,7 @@ public class PrologDatabase {
 	 * @return
 	 * @throws SQLException
 	 */
-	public ResultSet executeSelect(String sql, String schemaName) throws PSQLException {
+	public PResultSet executeSelect(String sql, String schemaName) throws PSQLException {
 		
 		log.info("query: \""+sql+"\"");
 		

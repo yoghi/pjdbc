@@ -1,6 +1,5 @@
 package it.unibo.lmc.pjdbc.core;
 
-import it.unibo.lmc.pjdbc.core.database.PrologDatabase;
 
 import java.io.File;
 import java.io.FileInputStream;

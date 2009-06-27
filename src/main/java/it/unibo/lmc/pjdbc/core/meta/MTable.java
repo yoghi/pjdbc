@@ -1,5 +1,8 @@
 package it.unibo.lmc.pjdbc.core.meta;
 
+import it.unibo.lmc.pjdbc.core.database.PSQLState;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
+
 
 public class MTable {
 	
@@ -111,9 +114,9 @@ public class MTable {
 		return tname;
 	}
 
-	public MColumn getColumnMeta(String columnNamePattern) {
+	public MColumn getColumnMeta(String columnNamePattern) throws PSQLException {
 		// TODO Auto-generated method stub
-		return null;
+		throw new PSQLException("ancora non ci sono le MColumn",PSQLState.NOT_IMPLEMENTED);
 	}
 
 }

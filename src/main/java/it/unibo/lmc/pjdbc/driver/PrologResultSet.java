@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import it.unibo.lmc.pjdbc.core.database.PResultSet;
 import it.unibo.lmc.pjdbc.core.database.PSQLState;
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.udt.PArray;
@@ -32,28 +33,19 @@ import org.apache.log4j.Logger;
 
 import alice.tuprolog.Term;
 
-public class PrologResultSet implements ResultSet {
+public class PrologResultSet extends PResultSet implements ResultSet {
 
 	private int currentPosition = -1;
 	private int insertPosition = 0;
 
-	/**
-	 * Metainformazioni sui campi
-	 */
-	private List<MColumn> mFields;
-	
-	/**
-	 * Righe/Solution
-	 */
-	private List<Term[]> rowData;
+
 	
 	/**
 	 * Mappa Alias/Name => Posizione
 	 */
 	private Map<String,Integer> mapFields;
 	
-	private UUID code = UUID.randomUUID();
-	private Logger log;
+	
 //	private PRequest pRequest;
 
 
@@ -74,12 +66,9 @@ public class PrologResultSet implements ResultSet {
 		}
 		
 		this.rowData = rows;
+
 		
 		
-		
-		
-		
-		log = Logger.getLogger(PrologResultSet.class.toString() + "." + this.code);
 	}
 
 
@@ -235,41 +224,6 @@ public class PrologResultSet implements ResultSet {
 	public int getFetchSize() throws SQLException {
 		//TODO devo ricordarmi di togliere la riga che uso per gli inserimenti
 		return this.rowData.size() - 1;
-	}
-
-	protected Term getValue(int columnIndex) throws PSQLException {
-		
-		PSolution info = this.rowData.get(this.currentPosition);
-		try {
-			Term t = info.getVar(columnIndex-1);			
-			return t;
-		} catch (IndexOutOfBoundsException e) {
-			throw new PSQLException("Column " + columnIndex + "not exist", PSQLState.DATA_TYPE_MISMATCH );
-		}
-		
-		// if ( vresult.getTerm() instanceof alice.tuprolog.Number )
-
-	}
-
-	/**
-	 * Ottengo il term corrispondente alla colonna selezionata
-	 * @param columnLabel nome colonna
-	 * @return Term
-	 * @throws PSQLException
-	 */
-	protected Term getValue(String columnLabel) throws PSQLException {
-
-		if (null == columnLabel)
-			throw new PSQLException("columLabel cann't nullable ",PSQLState.UNDEFINED_COLUMN);
-
-		PSolution info = this.rowData.get(this.currentPosition);
-
-		MColumn minfo = this.mfields.get(columnLabel);
-		
-		..
-		
-		return info.getVar(minfo);
-
 	}
 	
 	public Array getArray(int columnIndex) throws PSQLException {

@@ -1,15 +1,15 @@
 package it.unibo.lmc.pjdbc.core.transaction;
 
-import java.util.UUID;
-
+import it.unibo.lmc.pjdbc.core.database.PResultSet;
 import it.unibo.lmc.pjdbc.core.database.PSchema;
-import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.utils.PSQLException;
+
+import java.util.UUID;
 
 /**
  * 
@@ -27,7 +27,7 @@ public class TSchemaRU extends TSchema {
 	}
 
 	@Override
-	public PrologResultSet applyCommand(Select request) throws PSQLException {
+	public PResultSet applyCommand(Select request) throws PSQLException {
 		this.log.add(request);
 		return this.realSchema.applyCommand(request);
 	}

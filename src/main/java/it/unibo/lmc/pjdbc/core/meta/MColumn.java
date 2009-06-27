@@ -43,7 +43,7 @@ public class MColumn {
 
 
 
-	public String getFullName() {
+	public String getQualifiedName() {
 		return this.schema+"."+this.table+"."+this.name;
 	} 
 	
