@@ -3,6 +3,7 @@ package it.unibo.lmc.pjdbc.core.dml;
 import it.unibo.lmc.pjdbc.core.database.PClausola;
 import it.unibo.lmc.pjdbc.core.database.PRequest;
 import it.unibo.lmc.pjdbc.core.database.PSQLState;
+import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
@@ -10,6 +11,8 @@ import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 import it.unibo.lmc.pjdbc.utils.PSQLException;
 
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -181,5 +184,20 @@ public class Pselect extends PRequest {
 		
 		
 	}
+
+//	public HashMap getMapVar() {
+//
+//		HashMap<String, MColumn> t = new HashMap<String, MColumn>();
+//		
+//		// le colonne le prendo dalla sequenza di var richieste...
+//		
+//		Enumeration<String> e = this.mapVariables.elements();
+//		//...ciclo e ho tutte le var nell'ordine giusto...
+//		//chiedo this.mschema.getMetaTableInfo() sul nome della tabella e poi .getColumInfo sulla MTable 
+//		
+//		
+//		
+//		return t;
+//	}
 	
 }

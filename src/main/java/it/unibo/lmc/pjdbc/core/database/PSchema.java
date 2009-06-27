@@ -2,12 +2,14 @@ package it.unibo.lmc.pjdbc.core.database;
 
 import it.unibo.lmc.pjdbc.core.dml.IDml;
 import it.unibo.lmc.pjdbc.core.dml.Pselect;
+import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.io.File;
@@ -15,7 +17,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -26,6 +35,7 @@ import alice.tuprolog.NoMoreSolutionException;
 import alice.tuprolog.NoSolutionException;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Term;
 import alice.tuprolog.Theory;
 
 public class PSchema implements IDml {
@@ -144,7 +154,9 @@ public class PSchema implements IDml {
 		
 		log.debug("psql da eseguire: "+gen_psql);
 
-		List<PSolution> rows = new ArrayList<PSolution>();
+		List<Term[]> rows = new Vector<Term[]>();
+		
+		
 		
 		try {
 		
@@ -154,11 +166,29 @@ public class PSchema implements IDml {
 			
 			SolveInfo info = p.solve(gen_psql);
 			
+			List<TableField> field_req = request.getCampiRicerca();
+			
+			List<MColumn> fields = null;	//PSelect ha tutto il metaSchema info
+			
 			while (info.isSuccess()){ 
 				
-				log.debug(info.getBindingVars().toString());
+				log.debug("soluzione"+info.getBindingVars().toString());
 				
-				rows.add(new PSolution(info));
+				Term[] row = new Term[fields.size()];
+				int i=0;
+				
+				for (MColumn column : fields) {
+					String varSql = column.getFullName();
+					String varName = prq.sql2prologVar(varSql);
+					
+					field_req.get(i).setOID(column.getOID());
+					
+					Term t = info.getVarValue(varName);
+					row[i] = t;
+					i++;
+				}
+				
+				rows.add(row);
 				
 				if (p.hasOpenAlternatives()){ 
 					try {
@@ -169,10 +199,9 @@ public class PSchema implements IDml {
 				} else { 
 					break;
 				}
-				
 			}
 			
-			return new PrologResultSet(prq,rows);
+			return new PrologResultSet(fields,rows);
 	
 		} catch (InvalidTheoryException e) {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
@@ -180,7 +209,8 @@ public class PSchema implements IDml {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
 		} catch (NoSolutionException e) {
 			// non ho soluzionio 
-			return new PrologResultSet(prq,rows);
+			//return new PrologResultSet(mappaVar,rows);
+			return null;
 		}
 
 	}

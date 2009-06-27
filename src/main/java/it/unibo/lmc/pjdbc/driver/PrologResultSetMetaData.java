@@ -1,12 +1,20 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import it.unibo.lmc.pjdbc.core.database.PSQLState;
+import it.unibo.lmc.pjdbc.core.meta.MColumn;
+import it.unibo.lmc.pjdbc.utils.PSQLException;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.List;
 
 public class PrologResultSetMetaData implements ResultSetMetaData {
 
-	public PrologResultSetMetaData() {
-		// TODO Auto-generated constructor stub
+	private List<MColumn> fileds;
+	
+	
+	public PrologResultSetMetaData(List<MColumn> columns) {
+		this.fileds = columns;
 	}
 
 	public String getCatalogName(int column) throws SQLException {
@@ -20,8 +28,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public int getColumnCount() throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.fileds.size();
 	}
 
 	public int getColumnDisplaySize(int column) throws SQLException {
@@ -35,13 +42,19 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public String getColumnName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try { 
+			return this.fileds.get(column).getColumnName();
+		} catch (Exception e) {
+			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
+		}
 	}
 
 	public int getColumnType(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return 0;
+		try { 
+			return this.fileds.get(column).getColumnType();
+		} catch (Exception e) {
+			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
+		}
 	}
 
 	public String getColumnTypeName(int column) throws SQLException {
@@ -60,13 +73,19 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public String getSchemaName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try { 
+			return this.fileds.get(column).getSchemaName();
+		} catch (Exception e) {
+			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
+		}
 	}
 
 	public String getTableName(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		try { 
+			return this.fileds.get(column).getTableName();
+		} catch (Exception e) {
+			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
+		}
 	}
 
 	public boolean isAutoIncrement(int column) throws SQLException {

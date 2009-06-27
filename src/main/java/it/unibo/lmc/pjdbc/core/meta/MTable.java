@@ -111,6 +111,11 @@ public class MTable {
 		return tname;
 	}
 
+	public MColumn getColumnMeta(String columnNamePattern) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
 //if ( field_type.toString().equalsIgnoreCase("int") ) {

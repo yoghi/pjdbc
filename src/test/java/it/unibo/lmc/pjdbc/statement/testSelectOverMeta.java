@@ -80,6 +80,7 @@ public class testSelectOverMeta extends TestCase {
 		ts.addTest(new testSelectOverMeta("testAliasSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelectMisc"));
 		ts.addTest(new testSelectOverMeta("testGetArray"));
+		ts.addTest(new testSelectOverMeta("testGetInvalidArray"));
 		ts.addTest(new testSelectOverMeta("testInvalidAliasQuery"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
@@ -212,10 +213,10 @@ public class testSelectOverMeta extends TestCase {
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (PSQLException e) {
-			
+			assert(true);
+			return;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.getLocalizedMessage());
 		}
 		
 		fail(" getArray non si è accorto che non è un array ");

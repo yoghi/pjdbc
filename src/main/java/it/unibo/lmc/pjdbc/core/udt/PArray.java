@@ -1,44 +1,89 @@
 package it.unibo.lmc.pjdbc.core.udt;
 
+import it.unibo.lmc.pjdbc.core.database.PSQLState;
 import it.unibo.lmc.pjdbc.utils.PSQLException;
 
 import java.sql.Array;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
+import alice.tuprolog.Number;
 
 public class PArray implements Array {
 	
+	List<Object> internalArray = new ArrayList<Object>();
 	
 	public PArray() {
 		
 	}
 
-	public PArray(Term t) {
+	public PArray(Term t) throws PSQLException {
 		
 		try {
 		
 			Struct list = (Struct)t;
 			
-			System.out.println(list);
+			Iterator i = list.listIterator();	
 			
-			Iterator i = list.listIterator();	//se non è una lista qui fallisce...
 			while(i.hasNext()){
 				
 				Term internalTerm = (Term)i.next();
 				
-				System.out.println(">>"+internalTerm);
+				if ( internalTerm.isList() ) internalArray.add(this.generateMap(internalTerm));
 				
+				internalArray.add(this.normalize(internalTerm));
 				
 			}
 		
 		} catch (Exception e) {
 			System.out.println("errore: "+e);
+			throw new PSQLException("not valid array ",PSQLState.DATA_TYPE_MISMATCH);
 		}
 		
+		
+	}
+	
+	private Object normalize(Term t) {
+		
+		if ( t instanceof Number ){
+			return Double.parseDouble(t.toString());
+		}
+		
+		return t.toString();
+	}
+
+	private List generateMap(Term t){
+		
+		ArrayList a = new ArrayList();
+		
+		if ( t.isList() ) {
+			
+			Struct list = (Struct)t;
+			
+			Iterator i = list.listIterator();	//se non è una lista qui fallisce...
+			
+			while(i.hasNext()){
+				
+				Term internalTerm = (Term)i.next();
+
+				Object o;
+				if ( internalTerm.isList() ) o = this.generateMap(internalTerm);
+				else o = this.normalize(internalTerm);
+				
+				a.add(o);
+				
+			}
+			
+			
+			
+		}
+		
+		return a;
 		
 	}
 
@@ -58,8 +103,7 @@ public class PArray implements Array {
 	   * @since 1.2
 	   */
 	public Object getArray() throws PSQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return this.internalArray;
 	}
 
 	/**

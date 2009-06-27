@@ -14,16 +14,16 @@ import org.apache.log4j.Logger;
 public class PrologStatement implements Statement {
 
 	private PrologConnection conn = null;
-	private PrologDatabase currentSchema = null;
+	private PrologDatabase currentDatabase = null;
 	
 	
 	private StringReader currentQuery = null;
 	
 	private Logger log;
 
-	public PrologStatement(PrologConnection connection,PrologDatabase schema) {
+	public PrologStatement(PrologConnection connection,PrologDatabase database) {
 		this.conn = connection;
-		this.currentSchema = schema;
+		this.currentDatabase = database;
 		log = Logger.getLogger(PrologStatement.class);
 	}
 
@@ -84,7 +84,7 @@ public class PrologStatement implements Statement {
 		
 		//NOTA BENE: qui posso lavorare sull'sql con i "?" da mettere a posto nel caso di query precalcolate o come si dice .. 
 		
-		return this.currentSchema.executeSelect(sql);
+		return this.currentDatabase.executeSelect(sql);
 		
 		
 	}
