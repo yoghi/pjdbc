@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.core.meta;
 
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -139,4 +140,27 @@ public class MTable {
 		return this.columns.length;
 	}
 
+	/**
+	 * Visualizzo la tabella
+	 */
+	public String toString(){
+		StringBuilder build = new StringBuilder();
+		
+		for (int i = 0; i < this.columns.length; i++) {
+			
+			Formatter formatter = new Formatter();
+			
+			if ( null == this.columns[i] ) {
+				build.append("unknow \t unknow \n");
+			} else {
+				formatter.format(" %s \t %s  \n",this.columns[i].getColumnName(),this.columns[i].getColumnType());
+				build.append(formatter.toString());
+			}
+			
+		}
+		
+		return build.toString();
+	}
+	
+	
 }

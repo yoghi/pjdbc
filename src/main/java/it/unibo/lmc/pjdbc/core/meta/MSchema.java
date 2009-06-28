@@ -95,8 +95,6 @@ public class MSchema {
 						 * se c'è qualcosa diverso da (!|[a-z][a-zA-Z_0-9]*) allora non è atomico e compare tra '
 						 */
 						t.setField( ((Number) field_position).intValue() , field_name.toString().replace("'", ""), field_type.toString() ) ;
-//						log.debug("tabella : "+table_name.toString()+" campo : "+((Number) field_position).intValue()+" "+field_name.toString()+" "+field_type.toString());
-						
 
 					} else {
 						throw new PSQLException("Malformed metabase",PSQLState.INVALID_THEORY);
@@ -122,6 +120,10 @@ public class MSchema {
 		        		//System.out.println("Ground (non contiene variabili) "+s.isGround());	        		
 		        		int l = s.getArity();
 		        		
+		        		if ( s.getName().equalsIgnoreCase("metabase") ) {
+		        			continue;
+		        		}	
+		        		
 		        		if ( this.tables.containsKey(s.getName()) ) {
 		        			if ( this.tables.get(s.getName()).numColum() < l ) {
 		        				this.tables.get(s.getName()).setField(l-1, "unknown" , "unknown");
@@ -131,12 +133,9 @@ public class MSchema {
 		        			}
 		        		} else {
 		        			
-		        			if ( !s.getName().equalsIgnoreCase("metabase") ) {
-			        			this.tables.put(s.getName(), new MTable(this,s.getName(),l));
-			        			log.debug("trovata tabella "+s.getName()+" di dimensione "+l);
-		        			} else {
-		        				log.debug("filtro tabella metabase");
-		        			}
+		        			this.tables.put(s.getName(), new MTable(this,s.getName(),l));
+		        			log.debug("trovata tabella "+s.getName()+" di dimensione "+l);
+		        			
 		        		}
 		        		
 		        	}
