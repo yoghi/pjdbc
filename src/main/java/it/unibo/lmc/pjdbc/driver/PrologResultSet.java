@@ -1,11 +1,9 @@
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.PSchema;
 import it.unibo.lmc.pjdbc.core.command.PResultSet;
 import it.unibo.lmc.pjdbc.core.udt.PArray;
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.core.utils.PSQLState;
-import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -25,14 +23,12 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
 
 import alice.tuprolog.Term;
 
 public class PrologResultSet implements ResultSet {
 
-	private int currentPosition = -1;
 	private int insertPosition = 0;
 	
 	private PResultSet pResult = null;
@@ -70,9 +66,6 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public void moveToInsertRow() throws PSQLException {
-		// this.row_data.add(this.insertPosition, new ArrayList<Object>());
-		// devo creare un nuovo solveinfo???
-		this.currentPosition = this.insertPosition;
 	}
 
 	public boolean next() throws PSQLException {

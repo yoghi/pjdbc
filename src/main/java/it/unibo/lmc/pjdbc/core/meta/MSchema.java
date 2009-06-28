@@ -1,5 +1,8 @@
 package it.unibo.lmc.pjdbc.core.meta;
 
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,20 +87,19 @@ public class MSchema {
 						if ( this.tables.containsKey(table_name.toString()) ) {
 							t = this.tables.get(table_name.toString());
 						} else {
-							t  = new MTable(table_name.toString(),1);
+							t  = new MTable(this,table_name.toString(),1);
 							this.tables.put(table_name.toString(), t);
 						}
 						
 						/*
 						 * se c'è qualcosa diverso da (!|[a-z][a-zA-Z_0-9]*) allora non è atomico e compare tra '
 						 */
-						t.addField( ((Number) field_position).intValue() , field_name.toString().replace("'", ""), field_type.toString() ) ;
-						log.debug("tabella : "+table_name.toString()+" campo : "+((Number) field_position).intValue()+" "+field_name.toString()+" "+field_type.toString());
+						t.setField( ((Number) field_position).intValue() , field_name.toString().replace("'", ""), field_type.toString() ) ;
+//						log.debug("tabella : "+table_name.toString()+" campo : "+((Number) field_position).intValue()+" "+field_name.toString()+" "+field_type.toString());
 						
 
 					} else {
-						//throw new PSQLException("Malformed metabase");
-						System.out.println("Malformed metabase");
+						throw new PSQLException("Malformed metabase",PSQLState.INVALID_THEORY);
 						//TODO gestire il caso di metabase malformato!
 					}
 					
@@ -122,13 +124,15 @@ public class MSchema {
 		        		
 		        		if ( this.tables.containsKey(s.getName()) ) {
 		        			if ( this.tables.get(s.getName()).numColum() < l ) {
-		        				this.tables.get(s.getName()).addField(l-1, "unknown" , "unknown");
+		        				this.tables.get(s.getName()).setField(l-1, "unknown" , "unknown");
 		        				log.debug("aggiunto a "+s.getName()+" la colonna "+l);
-		        			} 
+		        			} else {
+		        				//.... devo capire perchè ho messo il check... 
+		        			}
 		        		} else {
 		        			
 		        			if ( !s.getName().equalsIgnoreCase("metabase") ) {
-			        			this.tables.put(s.getName(), new MTable(s.getName(),l));
+			        			this.tables.put(s.getName(), new MTable(this,s.getName(),l));
 			        			log.debug("trovata tabella "+s.getName()+" di dimensione "+l);
 		        			} else {
 		        				log.debug("filtro tabella metabase");
@@ -142,12 +146,18 @@ public class MSchema {
 			
 
 		} catch (MalformedGoalException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSolutionException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnknownVarException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidTheoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PSQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -2,21 +2,29 @@ package it.unibo.lmc.pjdbc.core.meta;
 
 public class MColumn {
 
-	private String schema;
-	private String table;
+	private MSchema schema;
+	private MTable table;
 	private int type;	//java.sql.Types
 	private String name;
-	
-	
-	
-	
-	
-	public String getColumnName() {
-		return this.name;
+
+	/**
+	 * 
+	 * @param schema
+	 * @param table
+	 * @param columnName
+	 * @param columnType
+	 */
+	public MColumn(MSchema schema, MTable table, String columnName, int columnType) {
+		this.name = columnName;
+		this.type = columnType;
+		this.schema = schema;
+		this.table = table;
 	}
 
 
-
+	public String getColumnName() {
+		return this.name;
+	}
 
 
 	public int getColumnType() {
@@ -24,27 +32,18 @@ public class MColumn {
 	}
 
 
-
-
-
 	public String getSchemaName() {
-		return this.schema;
+		return this.schema.getSchemaName();
 	}
-
-
-
 
 
 	public String getTableName() {
-		return this.table;
+		return this.table.getTableName();
 	}
 
 
-
-
-
 	public String getQualifiedName() {
-		return this.schema+"."+this.table+"."+this.name;
+		return this.schema.getSchemaName()+"."+this.table.getTableName()+"."+this.name;
 	} 
 	
 	

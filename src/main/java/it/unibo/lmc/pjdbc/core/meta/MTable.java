@@ -1,127 +1,142 @@
 package it.unibo.lmc.pjdbc.core.meta;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.core.utils.PTypes;
 
 
 public class MTable {
 	
-	String[][] tcolumns;
+	/**
+	 * Schema
+	 */
+	private MSchema schema;
+	
+	/**
+	 * Indice NomeColonna => posizione
+	 */
+	private Map<String,Integer> tcolumns;
+	
+	/**
+	 * Elenco Colonne
+	 */
+	private MColumn[] columns;
+	
+	/**
+	 * Nome tabella
+	 */
 	private String tname;
 	
-	public MTable(String name, int columNumber) {
-		 this.tcolumns = new String[columNumber][2];
+	/**
+	 * Costruttore Tabella
+	 * @param name nome tabella
+	 * @param columNumber numero di colonne
+	 */
+	public MTable(MSchema schema, String name, int columNumber) {
+		 this.tcolumns = new HashMap<String, Integer>();
+		 this.columns = new MColumn[columNumber];
 		 this.tname = name;
-	}
-	
-	public void addField(int position, String name, String type) {
-	
-		if ( position < 0 ) {
-			//TODO eccezzione
-		}
-		
-		String[] column = new String[2];
-		column[0] = name;
-		column[1] = type;
-	
-		if ( position < this.tcolumns.length ) {
-			this.tcolumns[position] = column;		//OVERRIDE??
-		} else {
-			
-			try { 
-				
-				int newsize = position+1;
-				String[][] temp = new String[newsize][2];
-				
-				for(int i = 0; i < this.tcolumns.length; i++ ){
-					temp[i] = this.tcolumns[i];
-				}
-				
-				temp[position] = column;
-				this.tcolumns = temp;
-		
-			} catch (IndexOutOfBoundsException e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-	
-	public String toString(){
-		
-		StringBuffer buffer = new StringBuffer();
-		
-		for ( int i = 0; i < this.tcolumns.length; i++ ){
-			
-			buffer.append(i);
-			buffer.append(":");
-			
-			if ( this.tcolumns[i][0] != null ){
-			
-				buffer.append(this.tcolumns[i][0].toString());
-				buffer.append(":");
-				buffer.append(this.tcolumns[i][1].toString());
-				
-			} else {
-				buffer.append("unknown:unknown");
-			}
-			
-			buffer.append("\n");
-		}
-		
-		return buffer.toString();
+		 this.schema = schema;
 	}
 	
 	/**
-	 * Quante colonne ha questa tabella
-	 * @return numero di colonne
+	 * @return the table name
 	 */
-	public int numColum(){
-		return this.tcolumns.length;
-	}
-	
-	/**
-	 * Verifico se la colonna X è una colonna di numeri
-	 * @param position posizione della colonna nella tabella
-	 * @return vero se la colonna è composta da numeri
-	 */
-	public boolean columnIsNumber(int position) {
-		
-		if ( this.tcolumns[position][1].equalsIgnoreCase("int") || this.tcolumns[position][1].equalsIgnoreCase("double") || this.tcolumns[position][1].equalsIgnoreCase("float") ) return true;
-		return false;
-			
-	}
-
-	public int containsField(String columnName) {
-		for (int i = 0; i < tcolumns.length; i++) {
-			
-			if ( tcolumns[i][0] != null ){
-				if ( tcolumns[i][0].equalsIgnoreCase(columnName) ) return i;
-			} else {
-				//TODO: non ci sono i metadati... come mi comporto??
-				System.out.println(" MANCANO I METADATI IN MEMORIA !!!");
-				System.exit(-1);
-			}
-			
-		}
-		return -1;
-	}
-
-	/**
-	 * @return the tname
-	 */
-	public String getTname() {
+	public String getTableName() {
 		return tname;
 	}
+	
+	/**
+	 * setto una colonna della tabella
+	 * @param position
+	 * @param columnName
+	 * @param columnType
+	 * @return
+	 * @throws PSQLException
+	 */
+	public MColumn setField(int position, String columnName, String columnType) throws PSQLException {
+		
+		if (  position >= 0 && position < this.columns.length ) {	
+			
+			if ( null == this.tcolumns.put(columnName, position) ) {
+		
+				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.getSqlType(columnType));
+				this.columns[position] = columnNew;
+				return null;
+				
+			} else { //override
+				
+				MColumn columnOld = this.columns[position];
+				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.getSqlType(columnType));
+				
+				this.columns[position] = columnNew;
+				
+				return columnOld;
+			}
+			
+			
+		} else {
+			
+			if ( position < 0 ) throw new PSQLException("posizione "+position + " non valida", PSQLState.INVALID_POSITION);
+			
+			this.tcolumns.put(columnName, position);
+			MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.getSqlType(columnType));
+			
+			try {
+				
+				int newsize = position+1;
+				MColumn[] temp = new MColumn[newsize];
+				
+				for (int i = 0; i < this.columns.length; i++) {
+					temp[i] = this.columns[i];
+				}
+				
+				this.columns = temp;
+				
+			} catch (IndexOutOfBoundsException e) {
+				throw new PSQLException("problemi nel resize della lista di colonne della tabella "+this.tname, PSQLState.SYSTEM_ERROR);
+			}
+			
+			this.columns[position] = columnNew;
+			return null;
+		}
+		
+	}
 
+	/**
+	 * Ottengo la prima column che corrisponde al pattern passato 
+	 * @param columnNamePattern
+	 * @return column metainfo
+	 * @throws PSQLException
+	 */
 	public MColumn getColumnMeta(String columnNamePattern) throws PSQLException {
-		// TODO Auto-generated method stub
-		throw new PSQLException("ancora non ci sono le MColumn",PSQLState.NOT_IMPLEMENTED);
+		if ( null == columnNamePattern ) throw new PSQLException("column can't be null", PSQLState.INVALID_NAME);
+		Integer pos = this.tcolumns.get(columnNamePattern);
+		if ( null == pos ) throw new PSQLException("column "+columnNamePattern+" not exist", PSQLState.UNDEFINED_COLUMN);
+		return this.columns[pos.intValue()];
+	}
+	
+	/**
+	 * Verifico se la colonna esiste in questa tabella
+	 * @param columnName
+	 * @return
+	 * @throws PSQLException 
+	 */
+	public int containsField(String columnName) throws PSQLException {
+		Integer pos = this.tcolumns.get(columnName);
+		if ( null == pos ) throw new PSQLException("invalid column "+columnName, PSQLState.UNDEFINED_COLUMN);
+		return pos;
+	}
+
+	/**
+	 * Restituisco quante colonne ha questa tabella
+	 * @return numero colonne
+	 */
+	public int numColum() {
+		return this.columns.length;
 	}
 
 }
-
-//if ( field_type.toString().equalsIgnoreCase("int") ) {
-//int ty = java.sql.Types.INTEGER;
-//}
-//string => java.sql.Types.VARCHAR

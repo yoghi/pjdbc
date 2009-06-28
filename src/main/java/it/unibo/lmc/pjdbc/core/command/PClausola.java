@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.core.command;
 
 import it.unibo.lmc.pjdbc.core.meta.MTable;
+import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 
 public class PClausola {
 
@@ -32,14 +33,14 @@ public class PClausola {
 	}
 	
 	
-	public boolean setTerm(String item,String name,boolean override) throws ArrayIndexOutOfBoundsException {
+	public boolean setTerm(String item,String name,boolean override) throws PSQLException {
 		int pos = this.metadati.containsField(name);
 		return this.setTerm(item, pos, override);
 	}
 	
 	public String toString(){
 		StringBuilder build = new StringBuilder();
-		build.append(this.metadati.getTname());
+		build.append(this.metadati.getTableName());
 		build.append("(");
 		for (int i = 0; i < this.terms.length; i++) {
 			if ( null == this.terms[i] ) {

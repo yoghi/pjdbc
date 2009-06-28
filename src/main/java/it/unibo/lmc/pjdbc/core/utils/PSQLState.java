@@ -14,6 +14,8 @@ public class PSQLState {
 	
 	 // begin constant state codes
     public final static PSQLState UNKNOWN_STATE = new PSQLState("");
+
+    public final static PSQLState INVALID_THEORY = new PSQLState("0100E");
     
     public final static PSQLState SYNTAX_ERROR = new PSQLState("42601");
     public final static PSQLState INVALID_NAME = new PSQLState("42602");
@@ -32,7 +34,10 @@ public class PSQLState {
     public final static PSQLState NOT_IMPLEMENTED = new PSQLState("0A000");
     
     
-//    public final static PSQLState TOO_MANY_RESULTS = new PSQLState("0100E");
+    
+    
+    
+
 //
 //    public final static PSQLState NO_DATA = new PSQLState("02000");
 //
