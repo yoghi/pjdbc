@@ -182,5 +182,9 @@ public class TableField {
 	public String getAlias(){
 		return this.alias;
 	}
+
+	public String getQualifiedName() {
+		return this.schema+"."+this.tableName+"."+this.columnName;
+	}
     
 }

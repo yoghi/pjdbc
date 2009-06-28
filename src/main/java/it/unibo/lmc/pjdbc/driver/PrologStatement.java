@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.core.PrologDatabase;
+import it.unibo.lmc.pjdbc.core.command.PResultSet;
 
 import java.io.StringReader;
 import java.sql.Connection;
@@ -80,11 +81,12 @@ public class PrologStatement implements Statement {
 	 * Select type query
 	 */
 	public ResultSet executeQuery(String sql) throws SQLException {
-		
-		
+
 		//NOTA BENE: qui posso lavorare sull'sql con i "?" da mettere a posto nel caso di query precalcolate o come si dice .. 
 		
-		return this.currentDatabase.executeSelect(sql);
+		PResultSet res = this.currentDatabase.executeSelect(sql);
+		
+		return new PrologResultSet(res);
 		
 		
 	}

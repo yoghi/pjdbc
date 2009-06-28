@@ -1,10 +1,11 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import it.unibo.lmc.pjdbc.core.PSchema;
 import it.unibo.lmc.pjdbc.core.command.PResultSet;
-import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.udt.PArray;
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -24,51 +25,20 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import org.apache.log4j.Logger;
 
 import alice.tuprolog.Term;
 
-public class PrologResultSet extends PResultSet implements ResultSet {
+public class PrologResultSet implements ResultSet {
 
 	private int currentPosition = -1;
 	private int insertPosition = 0;
-
-
 	
-	/**
-	 * Mappa Alias/Name => Posizione
-	 */
-	private Map<String,Integer> mapFields;
-	
-	
-//	private PRequest pRequest;
+	private PResultSet pResult = null;
 
-
-//	public PrologResultSet(Map<String,MColumn> field, List<PSolution> rows){
-//		 this.mfields = field;
-//		 this.rowData = rows;
-//		 
-//	}
-
-	public PrologResultSet(List<MColumn> fields, List<Term[]> rows) {
-		
-		this.mapFields = new Hashtable<String, Integer>();
-		
-		this.mFields = fields;
-		int i = 0;
-		for(MColumn column : fields){
-			this.mapFields.put(..., value);
-		}
-		
-		this.rowData = rows;
-
-		
-		
+	public PrologResultSet(PResultSet result) {
+		this.pResult = result;
 	}
 
 
@@ -90,8 +60,9 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	 * Torno al primo elemento
 	 */
 	public boolean first() throws PSQLException {
-		this.currentPosition = -1;
-		return this.rowData.size() > 0;
+//		this.currentPosition = -1;
+//		return this.rowData.size() > 0;
+		return this.pResult.first();
 	}
 
 	public void moveToCurrentRow() throws PSQLException {
@@ -105,13 +76,13 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public boolean next() throws PSQLException {
-		boolean r = this.currentPosition < this.rowData.size() - 1;
-		this.currentPosition++;
-		return r;
+		return this.pResult.next();
+//		boolean r = this.currentPosition < this.rowData.size() - 1;
+//		this.currentPosition++;
+//		return r;
 	}
 
 	public boolean previous() throws PSQLException {
-
 		return false;
 	}
 
@@ -120,7 +91,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public byte getByte(int columnIndex) throws PSQLException {
-		Term value = this.getValue(columnIndex);
+		Term value = this.pResult.getValue(columnIndex);
 		try {
 			return Byte.parseByte(value.toString());
 		} catch (NumberFormatException e) {
@@ -129,7 +100,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public byte getByte(String columnLabel) throws PSQLException {
-		Term value = this.getValue(columnLabel);
+		Term value = this.pResult.getValue(columnLabel);
 		try {
 			return Byte.parseByte(value.toString());
 		} catch (NumberFormatException e) {
@@ -169,7 +140,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public Date getDate(int columnIndex) throws SQLException {
-		Term value = this.getValue(columnIndex);
+		Term value = this.pResult.getValue(columnIndex);
 		try {
 			return Date.valueOf(value.toString());	//s a String object representing a date in in the format "yyyy-mm-dd"
 		} catch (IllegalArgumentException e) {
@@ -178,7 +149,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public Date getDate(String columnLabel) throws SQLException {
-		Term value = this.getValue(columnLabel);
+		Term value = this.pResult.getValue(columnLabel);
 		try {
 			return Date.valueOf(value.toString());	//s a String object representing a date in in the format "yyyy-mm-dd"
 		} catch (IllegalArgumentException e) {
@@ -201,7 +172,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public double getDouble(int columnIndex) throws SQLException {
-		Term value = this.getValue(columnIndex);
+		Term value = this.pResult.getValue(columnIndex);
 		try {
 			return Double.parseDouble(value.toString());
 		} catch (NumberFormatException e) {
@@ -210,7 +181,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public double getDouble(String columnLabel) throws SQLException {
-		Term value = this.getValue(columnLabel);
+		Term value = this.pResult.getValue(columnLabel);
 		try {
 			return Double.parseDouble(value.toString());
 		} catch (NumberFormatException e) {
@@ -222,15 +193,14 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	 * Quanti elementi ci sono nel ResultSet
 	 */
 	public int getFetchSize() throws SQLException {
-		//TODO devo ricordarmi di togliere la riga che uso per gli inserimenti
-		return this.rowData.size() - 1;
+		return this.pResult.getFetchSize();
 	}
 	
 	public Array getArray(int columnIndex) throws PSQLException {
 		
 		/** NOTA BENE ARRAY è una classe java.sql dalla quale poi estrai gli elementi dell'array */
 		
-		Term t = this.getValue(columnIndex);
+		Term t = this.pResult.getValue(columnIndex);
 		
 		if ( !t.isList()) {
 			throw new PSQLException("Column " + columnIndex + " not valid array", PSQLState.DATA_TYPE_MISMATCH);
@@ -245,19 +215,18 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 
 		/** NOTA BENE ARRAY è una classe java.sql dalla quale poi estrai gli elementi dell'array */
 		
-		Term t = this.getValue(columnLabel);
+		Term t = this.pResult.getValue(columnLabel);
 		
 		if ( !t.isList()) {
 			throw new PSQLException("Column " + columnLabel + " not valid array", PSQLState.DATA_TYPE_MISMATCH);
 		}
-		...
 		
 		return new PArray(t); 
 	}
 
 	public float getFloat(int columnIndex) throws SQLException {
 		try {
-			return Float.parseFloat(this.getValue(columnIndex).toString());
+			return Float.parseFloat(this.pResult.getValue(columnIndex).toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -265,7 +234,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 
 	public float getFloat(String columnLabel) throws SQLException {
 		try {
-			return Float.parseFloat(this.getValue(columnLabel).toString());
+			return Float.parseFloat(this.pResult.getValue(columnLabel).toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -273,7 +242,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 
 	public int getInt(int columnIndex) throws SQLException {
 		try {
-			return Integer.parseInt(this.getValue(columnIndex).toString());
+			return Integer.parseInt(this.pResult.getValue(columnIndex).toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -281,7 +250,7 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 
 	public int getInt(String columnLabel) throws SQLException {
 		try {
-			return Integer.parseInt(this.getValue(columnLabel).toString());
+			return Integer.parseInt(this.pResult.getValue(columnLabel).toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -301,7 +270,8 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	 * Restituisco i metadati sui campi del resultset
 	 */
 	public ResultSetMetaData getMetaData() throws SQLException {
-		return new PrologResultSetMetaData( new ArrayList<MColumn>(this.mfields.values()) );
+		throw new SQLException("not implemented yet");
+		//return new PrologResultSetMetaData( new ArrayList<MColumn>(this.mfields.values()) );
 	}
 
 	public int getRow() throws SQLException {
@@ -325,11 +295,11 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 	}
 
 	public String getString(int columnIndex) throws SQLException {
-		return this.getValue(columnIndex).toString();
+		return this.pResult.getValue(columnIndex).toString();
 	}
 
 	public String getString(String columnLabel) throws SQLException {
-		return this.getValue(columnLabel).toString();
+		return this.pResult.getValue(columnLabel).toString();
 	}
 
 	public Time getTime(int columnIndex) throws SQLException {
@@ -803,11 +773,11 @@ public class PrologResultSet extends PResultSet implements ResultSet {
 
 	public void updateString(String columnLabel, String x) throws SQLException {
 		
-		PSolution info = this.rowData.get(this.currentPosition);
-		
-		MColumn minfo = this.mfields.get(columnLabel);
-		
-		info.setVar(columnLabel,x);	//TODO da pensare...
+//		PSolution info = this.rowData.get(this.currentPosition);
+//		
+//		MColumn minfo = this.mfields.get(columnLabel);
+//		
+//		info.setVar(columnLabel,x);	//TODO da pensare...
 		
 	}
 

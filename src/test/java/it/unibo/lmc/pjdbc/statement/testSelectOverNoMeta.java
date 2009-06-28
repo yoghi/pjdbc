@@ -137,7 +137,7 @@ public class testSelectOverNoMeta extends TestCase {
 				int x2 = rs.getInt("$0");
 				assertEquals(x, x2);
 				
-				float y = rs.getFloat(3);
+				float y = rs.getFloat(2);
 				float y2 = rs.getFloat("$2");
 				assertEquals(y, y2);
 

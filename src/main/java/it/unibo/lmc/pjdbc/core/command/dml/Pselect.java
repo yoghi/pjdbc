@@ -166,30 +166,19 @@ public class Pselect extends PRequest {
 			PClausola prolog_clausola = this.clausole.get( tf.getTableName() );
 			
 			String columnName = tf.getColumnName();
-			String columnTable = tf.getTableName();
-			String columnSchema = tf.getSchema();
 			
 			try {
 				if ( columnName.startsWith("$")  ) {
 					int pos = Integer.parseInt(columnName.substring(1));
-					prolog_clausola.setTerm( this.generateNewVar(columnSchema+"."+columnTable+"."+columnName)  , pos, false);
+					prolog_clausola.setTerm( this.generateNewVar(tf.getQualifiedName())  , pos, false);
 				} else {
-					prolog_clausola.setTerm( this.generateNewVar(columnSchema+"."+columnTable+"."+columnName) , columnName, false);
+					prolog_clausola.setTerm( this.generateNewVar(tf.getQualifiedName()) , columnName, false);
 				}
 			} catch (ArrayIndexOutOfBoundsException e){
 				log.error("colonna "+columnName+" "+e.getLocalizedMessage());
 			}
 			
 		} //for
-		
-		
-	}
-
-	public List<MColumn> getFieldList() {
-		
-		//FieldName => Column Info
-		HashMap<String, MColumn> t = new HashMap<String, MColumn>();
-		
 		
 		
 	}

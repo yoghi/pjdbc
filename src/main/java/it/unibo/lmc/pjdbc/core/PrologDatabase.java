@@ -14,7 +14,7 @@ import it.unibo.lmc.pjdbc.parser.schema.Table;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;

@@ -5,6 +5,7 @@ import it.unibo.lmc.pjdbc.core.command.dml.IDml;
 import it.unibo.lmc.pjdbc.core.command.dml.Pselect;
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
+import it.unibo.lmc.pjdbc.core.meta.MTable;
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
 import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -18,14 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -156,12 +150,7 @@ public class PSchema implements IDml {
 		log.debug("psql da eseguire: "+gen_psql);
 
 		List<Term[]> rows = new Vector<Term[]>();
-		
-//		queste info le ha già usate PRequest e la sa usare meglio
-//		List<TableField> field_req = request.getCampiRicerca();
-		
-		List<MColumn> fields = prq.getFieldList();
-		
+		List<TableField> fields = request.getCampiRicerca();	// il campo alias è il campo con cui si presentano nella SELECT (e.di,$1,etc...)
 		
 		try {
 		
@@ -178,9 +167,10 @@ public class PSchema implements IDml {
 				Term[] row = new Term[fields.size()];
 				int i=0;
 				
-				for (MColumn column : fields) {
-					String varSql = column.getQualifiedName();
-					String varName = prq.sql2prologVar(varSql);
+				for (TableField field : fields) {
+					
+					String fieldName = field.getQualifiedName();
+					String varName = prq.sql2prologVar(fieldName);
 					Term t = info.getVarValue(varName);
 					row[i] = t;
 					i++;
@@ -198,8 +188,6 @@ public class PSchema implements IDml {
 					break;
 				}
 			}
-			
-			return new PrologResultSet(fields,rows);
 	
 		} catch (InvalidTheoryException e) {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
@@ -207,9 +195,9 @@ public class PSchema implements IDml {
 			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
 		} catch (NoSolutionException e) {
 			// non ho soluzionio 
-			//return new PrologResultSet(mappaVar,rows);
-			return null;
 		}
+		
+		return new PResultSet(fields,rows,this);
 
 	}
 
@@ -245,6 +233,26 @@ public class PSchema implements IDml {
 	public void close() {
 		//TODO: devo rilasciare le risorse : theory e quant'altro a esso collegata
 	}
+
+	
+	/**
+	 * Restituisco i metadati
+	 * @return
+	 */
+	protected MSchema getSchemaInfo() {
+		return this.metaSchema;
+	}
+
+//	public MColumn getColumnInfo(String tableName, String columnName) throws PSQLException {
+//		
+//		MTable tmeta = this.metaSchema.getMetaTableInfo(tableName);
+//		if ( null == tmeta ) throw new PSQLException("tabella "+tableName+" non trovata",PSQLState.UNDEFINED_TABLE);
+//		
+//		MColumn cmeta = tmeta.getColumnMeta(columnName);
+//		if ( null == tmeta ) throw new PSQLException("colonna "+columnName+" non trovata",PSQLState.UNDEFINED_COLUMN);
+//		
+//		return cmeta;
+//	}
 	
 	
 }
