@@ -3,11 +3,11 @@
 Il driver è stato sviluppato secondo le specifiche \emph{JDBC 4.0} (JSR 221) del Novembre 2006; secondo queste specifiche il driver è di tipo 4, ossia interamente scritto in java con accesso diretto alle risorse che compongono il database. Per aderire a queste specifiche è necessario che vengano implementate le seguenti interfacce : 
 \begin{itemize}
 \item[-] java.sql.Driver
+\item[-] java.sql.DataSource
 \item[-] java.sql.DatabaseMetaData
 \item[-] java.sql.ParameterMetaData
 \item[-] java.sql.ResultSetMetaData
 \item[-] java.sql.Wrapper
-\item[-] java.sql.DataSource
 \end{itemize}
 e supportare nei ResultSet la capacita di concorrenza in lettura. 
 
@@ -22,6 +22,12 @@ e supportare nei ResultSet la capacita di concorrenza in lettura.
 % -- se manca il metabase, ne creo cmq. uno io all'avvio e lo tengo in memoria ---- 
 
 \subsection{Struttura}
+
+Catalog è la cartella in cui si opera
+Schema è il nome del file .db su cui si opera
+Table è il funtore che si usa all'interno della teoria prolog
+
+Nella cartella ci sono anche dei file .log(??) che servono per tenere traccia delle transizioni
 
 \subsection{Operazion}	% CRUD
 

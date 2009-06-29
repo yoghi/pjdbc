@@ -18,8 +18,9 @@ public enum PTypes {
 	
 	STRING (java.sql.Types.VARCHAR),
 	INT ( java.sql.Types.INTEGER ),
+	ARRAY ( java.sql.Types.ARRAY ),
 	REAL ( java.sql.Types.REAL );
-	
+
 	
 	private final int jType;
 	

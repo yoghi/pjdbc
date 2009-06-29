@@ -65,6 +65,7 @@ public class testParser extends TestCase {
 		ts.addTest(new testParser("testSelectMultiTable"));
 		ts.addTest(new testParser("testSelectWhereOR"));
 		ts.addTest(new testParser("testSelectWhereOR2"));
+		ts.addTest(new testParser("testInsert"));
 		
 		
 		return ts;
@@ -208,5 +209,32 @@ public class testParser extends TestCase {
 		
 	}
 	
-	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testInsert() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testInsert    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "insert into employee (id,name,salary) values (1,'babo',1000);";
+			
+			ParsedCommand pRequest = null;
+			
+			Psql parse = new Psql(new StringReader(query));
+			pRequest = parse.parseIt("");
+			
+			System.out.println(pRequest);
+			
+			
+		} catch (Exception e) {
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
 }

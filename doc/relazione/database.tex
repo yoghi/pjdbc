@@ -37,32 +37,65 @@ Per avere la completezza di informazioni tipiche di un moderno database relazion
 \end{enumerate}
 questi sono solo alcuni possibili elementi. Nel nostro caso il \emph{metabase} può essere descritto attraverso l'uso di una tabella speciale dal nome {\bf metabase}; la sintassi sarà : 
 \begin{lstlisting}[language=Prolog,showstringspaces=false]
-metabase(
+ metabase(
 	"nome tabella",
 	"posizione della colonna tra gli argomenti",
 	"nome della colonna",
 	"tipo di dato contenuto",
 	"descrizione"
-).
+ ).
 \end{lstlisting}
 Questa particolare tabella non è pero necessaria, il database sarà comuque consistente, ma la sua presenza facilita l'interazione dell'utente nello scrivere query sql. Un esempio :
 \begin{lstlisting}[language=Prolog,showstringspaces=false]
-metabase("ta",1,"colonna1","string","prima colonna").
+ metabase("ta",1,"colonna1","string","prima colonna").
 \end{lstlisting}
+Permetterà all'utente di usare il nome della colonna nelle clausole sql.
 
-\begin{table}[ht]
-\caption(Prolog Types)
-\centering
+\subsection{Tipi di dato}
+
+\subsubsection{Dati primitivi}
+
+Il database essendo scritto in prolog avrà come tipi di dati primitivi gli stessi supportati dal prolog;  la mappatura tra i tipi di dato primitivi Java , Prolog e quelli usati nel database è la seguente :
+
+•Int, Long, Double, Floa
+
+\begin{table}[Ht]
+\caption{Mapping Java -  Prolog - Database }
+\begin{center}
 \begin{tabular}{c c c c c c c c}
 \hline
-Term& Struct& Var& Number& Atom& Atomic& Compound& List
+Java & Prolog & Database \\
 \hline
-a1 & true& -& -& true& true& -& -
-1 & -& -& true& -& true& -& -
-[a,b] & true& -& -& -& -& true& true
-p(a,b) & true& -& -& -& -& true& -
-_ & -& true& -& -& -& -& -
-A & -& true& -& -& -& -& -
+null & {\_} & {string(null)} \\
+int & int & int or number\\
+long & long & long or number\\
+short & int & int or number\\
+byte & int & int or number \\
+double & double & double or number \\
+float & float & float or number \\
+boolean & NON PERVENUTO & string{(true,false)} \\
 \hline
 \end{tabular}
-\end{table}
+\end{center}
+\end{table}%
+
+\subsubsection{Strutture Dati}
+
+Le strutture dati principali supportate saranno :
+\begin{table}[Ht]
+\caption{Database Structure - Prolog}
+\begin{center}
+\begin{tabular}{l c c c c c c c c}
+\hline
+  & Term & Struct & Var & Number & Atom & Atomic & Compound & List \\
+\hline
+0 & a1 & true & - & - & true & true & - & - \\
+1 & 1 & - & - & true & - & true & - & - \\
+2 & {[a,b]} & true & - & - & - & - & true & true \\
+3 & p(a,b) & true & - & - & - & - & true & - \\
+4 & {\_} & - & true & - & - & - & - & - \\
+5 & A & -& true & - & - & - & - & - \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}%

@@ -8,6 +8,7 @@ import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 
@@ -44,8 +45,7 @@ public class PrologDatabase {
 	 * Logger 
 	 */
 	private Logger log = null;
-	
-	
+		
 	/**
 	 * Parser
 	 */
@@ -172,24 +172,13 @@ public class PrologDatabase {
 	}
 
 	/**
-	 * Eseguo una select sul default schema del database
-	 * @param sql
-	 * @return
-	 * @throws SQLException
+	 * Parso l'sql e ottengo un oggetto descrittivo
+	 * @param sql 
+	 * @param schemaName nome dello schema principale 
+	 * @return @see ParsedCommand
+	 * @throws PSQLException
 	 */
-	public PResultSet executeSelect(String sql) throws PSQLException {
-		String nameSchema = this.availableSchema.keys().nextElement();
-		return this.executeSelect(sql,nameSchema);
-	}
-	
-	/**
-	 * Eseguo una select su uno specifico schema del database
-	 * @param sql
-	 * @param schemaName
-	 * @return
-	 * @throws SQLException
-	 */
-	public PResultSet executeSelect(String sql, String schemaName) throws PSQLException {
+	protected ParsedCommand analizeSql(String sql,String schemaName) throws PSQLException{
 		
 		log.info("query: \""+sql+"\"");
 		
@@ -209,6 +198,30 @@ public class PrologDatabase {
 			log.error(e.getLocalizedMessage());
 			throw new PSQLException(e.getMessage(),PSQLState.SYNTAX_ERROR);
 		}
+		return pRequest;
+	}
+	
+	/**
+	 * Eseguo una select sul default schema del database
+	 * @param sql
+	 * @return
+	 * @throws SQLException
+	 */
+	public PResultSet executeSelect(String sql) throws PSQLException {
+		String nameSchema = this.availableSchema.keys().nextElement();
+		return this.executeSelect(sql,nameSchema);
+	}
+	
+	/**
+	 * Eseguo una select su uno specifico schema del database
+	 * @param sql
+	 * @param schemaName
+	 * @return
+	 * @throws SQLException
+	 */
+	public PResultSet executeSelect(String sql, String schemaName) throws PSQLException {
+		
+		ParsedCommand pRequest = this.analizeSql(sql, schemaName);
 
 		if ( pRequest instanceof Select ) {
 			
@@ -237,6 +250,44 @@ public class PrologDatabase {
 		
 	}
 	
+	/**
+	 * Eseguo un aggiornamento sullo schema corrente
+	 * @param sql richiesta sql
+	 * @return numero di righe aggiornate
+	 * @throws PSQLException
+	 */
+	public int executeUpdate(String sql) throws PSQLException{
+		String nameSchema = this.availableSchema.keys().nextElement();
+		return this.executeUpdate(sql,nameSchema);
+	}
 	
+	/**
+	 * Eseguo un aggiornamento sullo schema indicato
+	 * @param sql richiesta sql
+	 * @param schemaName
+	 * @return numero di righe aggiornate
+	 * @throws PSQLException
+	 */
+	public int executeUpdate(String sql,String schemaName) throws PSQLException {
+		
+		ParsedCommand pRequest = this.analizeSql(sql, schemaName);
+		
+		if ( pRequest instanceof Insert ) {
+			
+			TSchema tschema = this.availableSchema.get(schemaName);
+			
+			if ( null != tschema  ){
+				
+				Insert insertReq = ((Insert)pRequest);
+				
+				return tschema.applyCommand( insertReq );
+				
+			} else {
+				throw new PSQLException("Invalid Schema : "+schemaName,PSQLState.SYNTAX_ERROR);
+			}
+
+		} else throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
+		
+	}
 	
 }

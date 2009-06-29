@@ -2,6 +2,7 @@ package it.unibo.lmc.pjdbc.core;
 
 import it.unibo.lmc.pjdbc.core.command.PResultSet;
 import it.unibo.lmc.pjdbc.core.command.dml.IDml;
+import it.unibo.lmc.pjdbc.core.command.dml.PInsert;
 import it.unibo.lmc.pjdbc.core.command.dml.Pselect;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
@@ -199,6 +200,36 @@ public class PSchema implements IDml {
 	}
 
 	public int applyCommand(Insert request) throws PSQLException {
+		
+		PInsert prq = new PInsert(this.metaSchema,request);
+
+		try {
+			
+			Prolog p = new Prolog();
+			p.setTheory(this.current_theory);
+			
+			String requestPsql = prq.generatePrologRequest();
+			
+			log.debug("psql da eseguire: "+requestPsql);
+			
+			SolveInfo info = p.solve(requestPsql);
+			
+			log.debug(info.toString());
+			
+			if ( info.isSuccess() ) return 1;
+			else {
+				log.error("errore");
+				throw new PSQLException("", PSQLState.SYSTEM_ERROR);
+			}
+ 			
+		} catch (InvalidTheoryException e) {
+			
+		} catch (MalformedGoalException e) {
+			
+		}
+		
+		
+		
 		
 		/**
 		 * Assert

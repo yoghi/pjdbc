@@ -218,27 +218,27 @@ Insert Insert():
 	Insert insert = new Insert(this.defaultSchema);
 	Table t;
 	TableField column;
-	ArrayList<TableField> columns = new ArrayList<TableField>();
-	ArrayList<Expression> values = new ArrayList<Expression>();
-	Expression exp;
+	String exp;
 }
 {
     <K_INSERT> [<K_INTO>] t=Table() { insert.setTable(t); }
     
-    
-     [LOOKAHEAD(2) "(" column=Column() { columns.add(column); } ("," column=Column() { columns.add(column); } )* ")"  ]
+    [ LOOKAHEAD(2) "(" column=Column() { insert.setField(column); } ("," column=Column() { insert.setField(column); } )* ")"  ]
 	
 	( 
-		<K_VALUES>  "(" exp=Expression() { values.add(exp); } 
-					("," exp=Expression()  { values.add(exp); } )* 
-					")" 
-					{
-				
-						for (int i = 0; i < columns.size(); i++) {
-							insert.insert(columns.get(i).getColumnName(),values.get(i));
-						}
-					
-					}
+		<K_VALUES>  "(" 
+			
+			exp = GenericValue() 
+			{ insert.setValue(exp); } 
+			
+			( 
+				"," 
+				exp = GenericValue()   
+				{ insert.setValue(exp); } 
+			)*  
+			
+		")" 
+		
 		| 
 		
 		[LOOKAHEAD(2) "(" ]
@@ -259,6 +259,27 @@ Insert Insert():
     }
 }
 
+String GenericValue():
+{
+	Token tk;
+	String ts;
+}
+{
+	tk=TextItem() {return tk.image;}
+	|
+	ts=ComparisonItem() {return ts;}
+}
+
+Token TextItem():
+{
+	Token tk;
+}
+{
+	tk=<S_CHAR_LITERAL>
+	{
+		return tk;
+	}
+}
 
 Delete Delete():
 { 
@@ -556,12 +577,12 @@ String ComparisonItem() :
 	(
 		tk=<S_DOUBLE>
 		|
-		tk=<S_INTEGER>
-		
+		tk=<S_INTEGER> 
 	)
 	{
 		return tk.image;
 	}
+	
 }
 
 ICondition Condition():

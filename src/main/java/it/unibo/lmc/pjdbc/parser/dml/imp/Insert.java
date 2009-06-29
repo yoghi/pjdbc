@@ -1,10 +1,11 @@
 package it.unibo.lmc.pjdbc.parser.dml.imp;
 
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * In questo caso ho una richiesta del tipo 
@@ -18,7 +19,17 @@ public class Insert extends ParsedCommand {
 	
 	private Table table;
 	
-	private HashMap<String, Object> inserts = new HashMap<String, Object>();
+	/**
+	 * Campi da aggiornare
+	 */
+	private List<TableField> fields = new ArrayList<TableField>();
+	
+	/**
+	 * Valori da inserire 
+	 * Expressioni (??)
+	 */
+	private List<String> values = new ArrayList<String>();
+	
 
 	public Insert(String schema) {
 		super(schema);
@@ -40,20 +51,55 @@ public class Insert extends ParsedCommand {
 	}
 
 	/**
-	 * Setto gli aggiornamenti da fare
+	 * Setto i nomi delle colonne da aggiornare
 	 * @param columnName
-	 * @param newValue
 	 */
-	public void insert(String columnName,Expression expression){
-		this.inserts.put(columnName, expression);
+	public void setField(TableField columnName){
+		this.fields.add(columnName);
 	}
 	
 	/**
-	 * Restituisco la lista degli inserimenti da fare
+	 * Setto i valori da aggiornare
+	 * @param value
+	 */
+	public void setValue(String value){
+		this.values.add(value);
+	}
+
+	/**
+	 * restituisco i campi da usare
 	 * @return
 	 */
-	public HashMap getUpdates(){
-		return this.inserts;
+	public List<TableField> getFields(){
+		return this.fields;
+	}
+	
+	/**
+	 * restituisco i valori da inserire
+	 * @return
+	 */
+	public List<String> getValues(){
+		return this.values;
+	}
+	
+	@Override
+	public String toString() {
+		String res = "insert into "+this.table+" ";
+		
+		if ( this.fields.size() > 0 ){
+			res += "(";
+			for (TableField field : this.fields) {
+				res += field + ",";
+			}
+			res += ") ";
+		}
+		
+		res += "VALUES (";
+		
+		for (String valore : this.values) {
+			res += valore+",";
+		}	
+		return res+")";
 	}
 	
 }
