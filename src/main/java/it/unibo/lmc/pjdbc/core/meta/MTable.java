@@ -63,15 +63,15 @@ public class MTable {
 		if (  position >= 0 && position < this.columns.length ) {	
 			
 			if ( null == this.tcolumns.put(columnName, position) ) {
-		
-				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.getSqlType(columnType));
+
+				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.valueOf(columnType));
 				this.columns[position] = columnNew;
 				return null;
 				
 			} else { //override
 				
 				MColumn columnOld = this.columns[position];
-				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.getSqlType(columnType));
+				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.valueOf(columnType));
 				
 				this.columns[position] = columnNew;
 				
@@ -84,7 +84,7 @@ public class MTable {
 			if ( position < 0 ) throw new PSQLException("posizione "+position + " non valida", PSQLState.INVALID_POSITION);
 			
 			this.tcolumns.put(columnName, position);
-			MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.getSqlType(columnType));
+			MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.valueOf(columnType));
 			
 			try {
 				

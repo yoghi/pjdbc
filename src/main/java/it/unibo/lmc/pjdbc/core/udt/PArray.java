@@ -5,6 +5,7 @@ import it.unibo.lmc.pjdbc.core.utils.PSQLState;
 
 import java.sql.Array;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -347,6 +348,11 @@ public class PArray implements Array {
 	public ResultSet getResultSet(long index, int count, Map<String, Class<?>> map) throws PSQLException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void free() throws SQLException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

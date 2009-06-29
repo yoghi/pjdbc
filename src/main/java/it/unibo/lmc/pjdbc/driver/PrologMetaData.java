@@ -3,15 +3,19 @@
  */
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.database.PSolution;
+import it.unibo.lmc.pjdbc.core.PSchema;
+import it.unibo.lmc.pjdbc.core.command.PResultSet;
 import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import alice.tuprolog.Term;
 
 
 public abstract class PrologMetaData implements DatabaseMetaData {
@@ -46,9 +50,14 @@ public abstract class PrologMetaData implements DatabaseMetaData {
 	 */
 	public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) throws SQLException {
 
-		List<MColumn> field = null;
-		List<PSolution> rows = null;
-		PrologResultSet a = new PrologResultSet(field,rows);
+		List<TableField> fields = null;
+		
+		List<Term[]> rows = null;
+		
+		PSchema schema = null;
+		
+		PResultSet result = new PResultSet(fields, rows, schema);
+		PrologResultSet a = new PrologResultSet(result);
 		
 		//schemaPattern.... serve nel caso di più schemi
 		

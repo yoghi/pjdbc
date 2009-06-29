@@ -1,10 +1,12 @@
 package it.unibo.lmc.pjdbc.core.meta;
 
+import it.unibo.lmc.pjdbc.core.utils.PTypes;
+
 public class MColumn {
 
 	private MSchema schema;
 	private MTable table;
-	private int type;	//java.sql.Types
+	private PTypes type;	//java.sql.Types
 	private String name;
 
 	/**
@@ -14,7 +16,7 @@ public class MColumn {
 	 * @param columnName
 	 * @param columnType
 	 */
-	public MColumn(MSchema schema, MTable table, String columnName, int columnType) {
+	public MColumn(MSchema schema, MTable table, String columnName, PTypes columnType) {
 		this.name = columnName;
 		this.type = columnType;
 		this.schema = schema;
@@ -27,8 +29,8 @@ public class MColumn {
 	}
 
 
-	public int getColumnType() {
-		return this.type;
+	public PTypes getColumnType() {
+		return this.type;	//va bene???
 	}
 
 

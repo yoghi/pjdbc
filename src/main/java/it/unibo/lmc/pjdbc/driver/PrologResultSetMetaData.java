@@ -51,7 +51,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 
 	public int getColumnType(int column) throws SQLException {
 		try { 
-			return this.fileds.get(column).getColumnType();
+			return this.fileds.get(column).getColumnType().getSqlType();
 		} catch (Exception e) {
 			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
 		}
