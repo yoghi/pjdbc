@@ -1,7 +1,10 @@
 package it.unibo.lmc.pjdbc.core.meta;
 
+import java.util.Collections;
 import java.util.Formatter;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
@@ -160,6 +163,14 @@ public class MTable {
 		}
 		
 		return build.toString();
+	}
+
+	/**
+	 * Array ordinata per posizione di tutte le colonne della tabella.
+	 * @return array of MColumns
+	 */
+	public MColumn[] getColumns() {
+		return this.columns.clone();
 	}
 	
 	

@@ -1,9 +1,6 @@
 package it.unibo.lmc.pjdbc.core.command.dml;
 
-import java.util.List;
-
 import it.unibo.lmc.pjdbc.core.command.PRequest;
-import it.unibo.lmc.pjdbc.core.meta.MColumn;
 import it.unibo.lmc.pjdbc.core.meta.MSchema;
 import it.unibo.lmc.pjdbc.core.meta.MTable;
 import it.unibo.lmc.pjdbc.core.utils.PSQLException;
@@ -12,6 +9,8 @@ import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
+
+import java.util.List;
 
 public class PInsert extends PRequest {
 

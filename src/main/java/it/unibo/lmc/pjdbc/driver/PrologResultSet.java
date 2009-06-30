@@ -88,7 +88,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Byte.parseByte(value.toString());
 		} catch (NumberFormatException e) {
-			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Byte.parseByte(value.toString());
 		} catch (NumberFormatException e) {
-			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
 	}
 
@@ -169,7 +169,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Double.parseDouble(value.toString());
 		} catch (NumberFormatException e) {
-			throw new SQLException(e.getLocalizedMessage(), "SQLSTATE");
+			throw new SQLException("problema nella conversione : "+e.getLocalizedMessage(), "SQLSTATE");
 		}
 	}
 
@@ -178,7 +178,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Double.parseDouble(value.toString());
 		} catch (NumberFormatException e) {
-			throw new SQLException(e.getLocalizedMessage(), "SQLSTATE");
+			throw new SQLException("problema nella conversione : "+e.getLocalizedMessage(), "SQLSTATE");
 		}
 	}
 
@@ -221,7 +221,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Float.parseFloat(this.pResult.getValue(columnIndex).toString());
 		} catch (NumberFormatException e) {
-			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
 	}
 
@@ -229,7 +229,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Float.parseFloat(this.pResult.getValue(columnLabel).toString());
 		} catch (NumberFormatException e) {
-			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
 	}
 
@@ -237,7 +237,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Integer.parseInt(this.pResult.getValue(columnIndex).toString());
 		} catch (NumberFormatException e) {
-			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
 	}
 
@@ -245,7 +245,7 @@ public class PrologResultSet implements ResultSet {
 		try {
 			return Integer.parseInt(this.pResult.getValue(columnLabel).toString());
 		} catch (NumberFormatException e) {
-			throw new PSQLException(e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
 	}
 

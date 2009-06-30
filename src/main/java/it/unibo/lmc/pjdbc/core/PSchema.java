@@ -150,6 +150,9 @@ public class PSchema implements IDml {
 		List<Term[]> rows = new Vector<Term[]>();
 		List<TableField> fields = request.getCampiRicerca();	// il campo alias è il campo con cui si presentano nella SELECT (e.di,$1,etc...)
 		
+		//fields se contiene * va convertito
+		
+		
 		try {
 		
 			Prolog p = new Prolog();
@@ -216,7 +219,10 @@ public class PSchema implements IDml {
 			
 			log.debug(info.toString());
 			
-			if ( info.isSuccess() ) return 1;
+			if ( info.isSuccess() ) {
+				this.current_theory = p.getTheory(); //modifico la theory ..-- manca la questione del salvataggio in uscita...
+				return 1;
+			}
 			else {
 				log.error("errore");
 				throw new PSQLException("", PSQLState.SYSTEM_ERROR);

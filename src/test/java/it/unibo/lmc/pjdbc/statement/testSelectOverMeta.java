@@ -76,12 +76,15 @@ public class testSelectOverMeta extends TestCase {
 		
 		ts.addTest(new testSelectOverMeta("testExecuteQuery"));
 		ts.addTest(new testSelectOverMeta("testMultiVarSelect"));
+		ts.addTest(new testSelectOverMeta("testAnyVarSelect"));
+		ts.addTest(new testSelectOverMeta("testMultiAnyVarSelect"));
 		ts.addTest(new testSelectOverMeta("testVarOverSizeTableSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelect"));
 		ts.addTest(new testSelectOverMeta("testAliasSelectMisc"));
 		ts.addTest(new testSelectOverMeta("testGetArray"));
 		ts.addTest(new testSelectOverMeta("testGetInvalidArray"));
 		ts.addTest(new testSelectOverMeta("testInvalidAliasQuery"));
+		
 //		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhereAND"));
@@ -137,6 +140,76 @@ public class testSelectOverMeta extends TestCase {
 		try {
 			
 			ResultSet rs = stmt.executeQuery("select id,salary from employee;");
+			
+			while (rs.next()) {
+
+				//NB: le colonne del resultset si contano da 1
+				int x = rs.getInt(1);
+				int x2 = rs.getInt("id");
+				assertEquals(x, x2);
+				assertNotNull(x);
+				
+				float y = rs.getFloat(2);
+				float y2 = rs.getFloat("salary");
+				assertEquals(y, y2);
+				assertNotNull(y);
+
+			}
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	public void testAnyVarSelect() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testAnyVarSelect    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select * from employee;");
+			
+			while (rs.next()) {
+
+				//NB: le colonne del resultset si contano da 1
+				int x = rs.getInt(1);
+				int x2 = rs.getInt("employee.id");
+				assertEquals(x, x2);
+				assertNotNull(x);
+				
+				float y = rs.getFloat(3);
+				float y2 = rs.getFloat("employee.salary");
+				assertEquals(y, y2);
+				assertNotNull(y);
+
+			}
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+
+	public void testMultiAnyVarSelect() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testMultiAnyVarSelect ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.*,d.$1 from employee as e,dept as d;");
 			
 			while (rs.next()) {
 

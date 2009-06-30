@@ -11,8 +11,8 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -64,6 +64,8 @@ public class Pselect extends PRequest {
 	public String generatePrologRequest() throws PSQLException {
 		
 		this.generateAlias();
+		
+		this.anyClausoleConvert();
 		
 		this.generateFromClausole();
 		
@@ -142,10 +144,48 @@ public class Pselect extends PRequest {
 				}
 			}
 
-			this.aliasVariables.put(current_variable.getAlias(), current_variable.getSchema()+"."+current_variable.getTableName()+"."+current_variable.getColumnName());
+			if ( !current_variable.getColumnName().equalsIgnoreCase("*") )  this.aliasVariables.put(current_variable.getAlias(), current_variable.getSchema()+"."+current_variable.getTableName()+"."+current_variable.getColumnName());
 			
 		}
 		
+	}
+	
+	/**
+	 * Trasformo i termini * nei termini corrispondenti della tabella
+	 */
+	private void anyClausoleConvert() {
+		
+		List<TableField> fr = ((Select)this.mcommand).getCampiRicerca();
+		
+		List<TableField> temp = new ArrayList<TableField>();
+		
+		for (TableField tableField : fr) {
+			if ( tableField.getColumnName().equalsIgnoreCase("*") ) { //ANY clausola
+				
+				String tableName = tableField.getTableName();
+				
+				MColumn[] columns = this.mschema.getMetaTableInfo(tableName).getColumns();
+				
+				for (int i = 0; i < columns.length; i++) {
+					
+					TableField tempTableField = new TableField(columns[i].getColumnName());
+					tempTableField.setSchema(tableField.getSchema());
+					tempTableField.setTableName(tableName);
+					
+					tempTableField.setAlias(tableName+"."+columns[i].getColumnName());
+					this.aliasVariables.put(tempTableField.getAlias(), columns[i].getQualifiedName());
+					
+					temp.add(tempTableField);
+					
+				}
+				
+			} else {
+				temp.add(tableField);
+			}
+		}
+		
+		fr.clear();
+		fr.addAll(temp);
 	}
 	
 	/**
@@ -179,23 +219,6 @@ public class Pselect extends PRequest {
 			}
 			
 		} //for
-		
-		
 	}
-
-//	public HashMap getMapVar() {
-//
-//		HashMap<String, MColumn> t = new HashMap<String, MColumn>();
-//		
-//		// le colonne le prendo dalla sequenza di var richieste...
-//		
-//		Enumeration<String> e = this.mapVariables.elements();
-//		//...ciclo e ho tutte le var nell'ordine giusto...
-//		//chiedo this.mschema.getMetaTableInfo() sul nome della tabella e poi .getColumInfo sulla MTable 
-//		
-//		
-//		
-//		return t;
-//	}
 	
 }

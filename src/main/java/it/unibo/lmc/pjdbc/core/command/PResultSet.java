@@ -107,7 +107,7 @@ public class PResultSet {
 		Integer indexColumn = this.cacheNameVar.get(columnLabel);
 		
 		if (null == indexColumn)
-			throw new PSQLException("columnLabel not found",PSQLState.UNDEFINED_COLUMN);
+			throw new PSQLException("columnLabel "+columnLabel+" not found",PSQLState.UNDEFINED_COLUMN);
 		
 		return this.getValue(indexColumn); 
 

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
 
@@ -90,6 +89,8 @@ public class testInsertOverMeta extends TestCase {
 			int rs = stmt.executeUpdate(" insert into employee (id,salary,name) values (100,1000,'babo');");
 			
 			assertEquals(1, rs);
+			
+			stmt.executeQuery(" select * from employee;");
 			
 		} catch (Exception e) {
 			fail(" ExecuteQuery ha ritornato: " + e);

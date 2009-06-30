@@ -56,5 +56,9 @@ public class PClausola {
 		build.append(")");
 		return build.toString();
 	}
+
+//	public int arity() {
+//		return this.terms.length;
+//	}
 	
 }

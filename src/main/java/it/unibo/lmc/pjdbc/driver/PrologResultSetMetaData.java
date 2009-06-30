@@ -12,7 +12,6 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 
 	private List<MColumn> fileds;
 	
-	
 	public PrologResultSetMetaData(List<MColumn> columns) {
 		this.fileds = columns;
 	}

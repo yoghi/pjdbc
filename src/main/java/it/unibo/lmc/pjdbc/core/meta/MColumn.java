@@ -23,30 +23,24 @@ public class MColumn {
 		this.table = table;
 	}
 
-
 	public String getColumnName() {
 		return this.name;
 	}
-
 
 	public PTypes getColumnType() {
 		return this.type;	//va bene???
 	}
 
-
 	public String getSchemaName() {
 		return this.schema.getSchemaName();
 	}
-
 
 	public String getTableName() {
 		return this.table.getTableName();
 	}
 
-
 	public String getQualifiedName() {
 		return this.schema.getSchemaName()+"."+this.table.getTableName()+"."+this.name;
 	} 
-	
 	
 }
