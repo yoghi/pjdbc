@@ -54,26 +54,18 @@ public class TSchemaRU extends TSchema {
 	public void rollback() {
 		
 		//TODO : itero sull'array di elementi e eseguo l'operazione contraria
-		
 		ParsedCommand[] tmp = null;
 		tmp = this.log.toArray(tmp);
-		
 		//this.realSchema.
-		
-		
-		
+
 		this.currentTransactionID = UUID.randomUUID();
 	}
 
 	@Override
-	public void commit() {
-		
-		// Lavoro già sul vero database non ho nulla da committare
-		
+	public void commit() throws PSQLException {
 		this.log.clear();
-		
+		this.realSchema.commit();
 		this.currentTransactionID = UUID.randomUUID();
-		
 	}
 
 	

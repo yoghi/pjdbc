@@ -163,7 +163,6 @@ public class PrologDatabase {
 		for(String name : this.availableSchema.keySet()) {
 			
 			TSchema p = this.availableSchema.get(name);
-			p.commit();
 			p.close();
 			this.availableSchema.remove(name);
 			this.log.info("Close schema : "+name);

@@ -52,7 +52,7 @@ public abstract class TSchema implements IDml {
 	/**
 	 * Committo la situzione attuale sul database.
 	 */
-	public abstract void commit();
+	public abstract void commit() throws PSQLException;
 	
 	/*
 	 * A.P.I DML 

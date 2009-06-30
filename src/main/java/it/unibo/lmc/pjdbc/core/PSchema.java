@@ -16,6 +16,7 @@ import it.unibo.lmc.pjdbc.parser.schema.TableField;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
@@ -220,7 +221,10 @@ public class PSchema implements IDml {
 			log.debug(info.toString());
 			
 			if ( info.isSuccess() ) {
-				this.current_theory = p.getTheory(); //modifico la theory ..-- manca la questione del salvataggio in uscita...
+				this.current_theory = p.getTheory(); //TODO: manca la questione del salvataggio in uscita...
+				
+				System.out.println(this.current_theory.toString());
+				
 				return 1;
 			}
 			else {
@@ -275,6 +279,17 @@ public class PSchema implements IDml {
 	 */
 	protected MSchema getSchemaInfo() {
 		return this.metaSchema;
+	}
+
+	public void commit() throws PSQLException {
+		try {
+			FileOutputStream theoryFile = new FileOutputStream(this.schemaFile);
+			theoryFile.write( this.current_theory.toString().getBytes());
+			theoryFile.flush();
+			theoryFile.close();
+		} catch (IOException e) {
+			throw new PSQLException("", PSQLState.SYSTEM_ERROR);
+		}
 	}
 
 //	public MColumn getColumnInfo(String tableName, String columnName) throws PSQLException {
