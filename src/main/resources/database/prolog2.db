@@ -1,0 +1,7 @@
+multiarray(1,[a,b]).
+multiarray(2,[b,c]).
+multiarray(3,[c,d]).
+multiarray(4,[[a,c],d]).
+multiarray(5,[pippo(a,b),pippo(c,d)]).
+
+noarray(5,pippo(a,b),c).

@@ -11,12 +11,3 @@ age(smith,30).
 age(erika,50).
 age(john,25).
 age(enrico,70).
-
-multiarray(1,[a,b]).
-multiarray(2,[b,c]).
-multiarray(3,[c,d]).
-multiarray(4,[[a,c],d]).
-multiarray(5,[pippo(a,b),pippo(c,d)]).
-multiarray(6,[pippo(a,b),[a_b,b_c]]).
-
-noarray(5,pippo(a,b),c).

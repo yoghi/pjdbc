@@ -13,9 +13,6 @@ nomeesame([12331312,17]).
 // Es. lookAll(10,[10,20,10,30,10],L) tutte le posizioni del 10
 lookAll(X,L,Ps):- findall(P,lookAny(X,L,P),Ps).
 
-
-
-
 /* da definire meglio ...*/
 
 max([H|T],M):-max([H|T],M,H). 
