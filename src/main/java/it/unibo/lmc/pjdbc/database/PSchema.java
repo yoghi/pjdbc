@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.database;
 
+import it.unibo.lmc.pjdbc.database.command.IDml;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
-import it.unibo.lmc.pjdbc.database.command.dml.IDml;
 import it.unibo.lmc.pjdbc.database.command.dml.PInsert;
 import it.unibo.lmc.pjdbc.database.command.dml.Pselect;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;

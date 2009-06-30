@@ -1,8 +1,8 @@
 package it.unibo.lmc.pjdbc.database.transaction;
 
 import it.unibo.lmc.pjdbc.database.PSchema;
+import it.unibo.lmc.pjdbc.database.command.IDml;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
-import it.unibo.lmc.pjdbc.database.command.dml.IDml;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;

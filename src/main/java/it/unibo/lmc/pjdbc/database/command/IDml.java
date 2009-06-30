@@ -1,6 +1,5 @@
-package it.unibo.lmc.pjdbc.database.command.dml;
+package it.unibo.lmc.pjdbc.database.command;
 
-import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
