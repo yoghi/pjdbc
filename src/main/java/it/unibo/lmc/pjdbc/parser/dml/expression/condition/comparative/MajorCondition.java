@@ -13,7 +13,7 @@ public class MajorCondition implements IComparativeCondition {
 	}
 	
 	public String toString(){
-		return "MAJOR";
+		return ">";
 	}
 
 	public boolean eval(String itemA, String itemB) {

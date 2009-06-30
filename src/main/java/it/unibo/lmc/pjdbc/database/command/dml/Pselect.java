@@ -7,6 +7,7 @@ import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
@@ -34,7 +35,6 @@ public class Pselect extends PRequest {
 	 */
 	protected Hashtable<String,String> aliasVariables = new Hashtable<String, String>();
 	
-	
 	/**
 	 * Prolog Request di tipo Select (MONO-SCHEMA)
 	 * @param ms metadati schema
@@ -53,13 +53,15 @@ public class Pselect extends PRequest {
 		return this.aliasTables.get(aliasTable);
 	}
 	
-	//TODO funzione contraria data una tabella esiste il suo alias??
-	
+	/**
+	 * Restituisco il nome per esteso del campo a partire dall'alias usato nella query 
+	 * @param columnLabel
+	 * @return
+	 */
 	public String alias2nameVar(String columnLabel) {
 		return this.aliasVariables.get(columnLabel);
 	}
 	
-
 	@Override
 	public String generatePrologRequest() throws PSQLException {
 		
@@ -70,7 +72,7 @@ public class Pselect extends PRequest {
 		this.generateFromClausole();
 		
 		//where clausole
-		//this.generateWhereClausole();
+		String whereClausole = this.generateWhereClausole();
 		
 		StringBuilder sbuilder = new StringBuilder();
 		for( String key : this.clausole.keySet()){
@@ -80,11 +82,19 @@ public class Pselect extends PRequest {
 			
 		}
 		
-		String pclausole = sbuilder.toString();
+		if ( !whereClausole.equalsIgnoreCase("") ) {
+			sbuilder.append(whereClausole);
+			sbuilder.append(".");
+		} else {
+			sbuilder.reverse();
+			sbuilder.replace(0, 1, ".");
+			sbuilder.reverse();
+		}
 		
-		return pclausole.subSequence(0,pclausole.length()-1)+".";
+		return sbuilder.toString(); 
 		
 	}
+
 
 	/**
 	 * Analizzo i metadati della richiesta e genero la tabella degli Alias (Table and Var) se presenti
@@ -122,7 +132,7 @@ public class Pselect extends PRequest {
 		 * 
 		 *  SELECT id AS identificativo
 		 */
-		String primaryTableName = tb.get(0).getName();
+		this.primaryTable = tb.get(0).getName();
 		List<TableField> fr = ((Select)this.mcommand).getCampiRicerca();
 		
 		for (int i = 0; i < fr.size(); i++) {
@@ -130,7 +140,7 @@ public class Pselect extends PRequest {
 			TableField current_variable = fr.get(i);
 			
 			if ( current_variable.getTableName() == null ) {	// id
-				current_variable.setTableName(primaryTableName);
+				current_variable.setTableName(this.primaryTable);
 				if ( current_variable.getAlias() == null ) current_variable.setAlias(current_variable.getColumnName());
 			}
 			else {	//NOTA: mi aspetto sempre 1 solo schema alla volta!!! per quello uso tablename.columname senza schema specificato!!
@@ -221,4 +231,70 @@ public class Pselect extends PRequest {
 		} //for
 	}
 	
+	/**
+	 * Genero le clausole riguardanti il campo WHERE
+	 */
+	private String generateWhereClausole() {
+		
+		Expression exp = ((Select)this.mcommand).getWhereClausole();
+		
+		if ( exp == null ) return "";
+		
+		StringBuilder build = new StringBuilder();
+		
+		if ( null != exp.getLeft() ) {
+			build.append(exp.getLeft());
+		} else {
+			if ( null != exp.getLeftF() ) {
+				
+				TableField tf = exp.getLeftF();
+				String varSql = null;
+				if ( tf.getTableName() == null ){
+					varSql = this.alias2nameVar(tf.getColumnName());
+				} else {
+					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+				}
+				
+				String varPsql = null;
+				for(String key : this.mapVariables.keySet() ){
+					if ( this.mapVariables.get(key).equalsIgnoreCase(varSql) ){
+						varPsql = key;
+					}
+				}
+				
+				build.append(varPsql);
+				
+			}
+		}
+		
+		build.append(exp.getCondition().toString());
+		
+		if ( null != exp.getRight() ) {
+			build.append(exp.getRight());
+		} else {
+			if ( null != exp.getRightF() ) {
+				
+				TableField tf = exp.getRightF();
+				String varSql = null;
+				if ( tf.getTableName() == null ){
+					varSql = this.alias2nameVar(tf.getColumnName());
+				} else {
+					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+				}
+				
+				String varPsql = null;
+				for(String key : this.mapVariables.keySet() ){
+					if ( this.mapVariables.get(key).equalsIgnoreCase(varSql) ){
+						varPsql = key;
+					}
+				}
+				
+				build.append(varPsql);
+				
+			}
+		}
+		
+		return build.toString();
+		
+	}
 }

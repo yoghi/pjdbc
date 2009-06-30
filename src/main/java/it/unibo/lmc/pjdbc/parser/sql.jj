@@ -136,6 +136,8 @@ TOKEN: /* OPERATORS */
 	|   <K_TRUNCATE:"TRUNCATE">
 	|   <K_DISTINCT:"DISTINCT">
 	|   <K_INTERSECT:"INTERSECT">
+	|   <K_TRUE:"TRUE">
+	|   <K_FALSE:"FALSE">
 }
 
 
@@ -267,7 +269,7 @@ String GenericValue():
 {
 	tk=TextItem() {return tk.image;}
 	|
-	ts=ComparisonItem() {return ts;}
+	ts=NumberItem() {return ts;}
 }
 
 Token TextItem():
@@ -596,7 +598,7 @@ TableField ColumnReference():
 }
 
 
-String ComparisonItem() :
+String NumberItem() :
 { 
 	Token tk;
 	TableField tf;
@@ -613,35 +615,44 @@ String ComparisonItem() :
 	
 }
 
-ICondition Condition():
+Expression Expression():
 {
+	Expression exp = null;
+}
+{
+	(
+		<S_LPAR> exp = Expression() <S_RPAR>
+		|
+		exp = SimpleExpression()
+	)
+	{ return exp; }
+}
+
+Expression SimpleExpression():
+{
+	Expression exp = new Expression();;
+	String right;
+	TableField rightF;
+	String left;
+	TableField leftF;
 	ICondition cond;
 }
 {
 	(
-		cond = LogicCondition()
+		LOOKAHEAD(2)
+		left = GenericValue()  { exp.setLeft(left); }
 		|
-		cond = AritmeticCondition()
-		|
-		cond = ComparisonCondition()
+		leftF = Column()	{ exp.setLeft(leftF); }
 	)
-	{
-		return cond;
-	}
-}
-
-ICondition LogicCondition():
-{
-	ILogicCondition cond;
-}
-{
+	cond = ComparisonCondition() { exp.setCondition(cond); }
 	(
-		<K_AND>	{ cond = new AndCondition(); }
+		LOOKAHEAD(2)
+		right = GenericValue()	{ exp.setRight(right); } 
 		|
-		<K_OR> { cond = new OrCondition(); }
+		rightF = Column()	{ exp.setRight(rightF); }
 	)
 	{
-		return cond;
+		return exp;
 	}
 }
 
@@ -666,120 +677,4 @@ ICondition ComparisonCondition():
 	{
 		return cond;
 	}
-}
-
-ICondition AritmeticCondition():
-{
-	ICondition cond;
-}
-{
-	(
-		"+" { cond = new AritmeticCondition("+");  }
-		|
-		"-"	{ cond = new AritmeticCondition("-");  }
-		|
-		"*" { cond = new AritmeticCondition("*");  }
-		|
-		"/" { cond = new AritmeticCondition("/");  }
-	)
-	{
-		return cond;
-	}
-}
-
-Expression Expression():
-{
-	Expression result = null;
-	String item;
-	TableField tf;
-}
-{
-	( 
-		LOOKAHEAD ( 4 ) 
-		result = ListExpression() { return result; }
-		|
-		result = DirectExpression() { return result; }
-		|
-		item = ComparisonItem() { return new Expression(item);  }
-		|
-		tf = Column() { return new Expression(tf); }
-	)
-
-}
-
-Expression DirectExpression():
-{
-	Expression result,right;
-	ICondition cond;
-	String item;
-	TableField tf;
-}
-{	
-	<S_LPAR>
-	(
-		item = ComparisonItem() { result = new Expression(item); } 
-		| 
-		tf = Column() { result = new Expression(tf); }
-	) 
-	( 
-		LOOKAHEAD ( Condition() ) 
-		cond = Condition()
-		right = Expression()
-		{
-			result = new Expression(result,right,cond);
-		}
-	)*
-	<S_RPAR>
-	
-	{
-		return result;
-	}
-}
-
-Expression ListExpression():
-{
-	Expression left,right,result;
-	ICondition cond;
-}
-{	
-	<S_LPAR>
-		left = LeftExpression() { result = left; }
-		cond = Condition()
-		right = LeftExpression()
-		{
-			result = new Expression(left,right,cond);
-		}
-		(
-			LOOKAHEAD( Condition() )
-			cond = Condition()
-			right = LeftExpression()
-			{
-				result = new Expression(result,right,cond);
-			}
-		)*
-	<S_RPAR>
-	{
-		return result;
-	}
-
-}
-
-Expression LeftExpression():
-{
-	Expression left,right,result;
-	Token item;
-	ICondition cond;
-}
-{
-
-	<S_LPAR> 
-		left = Expression() 
-		cond = Condition()
-		right = Expression() 
-	<S_RPAR>
-	{
-		result = new Expression(left,right,cond);
-		return result;
-	}
-	
 }

@@ -67,6 +67,7 @@ public class testParser extends TestCase {
 		
 		ts.addTest(new testParser("testAnyClausola"));
 		
+		ts.addTest(new testParser("testSelectWhere"));
 //		ts.addTest(new testParser("testSelectWhereOR"));
 //		ts.addTest(new testParser("testSelectWhereOR2"));
 		
@@ -147,6 +148,33 @@ public class testParser extends TestCase {
 		assertTrue(true);
 		
 	}
+
+	/**
+	 * 
+	 */
+	public void testSelectWhere(){
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhere    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "select * from employee as e, dept as d where e.id > 0;";
+			
+			ParsedCommand pRequest = null;
+			
+			Psql parse = new Psql(new StringReader(query));
+			pRequest = parse.parseIt("schema");
+			
+			System.out.println(pRequest);
+			
+		} catch (Exception e) {
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+	}
+	
 	
 	/**
 	 * TEST: Select di un campo specifico

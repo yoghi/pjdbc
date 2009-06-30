@@ -1,12 +1,9 @@
 package it.unibo.lmc.pjdbc.statement;
 
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
-import it.unibo.lmc.pjdbc.parser.Psql;
-import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.StringReader;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,11 +13,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.apache.log4j.PropertyConfigurator;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.apache.log4j.PropertyConfigurator;
 
 public class testSelectOverMeta extends TestCase {
 
@@ -89,7 +86,9 @@ public class testSelectOverMeta extends TestCase {
 		ts.addTest(new testSelectOverMeta("testInvalidAliasQuery"));
 		ts.addTest(new testSelectOverMeta("testWrongAnyClausola"));
 		
-//		ts.addTest(new testSelectOverMeta("testSelectWhere"));
+		ts.addTest(new testSelectOverMeta("testSelectWhere"));
+		ts.addTest(new testSelectOverMeta("testSelectParWhere"));
+		
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhereAND"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhereOR"));
@@ -224,7 +223,7 @@ public class testSelectOverMeta extends TestCase {
 				assertNotNull(x);
 				
 				float y = rs.getFloat(3);
-				float y2 = rs.getFloat("empoyee.salary");
+				float y2 = rs.getFloat("employee.salary");
 				assertEquals(y, y2);
 				assertNotNull(y);
 
@@ -505,7 +504,30 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1);");
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where e.$0 = d.$1;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectParWhere() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectParWhere    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 != d.$1);");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			

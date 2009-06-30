@@ -1,101 +1,91 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression;
 
-import it.unibo.lmc.pjdbc.database.command.PRequest;
-import it.unibo.lmc.pjdbc.database.meta.MSchema;
-import it.unibo.lmc.pjdbc.parser.Token;
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.ICondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative.IComparativeCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.AndCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.ILogicCondition;
-import it.unibo.lmc.pjdbc.parser.dml.expression.condition.logic.OrCondition;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
-import java.util.HashMap;
 
 public class Expression {
 
-	Expression left;
-	Expression right;
-	ICondition condition;
-	String valore;
-	int numClausole;
+	private ICondition condition;
+	private String right;	
+	private String left;
+	private TableField rightF;
+	private TableField leftF;
 	
-	public Expression(String tk){
-		valore = tk;
-		this.numClausole = 1;
-	}
+	public Expression(){}
 	
-	public Expression(TableField tf){
-		valore = "T"+tf.toString();
-		this.numClausole = 1;	
-	}
-	
-	public Expression(Token tk){
-		valore = tk.image;
-		this.numClausole = 1;
-	}
-	
-	public Expression(Expression left,Expression right,ICondition cond){
+	public void setCondition(ICondition cond){
 		this.condition = cond;
+	}
+	
+	public void setLeft(String left){
 		this.left = left;
+	}
+	
+	public void setLeft(TableField left){
+		this.leftF = left;
+	}
+	
+	public void setRight(String right){
 		this.right = right;
-		this.numClausole = left.numClausole + right.numClausole;
+	}
+	
+	public void setRight(TableField right){
+		this.rightF = right;
 	}
 	
 	public String toString(){
-		if ( null != condition  ) return "[" + left.toString() + " " + this.condition.toString()  + " " + right.toString() + "]";
-		else return "["+valore+"]";
-	}
-
-	public int numClausole() {
-		return this.numClausole;
+		
+		StringBuilder build = new StringBuilder();
+		
+		if ( null != this.left ) build.append(this.left);
+		if ( null != this.leftF ) build.append(this.leftF);
+		
+		build.append(" ");
+		build.append(this.condition.toString());
+		build.append(" ");
+		
+		if ( null != this.right ) build.append(this.right);
+		if ( null != this.rightF ) build.append(this.rightF);
+		
+		
+		return build.toString();
+		
 	}
 
 	/**
-	 * Modifico la richiesta per rispettare le informazioni presenti in Expression
-	 * @param requestPsql la richiesta attuale
+	 * @return the condition
 	 */
-	public void eval(PRequest requestPsql) {
-		
-		if ( null == this.condition ) {
-			
-			// ... è solo un valore che ci faccio???
-			//requestPsql.AND(this.valore);
-			
-		} else {
-		
-			if ( this.condition instanceof ILogicCondition ) {
-				
-				if ( this.condition instanceof AndCondition ){
-					
-					this.left.eval(requestPsql);
-					this.right.eval(requestPsql);
-					
-				} else if ( this.condition instanceof OrCondition ){
-					
-					PRequest tempRequestA = requestPsql.duplicate();
-					//PRequest tempRequestB = requestPsql.duplicate();
-					
-					this.left.eval(requestPsql);
-					
-					this.right.eval(tempRequestA);
-					
-					requestPsql.OR(tempRequestA.getPsql());
-					
-				}
-				
-			}
-			
-			if ( this.condition instanceof IComparativeCondition ) {
-				
-				System.out.println("comparative = <= >= < > ");
-				
-				// qui metto in AND la clausola X1<=10+D2 etc etc 
-				
-			}
-		
-		}
-		
+	public ICondition getCondition() {
+		return condition;
+	}
+
+	/**
+	 * @return the right
+	 */
+	public String getRight() {
+		return right;
+	}
+
+	/**
+	 * @return the left
+	 */
+	public String getLeft() {
+		return left;
+	}
+
+	/**
+	 * @return the rightF
+	 */
+	public TableField getRightF() {
+		return rightF;
+	}
+
+	/**
+	 * @return the leftF
+	 */
+	public TableField getLeftF() {
+		return leftF;
 	}
 	
 }

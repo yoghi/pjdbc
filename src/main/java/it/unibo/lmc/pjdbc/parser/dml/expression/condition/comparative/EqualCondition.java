@@ -13,7 +13,8 @@ public class EqualCondition implements IComparativeCondition {
 	}
 	
 	public String toString(){
-		return "EQUAL";
+		if ( !this.negazione ) return "=:=";
+		else return "=\\=";
 	}
 
 	public boolean eval(String itemA, String itemB) {
