@@ -4,6 +4,7 @@ import it.unibo.lmc.pjdbc.database.command.ICommnad;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.command.dml.PInsert;
 import it.unibo.lmc.pjdbc.database.command.dml.Pselect;
+import it.unibo.lmc.pjdbc.database.meta.MCatalog;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
@@ -77,8 +78,6 @@ public class PSchema implements ICommnad {
 	 */
 	public PSchema(String sourceUrl) throws FileNotFoundException,IOException {
 		
-		//TODO sistemare l'url... come deve essere...
-		
 		File filePrologDB = new File(sourceUrl);
 		boolean exists = filePrologDB.exists();
 	    
@@ -88,18 +87,20 @@ public class PSchema implements ICommnad {
 		   log.info("Open file : "+filePrologDB.getAbsolutePath());
 	   } else {
 		   log.info("Impossibile caricare lo schema: "+filePrologDB.getAbsolutePath());
-//		   if ( !filePrologDB.createNewFile() ) throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
-//		   log.info("Creato schema vuoto: "+filePrologDB.getAbsolutePath());
+		   if ( !filePrologDB.createNewFile() ) throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
+		   log.info("Creato schema vuoto: "+filePrologDB.getAbsolutePath());
 	   }
 	    
 	    this.schemaFile = filePrologDB.getAbsolutePath();
 	    
-	    this.metaSchema = new MSchema(filePrologDB.getName());	//TODO solo il nome o tutto il direttorio??
-	    
 		this.load_theory();
 
-		this.load_meta();
-
+	}
+	
+	public PSchema(String sourceUrl, MCatalog catalogSchema) throws FileNotFoundException, IOException {
+		this(sourceUrl);
+		this.metaSchema = catalogSchema.getMetaSchema(this.schemaFile);
+		//	new MSchema(filePrologDB.getName());	//TODO solo il nome o tutto il direttorio??
 	}
 
 	protected PSchema(Theory th, MSchema schema){
@@ -107,7 +108,7 @@ public class PSchema implements ICommnad {
 		this.logger_init();
 		this.metaSchema = schema;
 	}
-	
+
 	public PSchema clone(){
 		return new PSchema(this.current_theory,this.metaSchema);
 	}
@@ -141,9 +142,7 @@ public class PSchema implements ICommnad {
 		}
 	}
 	
-	protected void load_meta() {
-		this.metaSchema.loadFromTheory(this.current_theory);
-	}
+	
 
 	public PResultSet applyCommand(Select request) throws PSQLException {
 		
@@ -280,8 +279,7 @@ public class PSchema implements ICommnad {
 		
 		
 		//ArrayList<Table> tables = request.getTablesList();
-		
-		
+
 		
 	}
 	

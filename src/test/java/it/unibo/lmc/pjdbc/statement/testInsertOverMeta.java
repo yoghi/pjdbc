@@ -34,7 +34,7 @@ public class testInsertOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/");
 		stmt = conn.createStatement();
 
 		super.setUp();

@@ -36,7 +36,7 @@ public class testSelectOverNoMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/");
 		stmt = conn.createStatement();
 
 		super.setUp();
@@ -54,7 +54,7 @@ public class testSelectOverNoMeta extends TestCase {
 		Properties properties = new Properties();
 		
 		String userDir = System.getProperty("user.dir");
-		File propFile = new File(userDir + "/target/classes/prolog.db.properties");
+		File propFile = new File(userDir + "/target/classes/common.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {

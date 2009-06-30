@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.database;
 
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.meta.MCatalog;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
@@ -10,6 +11,7 @@ import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 
 import java.io.File;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 
@@ -40,6 +43,11 @@ public class PrologDatabase {
 	 * Schemi attivi
 	 */
 	private Hashtable<String,TSchema> availableSchema = new Hashtable<String, TSchema>();
+	
+	/**
+	 * Metabase
+	 */
+	private MCatalog catalogSchema;
 	
 	/**
 	 * Logger 
@@ -116,19 +124,28 @@ public class PrologDatabase {
 				
 				if ( new File(dirpath + File.separator + filename).isFile() ) {
 		            
-					if ( filename.endsWith(extension) ) {
 					
-						PSchema p = new PSchema(dirpath + File.separator + filename);
+					if ( filename.equalsIgnoreCase("metabase.db") ){	//"metabase.db" è un database particolare
 						
-						//TODO instanziare TSChema corretto in base alle politiche attuali...
-						TSchemaRU tschema = new TSchemaRU(p);
-			            
-						String nameSchema = filename.split("\\.")[0];
-						this.log.info("Open schema : "+nameSchema);
-						this.availableSchema.put(nameSchema,tschema);
+						this.catalogSchema = new MCatalog( dirpath + File.separator + filename );
 						
 					} else {
-						log.debug("into dir find file with invalid url - not use extension : "+extension+ " - "+filename);
+					
+						if ( filename.endsWith(extension) ) {
+						
+							PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
+							
+							//TODO instanziare TSChema corretto in base alle politiche attuali...
+							TSchemaRU tschema = new TSchemaRU(p);
+				            
+							String nameSchema = filename.split("\\.")[0];
+							this.log.info("Open schema : "+nameSchema);
+							this.availableSchema.put(nameSchema,tschema);
+							
+						} else {
+							log.debug("into dir find file with invalid url - not use extension : "+extension+ " - "+filename);
+						}
+					
 					}
 					
 				}
@@ -151,6 +168,8 @@ public class PrologDatabase {
 			}
 			
 		}
+		
+		//se manca il catalog lo devo creare!!
 		
 	}
 
@@ -256,7 +275,12 @@ public class PrologDatabase {
 	 * @throws PSQLException
 	 */
 	public int executeUpdate(String sql) throws PSQLException{
-		String nameSchema = this.availableSchema.keys().nextElement();
+		String nameSchema = null;
+		try {
+			nameSchema = this.availableSchema.keys().nextElement();
+		} catch (NoSuchElementException  e) {
+			throw new PSQLException("not valid database found!", PSQLState.UNKNOWN_STATE);
+		}
 		return this.executeUpdate(sql,nameSchema);
 	}
 	
@@ -271,7 +295,7 @@ public class PrologDatabase {
 		
 		ParsedCommand pRequest = this.analizeSql(sql, schemaName);
 		
-		if ( pRequest instanceof Insert ) {
+		if ( pRequest instanceof Update ) {
 			
 			TSchema tschema = this.availableSchema.get(schemaName);
 			
@@ -285,7 +309,7 @@ public class PrologDatabase {
 				throw new PSQLException("Invalid Schema : "+schemaName,PSQLState.SYNTAX_ERROR);
 			}
 
-		} else throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
+		} else throw new PSQLException("Invalid Update : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
 		
 	}
 	

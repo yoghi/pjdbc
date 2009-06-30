@@ -34,7 +34,7 @@ public class testUpdateOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/"); //prolog_with_meta.db
 		stmt = conn.createStatement();
 
 		super.setUp();
@@ -82,7 +82,7 @@ public class testUpdateOverMeta extends TestCase {
 	public void testDropTable() {
 		
 		System.out.println(" ====================== ");
-		System.out.println("  testDropTable          ");
+		System.out.println("  testDropTable         ");
  		System.out.println(" ====================== ");
 		
 		try {
@@ -92,6 +92,7 @@ public class testUpdateOverMeta extends TestCase {
 			//come lo verifico???
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail(" ExecuteQuery ha ritornato: " + e);
 		}
 		
