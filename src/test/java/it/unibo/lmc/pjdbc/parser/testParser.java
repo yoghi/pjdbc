@@ -46,7 +46,7 @@ public class testParser extends TestCase {
 		Properties properties = new Properties();
 		
 		String userDir = System.getProperty("user.dir");
-		File propFile = new File(userDir + "/target/classes/prolog.db.properties");
+		File propFile = new File(userDir + "/target/classes/common.properties");
 		
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {
@@ -63,10 +63,12 @@ public class testParser extends TestCase {
 		TestSuite ts = new TestSuite();
 		 
 		ts.addTest(new testParser("testSelectMultiTable"));
-		ts.addTest(new testParser("testSelectWhereOR"));
-		ts.addTest(new testParser("testSelectWhereOR2"));
 		ts.addTest(new testParser("testInsert"));
 		
+		ts.addTest(new testParser("testAnyClausola"));
+		
+//		ts.addTest(new testParser("testSelectWhereOR"));
+//		ts.addTest(new testParser("testSelectWhereOR2"));
 		
 		return ts;
 	}
@@ -88,7 +90,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("");
+			pRequest = parse.parseIt("schema");
 			
 			if ( pRequest instanceof Select ) {
 				
@@ -146,7 +148,6 @@ public class testParser extends TestCase {
 		
 	}
 	
-	
 	/**
 	 * TEST: Select di un campo specifico
 	 */
@@ -163,7 +164,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("");
+			pRequest = parse.parseIt("schema");
 			
 			fail();	//TODO: da finire
 			
@@ -194,7 +195,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("");
+			pRequest = parse.parseIt("schema");
 			
 			fail();	//TODO: da finire
 			
@@ -225,7 +226,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("");
+			pRequest = parse.parseIt("schema");
 			
 			System.out.println(pRequest);
 			
@@ -237,4 +238,34 @@ public class testParser extends TestCase {
 		assertTrue(true);
 		
 	}
+	
+	/**
+	 * TEST Select con in mezzo ANY
+	 */
+	public void testAnyClausola() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testAnyClausola       ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "select e.*,d.$1 from employee as e, dept as d;";
+			
+			ParsedCommand pRequest = null;
+			
+			Psql parse = new Psql(new StringReader(query));
+			pRequest = parse.parseIt("schema");
+			
+			System.out.println(pRequest);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+
 }

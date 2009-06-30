@@ -49,7 +49,7 @@ public class testPrologDatabase extends TestCase {
 		Properties properties = new Properties();
 		
 		String userDir = System.getProperty("user.dir");
-		File propFile = new File(userDir + "/target/classes/prolog.db.properties");
+		File propFile = new File(userDir + "/target/classes/common.properties");
 		
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {

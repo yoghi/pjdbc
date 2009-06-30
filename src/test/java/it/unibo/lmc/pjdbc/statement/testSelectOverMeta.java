@@ -1,9 +1,12 @@
 package it.unibo.lmc.pjdbc.statement;
 
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.parser.Psql;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.StringReader;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -58,7 +61,7 @@ public class testSelectOverMeta extends TestCase {
 		Properties properties = new Properties();
 		
 		String userDir = System.getProperty("user.dir");
-		File propFile = new File(userDir + "/target/classes/prolog.db.properties");
+		File propFile = new File(userDir + "/target/classes/common.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {
@@ -84,6 +87,7 @@ public class testSelectOverMeta extends TestCase {
 		ts.addTest(new testSelectOverMeta("testGetArray"));
 		ts.addTest(new testSelectOverMeta("testGetInvalidArray"));
 		ts.addTest(new testSelectOverMeta("testInvalidAliasQuery"));
+		ts.addTest(new testSelectOverMeta("testWrongAnyClausola"));
 		
 //		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
@@ -215,12 +219,12 @@ public class testSelectOverMeta extends TestCase {
 
 				//NB: le colonne del resultset si contano da 1
 				int x = rs.getInt(1);
-				int x2 = rs.getInt("id");
+				int x2 = rs.getInt("employee.id");
 				assertEquals(x, x2);
 				assertNotNull(x);
 				
-				float y = rs.getFloat(2);
-				float y2 = rs.getFloat("salary");
+				float y = rs.getFloat(3);
+				float y2 = rs.getFloat("empoyee.salary");
 				assertEquals(y, y2);
 				assertNotNull(y);
 
@@ -603,6 +607,27 @@ public class testSelectOverMeta extends TestCase {
 		}
 		
 		assertTrue(true);
+		
+	}
+	
+	public void testWrongAnyClausola() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testWrongAnyClausola  ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt.executeQuery("select *.$0,d.$1 from employee as e, dept as d;");
+			
+			
+			
+		} catch (Exception e) {
+			assertTrue(true);
+			return;
+		}
+		fail(" Not find error into sql");
+		
 		
 	}
 	

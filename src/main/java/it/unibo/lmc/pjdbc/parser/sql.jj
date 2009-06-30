@@ -299,7 +299,11 @@ CreateDB CreateDB():
 	String t = null;
 }
 {
-	<K_CREATE> <K_DATABASE> t=RelObjectName() { create=new CreateDB(t); }
+	<K_CREATE> <K_DATABASE> t=RelObjectName() 
+	{ 
+		create=new CreateDB(this.defaultSchema);
+		create.setDatabase(t); 
+	}
 	
 	{
 		return create;
@@ -313,7 +317,11 @@ DropDB DropDB():
 }
 {
 	
-	<K_DROP> <K_TABLE> t=RelObjectName() { drop=new DropDB(t); }
+	<K_DROP> <K_DATABASE> t=RelObjectName() 
+	{ 
+		drop=new DropDB(this.defaultSchema);
+		drop.setDatabase(t); 
+	}
 	
 	{
 		return drop;
@@ -341,12 +349,37 @@ TableField Column():
 	String name3 = null;
 	String alias = null;
 	TableField field;
+	Token tk;
 	boolean distinct = false;
 	
 }
 {
     // [schema.][tabella.]colonna
-    [ <K_DISTINCT> {distinct = true;} ] name1=RelObjectName() [ "." name2=RelObjectName() ["." name3=RelObjectName()]] [ alias=Alias() ]
+    [ <K_DISTINCT> {distinct = true;} ] 
+    ( 
+    	(
+	    	name1=RelObjectName() 
+	    	|
+	    	tk="*" {name1=tk.image;}
+    	)
+    	[ 
+    		"." 
+    		( 
+    			name2=RelObjectName()
+    			|
+    			tk="*" {name2=tk.image;}
+    		)
+    		[
+    			"." 
+    			(
+    				name3=RelObjectName()
+    				|
+    				tk="*"{name3=tk.image;}
+    			)
+    		]
+    	] 
+    	[ alias=Alias() ] 
+    )
     {
     	if (name3 != null) {
     		field = new TableField(name3);
@@ -365,12 +398,7 @@ TableField Column():
     	field.setDistinct(distinct);
     	return field;
    	}
-   	|
-   	"*"
-   	{
-   		field = new TableField();
-   		return field;
-   	}
+   	
 }
 
 String RelObjectName()  :
@@ -381,7 +409,7 @@ String RelObjectName()  :
 	|
 	tk=<S_QUOTED_IDENTIFIER>
 	| 
-	tk=<S_CHAR_LITERAL>
+	tk=<S_CHAR_LITERAL>	
 	)
 	
     { return tk.image; }

@@ -288,20 +288,8 @@ public class PSchema implements IDml {
 			theoryFile.flush();
 			theoryFile.close();
 		} catch (IOException e) {
-			throw new PSQLException("", PSQLState.SYSTEM_ERROR);
+			throw new PSQLException("Impossibile salvare le modifiche", PSQLState.SYSTEM_ERROR);
 		}
 	}
-
-//	public MColumn getColumnInfo(String tableName, String columnName) throws PSQLException {
-//		
-//		MTable tmeta = this.metaSchema.getMetaTableInfo(tableName);
-//		if ( null == tmeta ) throw new PSQLException("tabella "+tableName+" non trovata",PSQLState.UNDEFINED_TABLE);
-//		
-//		MColumn cmeta = tmeta.getColumnMeta(columnName);
-//		if ( null == tmeta ) throw new PSQLException("colonna "+columnName+" non trovata",PSQLState.UNDEFINED_COLUMN);
-//		
-//		return cmeta;
-//	}
-	
 	
 }
