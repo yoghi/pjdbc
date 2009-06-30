@@ -1,10 +1,10 @@
-package it.unibo.lmc.pjdbc.core.command.dml;
+package it.unibo.lmc.pjdbc.database.command.dml;
 
-import it.unibo.lmc.pjdbc.core.command.PRequest;
-import it.unibo.lmc.pjdbc.core.meta.MSchema;
-import it.unibo.lmc.pjdbc.core.meta.MTable;
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
-import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.command.PRequest;
+import it.unibo.lmc.pjdbc.database.meta.MSchema;
+import it.unibo.lmc.pjdbc.database.meta.MTable;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.schema.Table;

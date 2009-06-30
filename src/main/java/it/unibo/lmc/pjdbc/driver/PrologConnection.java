@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.PrologDatabase;
-import it.unibo.lmc.pjdbc.core.service.PrologDaemon;
+import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.service.PrologDaemon;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

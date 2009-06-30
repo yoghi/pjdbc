@@ -1,12 +1,12 @@
-package it.unibo.lmc.pjdbc.core;
+package it.unibo.lmc.pjdbc.database;
 
-import it.unibo.lmc.pjdbc.core.command.PResultSet;
-import it.unibo.lmc.pjdbc.core.command.dml.IDml;
-import it.unibo.lmc.pjdbc.core.command.dml.PInsert;
-import it.unibo.lmc.pjdbc.core.command.dml.Pselect;
-import it.unibo.lmc.pjdbc.core.meta.MSchema;
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
-import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.command.dml.IDml;
+import it.unibo.lmc.pjdbc.database.command.dml.PInsert;
+import it.unibo.lmc.pjdbc.database.command.dml.Pselect;
+import it.unibo.lmc.pjdbc.database.meta.MSchema;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;

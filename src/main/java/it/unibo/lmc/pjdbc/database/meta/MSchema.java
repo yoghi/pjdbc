@@ -1,7 +1,7 @@
-package it.unibo.lmc.pjdbc.core.meta;
+package it.unibo.lmc.pjdbc.database.meta;
 
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
-import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

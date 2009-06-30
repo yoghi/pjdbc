@@ -1,8 +1,8 @@
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.meta.MColumn;
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
-import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.meta.MColumn;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;

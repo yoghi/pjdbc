@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.statement;
 
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
 import java.io.File;
 import java.io.FileInputStream;

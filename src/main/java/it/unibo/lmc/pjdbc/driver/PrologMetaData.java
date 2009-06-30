@@ -3,11 +3,11 @@
  */
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.PSchema;
-import it.unibo.lmc.pjdbc.core.command.PResultSet;
-import it.unibo.lmc.pjdbc.core.meta.MColumn;
-import it.unibo.lmc.pjdbc.core.meta.MSchema;
-import it.unibo.lmc.pjdbc.core.meta.MTable;
+import it.unibo.lmc.pjdbc.database.PSchema;
+import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.meta.MColumn;
+import it.unibo.lmc.pjdbc.database.meta.MSchema;
+import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.sql.DatabaseMetaData;

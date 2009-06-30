@@ -1,4 +1,4 @@
-package it.unibo.lmc.pjdbc.core.meta;
+package it.unibo.lmc.pjdbc.database.meta;
 
 import java.util.Collections;
 import java.util.Formatter;
@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
-import it.unibo.lmc.pjdbc.core.utils.PSQLState;
-import it.unibo.lmc.pjdbc.core.utils.PTypes;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.utils.PTypes;
 
 
 public class MTable {

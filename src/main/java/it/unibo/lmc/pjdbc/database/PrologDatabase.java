@@ -1,10 +1,10 @@
-package it.unibo.lmc.pjdbc.core;
+package it.unibo.lmc.pjdbc.database;
 
-import it.unibo.lmc.pjdbc.core.command.PResultSet;
-import it.unibo.lmc.pjdbc.core.transaction.TSchema;
-import it.unibo.lmc.pjdbc.core.transaction.TSchemaRU;
-import it.unibo.lmc.pjdbc.core.utils.PSQLException;
-import it.unibo.lmc.pjdbc.core.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.transaction.TSchema;
+import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;

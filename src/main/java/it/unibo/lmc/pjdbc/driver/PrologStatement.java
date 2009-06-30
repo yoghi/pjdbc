@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.core.PrologDatabase;
-import it.unibo.lmc.pjdbc.core.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.command.PResultSet;
 
 import java.io.StringReader;
 import java.sql.Connection;

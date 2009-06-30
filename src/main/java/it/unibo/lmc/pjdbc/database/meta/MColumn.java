@@ -1,6 +1,6 @@
-package it.unibo.lmc.pjdbc.core.meta;
+package it.unibo.lmc.pjdbc.database.meta;
 
-import it.unibo.lmc.pjdbc.core.utils.PTypes;
+import it.unibo.lmc.pjdbc.database.utils.PTypes;
 
 public class MColumn {
 
