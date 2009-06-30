@@ -5,6 +5,8 @@ import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
+import it.unibo.lmc.pjdbc.parser.dml.imp.DropDB;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
@@ -66,6 +68,16 @@ public class TSchemaRU extends TSchema {
 		this.log.clear();
 		this.realSchema.commit();
 		this.currentTransactionID = UUID.randomUUID();
+	}
+
+	public void applyCommand(DropDB request) throws PSQLException {
+		this.log.add(request);
+		this.realSchema.applyCommand(request);
+	}
+
+	public void applyCommand(Drop request) throws PSQLException {
+		this.log.add(request);
+		this.realSchema.applyCommand(request);
 	}
 
 	

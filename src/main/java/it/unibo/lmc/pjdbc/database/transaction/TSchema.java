@@ -1,7 +1,7 @@
 package it.unibo.lmc.pjdbc.database.transaction;
 
 import it.unibo.lmc.pjdbc.database.PSchema;
-import it.unibo.lmc.pjdbc.database.command.IDml;
+import it.unibo.lmc.pjdbc.database.command.ICommnad;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.driver.PrologResultSet;
@@ -18,7 +18,7 @@ import java.util.UUID;
  * Transaction Schema
  *
  */
-public abstract class TSchema implements IDml {
+public abstract class TSchema implements ICommnad {
 
 	protected UUID currentTransactionID;
 	

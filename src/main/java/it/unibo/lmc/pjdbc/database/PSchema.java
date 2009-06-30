@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.database;
 
-import it.unibo.lmc.pjdbc.database.command.IDml;
+import it.unibo.lmc.pjdbc.database.command.ICommnad;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.command.dml.PInsert;
 import it.unibo.lmc.pjdbc.database.command.dml.Pselect;
@@ -8,9 +8,12 @@ import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
+import it.unibo.lmc.pjdbc.parser.dml.imp.DropDB;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.io.File;
@@ -18,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,7 +37,7 @@ import alice.tuprolog.SolveInfo;
 import alice.tuprolog.Term;
 import alice.tuprolog.Theory;
 
-public class PSchema implements IDml {
+public class PSchema implements ICommnad {
 	
 	/**
 	 * Theory corrente
@@ -268,10 +272,22 @@ public class PSchema implements IDml {
 		return 0;
 	}
 
+	public void applyCommand(DropDB request) throws PSQLException {
+		throw new PSQLException("non implemented yet", PSQLState.NOT_IMPLEMENTED);
+	}
+	
+	public void applyCommand(Drop request) throws PSQLException {
+		
+		
+		//ArrayList<Table> tables = request.getTablesList();
+		
+		
+		
+	}
+	
 	public void close() {
 		//TODO: devo rilasciare le risorse : theory e quant'altro a esso collegata
 	}
-
 	
 	/**
 	 * Restituisco i metadati
@@ -291,5 +307,7 @@ public class PSchema implements IDml {
 			throw new PSQLException("Impossibile salvare le modifiche", PSQLState.SYSTEM_ERROR);
 		}
 	}
+
+	
 	
 }
