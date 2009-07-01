@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.database.service;
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class PrologDaemon {
 	//TODO MONITOR da usare per le transizioni.....
 	//static 
 	
-	public static PrologDatabase openDatabase(String url) throws FileNotFoundException, IOException{
+	public static PrologDatabase openDatabase(String url) throws FileNotFoundException, IOException, PSQLException{
 		
 		/**
 		 * TODO: capire come è url e come è la key da usare per memorizzare il database
@@ -26,7 +27,7 @@ public class PrologDaemon {
 		 * TODO: che transizione uso???
 		 */
 		
-		String key = "";
+		String key = url;
 		
 		PrologDatabase p;
 		if ( !attivi.containsKey(key) ){

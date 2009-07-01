@@ -38,7 +38,7 @@ public interface ICommnad {
 	int applyCommand(Update request) throws PSQLException;
 	
 	/**
-	 * DELETE
+	 * DELETE row
 	 * @param request
 	 * @return
 	 * @throws SQLException
@@ -50,7 +50,7 @@ public interface ICommnad {
 	 * @param request
 	 * @throws PSQLException
 	 */
-	void applyCommand(Drop request) throws PSQLException;
+	int applyCommand(Drop request) throws PSQLException;
 	
 	/**
 	 * DROP DATABASE

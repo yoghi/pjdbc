@@ -3,7 +3,8 @@ package it.unibo.lmc.pjdbc.parser.dml.imp;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * In questo caso ho una richiesta del tipo 
@@ -15,17 +16,31 @@ import java.util.ArrayList;
  */
 public class Drop extends ParsedCommand {
 
-	private ArrayList<Table> tables = new ArrayList<Table>();
+	private Map<String,Table[]> tables = new HashMap<String,Table[]>();
 	
 	public Drop(String schema) {
 		super(schema);
 	}
 	
 	public void addTable(Table t){
-		this.tables.add(t);
+		
+		if ( this.tables.containsKey(t.getSchemaName()) ){
+			Table[] tables_internal = this.tables.get(t.getSchemaName());
+			Table[] temp = new Table[tables_internal.length+1];
+			for (int i = 0; i < tables_internal.length; i++) {
+				temp[i] = tables_internal[i];
+			}
+			temp[tables_internal.length] = t;
+			this.tables.put(t.getSchemaName(), temp);
+		} else {
+			Table[] temp = new Table[1];
+			temp[0] = t;
+			this.tables.put(t.getSchemaName(), temp);
+		}
+		
 	}
 	
-	public ArrayList<Table> getTablesList(){
+	public Map<String, Table[]> getTablesList(){
 		return this.tables;
 	}
 
@@ -33,9 +48,13 @@ public class Drop extends ParsedCommand {
 	public String toString() {
 		StringBuilder build =  new StringBuilder();
 		build.append("drop table: ");
-		for (Table table : this.tables) {
-			build.append(table.getSchemaName()+"."+table.getName());
-			build.append(",");
+		for (String key : this.tables.keySet()) {
+			
+			Table[] tableArray = this.tables.get(key);
+			for (int i = 0; i < tableArray.length; i++) {
+				build.append(tableArray[i].getSchemaName()+"."+tableArray[i].getName());
+				build.append(",");
+			}
 		}
 		build.reverse();
 		build.replace(0, 1, ";");

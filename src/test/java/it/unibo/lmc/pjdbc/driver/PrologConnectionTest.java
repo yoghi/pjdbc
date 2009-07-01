@@ -180,7 +180,7 @@ public class PrologConnectionTest extends TestCase {
 	}
 
 	public final void testSetHoldability() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetReadOnly() {

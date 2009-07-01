@@ -22,7 +22,8 @@ import org.apache.log4j.PropertyConfigurator;
 public class testSelectOverMeta extends TestCase {
 
 	private Connection conn = null;
-	private Statement stmt = null;
+	private Statement stmt_1 = null;
+	private Statement stmt_2 = null;
 
 	/**
 	 * Costruttore 
@@ -40,8 +41,9 @@ public class testSelectOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
-		stmt = conn.createStatement();
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
+		stmt_1 = conn.createStatement();
+		stmt_2 = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog2.db").createStatement();
 
 		super.setUp();
 	}
@@ -109,7 +111,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select id from employee;");
+			ResultSet rs = stmt_1.executeQuery("select id from employee;");
 			
 			while (rs.next()) {
 
@@ -142,7 +144,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select id,salary from employee;");
+			ResultSet rs = stmt_1.executeQuery("select id,salary from employee;");
 			
 			while (rs.next()) {
 
@@ -177,7 +179,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select * from employee;");
+			ResultSet rs = stmt_1.executeQuery("select * from employee;");
 			
 			while (rs.next()) {
 
@@ -212,7 +214,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.*,d.$1 from employee as e,dept as d;");
+			ResultSet rs = stmt_1.executeQuery("select e.*,d.$1 from employee as e,dept as d;");
 			
 			while (rs.next()) {
 
@@ -249,7 +251,7 @@ public class testSelectOverMeta extends TestCase {
  		int i = 1;
 		try {
 			
-			rs = stmt.executeQuery("select $1 from multiarray;");
+			rs = stmt_2.executeQuery("select $1 from multiarray;");
 			
 			while ( rs.next() ) {
 				//NB: le colonne del resultset si contano da 1
@@ -278,7 +280,7 @@ public class testSelectOverMeta extends TestCase {
  		ResultSet rs = null;
 		try {
 			
-			rs = stmt.executeQuery("select $1 from noarray;");
+			rs = stmt_2.executeQuery("select $1 from noarray;");
 			
 			while ( rs.next() ) {
 
@@ -311,7 +313,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.id from employee;");
+			ResultSet rs = stmt_1.executeQuery("select e.id from employee;");
 			
 			ResultSetMetaData rsmd = rs.getMetaData();
 			
@@ -339,7 +341,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.id from employee;");
+			ResultSet rs = stmt_1.executeQuery("select e.id from employee;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -362,7 +364,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select employee.id from dept;");
+			ResultSet rs = stmt_1.executeQuery("select employee.id from dept;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -387,7 +389,7 @@ public class testSelectOverMeta extends TestCase {
  		ResultSet rs = null;
 		try {
 			
-			rs = stmt.executeQuery("select id,$5 from employee;");
+			rs = stmt_1.executeQuery("select id,$5 from employee;");
 			
 			rs.next();
 			//NB: le colonne del resultset si contano da 1
@@ -427,7 +429,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.id as id,e.name as name,d.department from employee as e, dept as d;");
+			ResultSet rs = stmt_1.executeQuery("select e.id as id,e.name as name,d.department from employee as e, dept as d;");
 			
 			while(rs.next()){
 				//NB: le colonne del resultset si contano da 1
@@ -464,7 +466,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.id,name,d.department from employee as e, dept as d;");
+			ResultSet rs = stmt_1.executeQuery("select e.id,name,d.department from employee as e, dept as d;");
 			
 			while(rs.next()){
 				//NB: le colonne del resultset si contano da 1
@@ -504,7 +506,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where e.$0 = d.$1;");
+			ResultSet rs = stmt_1.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where e.$0 = d.$1;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -527,7 +529,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 != d.$1);");
+			ResultSet rs = stmt_1.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 != d.$1);");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -550,7 +552,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = ( d.$1 + 1) );");
+			ResultSet rs = stmt_1.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = ( d.$1 + 1) );");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -573,7 +575,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where ( (e.$0 = d.$1) AND (e.$0 > 1) ) ;");
+			ResultSet rs = stmt_1.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where ( (e.$0 = d.$1) AND (e.$0 > 1) ) ;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -596,7 +598,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where ( (e.$0 > 1000) OR (d.$1 > 1) ) ;");
+			ResultSet rs = stmt_1.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where ( (e.$0 > 1000) OR (d.$1 > 1) ) ;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -620,7 +622,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select e.$1,d.$0 from employee as e , dept as d , eta as et where ( ( (e.$0 = d.$1) AND ( e.$1 = et.$0 ) ) AND ( (et.$1 < 40) OR ( e.$2 > 2000 ) ) ) ;");
+			ResultSet rs = stmt_1.executeQuery("select e.$1,d.$0 from employee as e , dept as d , eta as et where ( ( (e.$0 = d.$1) AND ( e.$1 = et.$0 ) ) AND ( (et.$1 < 40) OR ( e.$2 > 2000 ) ) ) ;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
@@ -640,7 +642,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select *.$0,d.$1 from employee as e, dept as d;");
+			ResultSet rs = stmt_1.executeQuery("select *.$0,d.$1 from employee as e, dept as d;");
 			
 			
 			

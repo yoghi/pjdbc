@@ -66,9 +66,6 @@ public class testUpdateOverMeta extends TestCase {
 	    
 	    PropertyConfigurator.configure(properties);
 		
-	    //internal.db
-	    
-	    
 		TestSuite ts = new TestSuite();
 		
 		ts.addTest(new testUpdateOverMeta("testDropTable"));
@@ -87,9 +84,9 @@ public class testUpdateOverMeta extends TestCase {
 		
 		try {
 			
-			stmt.executeUpdate("drop table employee;");
+			int n = stmt.executeUpdate("drop table prolog1.employee;");
 			
-			//come lo verifico???
+			assertEquals(4, n);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

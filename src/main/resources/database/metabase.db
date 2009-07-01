@@ -1,6 +1,6 @@
 %NB: le colonne PARTONO DA 0
 % TABLES DESCRIPTOR
-% table(%database,%tabella,%colonna,%tipo).
+% table(%schemaName,%tableName,%columnPosition,%columnName,%type).
 
 table('prolog1','age',0,'name','string').
 table('prolog1','age',1,'age','int').
@@ -17,6 +17,6 @@ table('prolog2','multiarray',1,'value','array').
 
 % DATABASE DESCRIPTOR
 % database(%schemaName,%fileName).
-database('prolog1','prolog1.db').
+database('prolog1','prolog.db').
 database('prolog2','prolog2.db').
 

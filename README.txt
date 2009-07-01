@@ -1,5 +1,10 @@
 
 
+DUE QUERY IN FILA FUNZIONANO?? query1; query2; ... no ma dovrebbero??
+
+NB: due colonne con lo stesso nome non possono esistere!!!
+
+
 Sintassi del javacc 
 
 void methodName():
@@ -35,3 +40,17 @@ ognuna di loro ha campi diversi
 Expression,Simple Expression
 
 Caso Insert con values presi da una SubSelect();
+
+
+
+
+/* predicati */
+/* Es. lookAll(10,[10,20,10,30,10],L) tutte le posizioni del 10 */
+lookAll(X,L,Ps):- findall(P,lookAny(X,L,P),Ps).
+/* da definire meglio ...*/
+
+max([H|T],M):-max([H|T],M,H). 
+max([H|T],M,Temp):-H>Temp, max(T,M,H). 
+max([H|T],M,Temp):-H<=Temp, max(T,M,Temp). 
+max([],M,M).
+maggiore([H|T],Paragone,Risultato) :-  true.

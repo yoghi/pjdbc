@@ -40,6 +40,7 @@ public class Insert extends ParsedCommand {
 	 */
 	public void setTable(Table t){
 		this.table = t;
+		if ( t.getSchemaName() != this.defaultSchema ) this.defaultSchema = t.getSchemaName();
 	}
 	
 	/**

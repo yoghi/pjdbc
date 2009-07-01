@@ -1,15 +1,14 @@
 package it.unibo.lmc.pjdbc.database.meta;
 
-import java.util.Collections;
-import java.util.Formatter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.database.utils.PTypes;
+
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 
 public class MTable {
@@ -21,6 +20,7 @@ public class MTable {
 	
 	/**
 	 * Indice NomeColonna => posizione
+	 * NB: due colonne con lo stesso nome non possono esistere!!!
 	 */
 	private Map<String,Integer> tcolumns;
 	
@@ -35,6 +35,11 @@ public class MTable {
 	private String tname;
 	
 	/**
+	 * Logger 
+	 */
+	private Logger log = null;
+	
+	/**
 	 * Costruttore Tabella
 	 * @param name nome tabella
 	 * @param columNumber numero di colonne
@@ -44,6 +49,7 @@ public class MTable {
 		 this.columns = new MColumn[columNumber];
 		 this.tname = name;
 		 this.schema = schema;
+		 log = Logger.getLogger("it.unibo.lmc.pjdbc.core.meta");
 	}
 	
 	/**
@@ -69,6 +75,7 @@ public class MTable {
 
 				MColumn columnNew = new MColumn(this.schema, this, columnName, PTypes.valueOf(columnType.toUpperCase()));
 				this.columns[position] = columnNew;
+				log.debug("add new column "+columnName);
 				return null;
 				
 			} else { //override
@@ -105,6 +112,7 @@ public class MTable {
 			}
 			
 			this.columns[position] = columnNew;
+			log.debug("add new column "+columnName);
 			return null;
 		}
 		

@@ -4,9 +4,9 @@ import it.unibo.lmc.pjdbc.database.PSchema;
 import it.unibo.lmc.pjdbc.database.command.ICommnad;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
-import it.unibo.lmc.pjdbc.driver.PrologResultSet;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
@@ -61,6 +61,7 @@ public abstract class TSchema implements ICommnad {
 	public abstract int applyCommand(Insert request) throws PSQLException;
 	public abstract int applyCommand(Update request) throws PSQLException;
 	public abstract int applyCommand(Delete request) throws PSQLException;
+	public abstract int applyCommand(Drop request) throws PSQLException;
 
 	public void close() {
 		this.realSchema.close();

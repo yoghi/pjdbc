@@ -4,34 +4,35 @@ import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 
-public class Delete extends ParsedCommand {
+public class Delete extends ParsedCommand  {
 
 	private Table table;
-	
-	//se nn viene settato il where devo cancellare tutti gli elementi della cartella (??)
+	private Expression whereClausole;
+
 	public Delete(String schema) {
 		super(schema);
 	}
-	
-	/**
-	 * Lavoro solo su una tabella!!
-	 */
-	public void setTable(Table t){
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setWhere(Expression where) {
+		this.whereClausole = where;
+	}
+
+	public void setTable(Table t) {
 		this.table = t;
 	}
-	
-	/**
-	 * Restituisco la tabella su cui si deve lavorare per l'insert
-	 * @return Table
-	 */
-	public Table getTable(){
+
+	public Table getTable() {
 		return this.table;
 	}
 	
-	//TODO: da fare la gestione della clausola WHERE
-	public void setWhere(Expression where){
-		
-	}	
-	
+	public Expression getWhereClausole(){
+		return this.whereClausole;
+	}
 
 }

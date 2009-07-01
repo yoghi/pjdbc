@@ -2,6 +2,8 @@ package it.unibo.lmc.pjdbc.database;
 
 import it.unibo.lmc.pjdbc.database.command.ICommnad;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.command.ddl.PDrop;
+import it.unibo.lmc.pjdbc.database.command.dml.PDelete;
 import it.unibo.lmc.pjdbc.database.command.dml.PInsert;
 import it.unibo.lmc.pjdbc.database.command.dml.Pselect;
 import it.unibo.lmc.pjdbc.database.meta.MCatalog;
@@ -14,7 +16,6 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.DropDB;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
-import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.io.File;
@@ -22,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
@@ -73,44 +73,45 @@ public class PSchema implements ICommnad {
 	/**
 	 * 
 	 * @param sourceUrl path del file contenente il db prolog
+	 * @param catalogSchema catalog meta informazioni
 	 * @throws FileNotFoundException,IOException 
 	 * @throws  
-	 */
-	public PSchema(String sourceUrl) throws FileNotFoundException,IOException {
-		
+	 */	
+	public PSchema(String sourceUrl, MCatalog catalogSchema) throws PSQLException {
+	
 		File filePrologDB = new File(sourceUrl);
 		boolean exists = filePrologDB.exists();
 	    
 		this.logger_init();
 		
-	   if ( exists ) {
-		   log.info("Open file : "+filePrologDB.getAbsolutePath());
-	   } else {
-		   log.info("Impossibile caricare lo schema: "+filePrologDB.getAbsolutePath());
-		   if ( !filePrologDB.createNewFile() ) throw new IOException("Impossibile creare: "+filePrologDB.getAbsolutePath());
-		   log.info("Creato schema vuoto: "+filePrologDB.getAbsolutePath());
-	   }
-	    
-	    this.schemaFile = filePrologDB.getAbsolutePath();
-	    
-		this.load_theory();
-
-	}
+		try {
+		
+			if (exists) {
+				log.info("Open file : " + filePrologDB.getAbsolutePath());
+			} else {
+				log.info("Impossibile caricare lo schema: " + filePrologDB.getAbsolutePath());
+				if (!filePrologDB.createNewFile()) throw new PSQLException("Impossibile creare: "+ filePrologDB.getAbsolutePath(),PSQLState.SYSTEM_ERROR);
+				log.info("Creato schema vuoto: " + filePrologDB.getAbsolutePath());
+			}
 	
-	public PSchema(String sourceUrl, MCatalog catalogSchema) throws FileNotFoundException, IOException {
-		this(sourceUrl);
-		this.metaSchema = catalogSchema.getMetaSchema(this.schemaFile);
-		//	new MSchema(filePrologDB.getName());	//TODO solo il nome o tutto il direttorio??
-	}
+			this.schemaFile = filePrologDB.getAbsolutePath();
+	
+			this.load_theory();
+			
+			catalogSchema.validate(filePrologDB.getName(),this.current_theory);
+			
+			if ( catalogSchema.existMetaSchema(filePrologDB.getName()) ){
+				this.metaSchema = catalogSchema.getMetaSchema(filePrologDB.getName());
+			} else {
+				//qui non ci posso essere se validate ha funzionato....
+				log.error("sono dove non dovrei essere...");
+			}
 
-	protected PSchema(Theory th, MSchema schema){
-		this.current_theory = th;
-		this.logger_init();
-		this.metaSchema = schema;
-	}
-
-	public PSchema clone(){
-		return new PSchema(this.current_theory,this.metaSchema);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		log.info("Schema ready: " + this.metaSchema.getSchemaName());
 	}
 	
 	/**
@@ -122,9 +123,8 @@ public class PSchema implements ICommnad {
 	
 	/**
 	 * Carico la teoria prolog
-	 * @throws IOException 
 	 */
-	protected void load_theory() throws IOException  {
+	protected void load_theory()  {
 		
 		try {
 			this.current_theory = new Theory(new FileInputStream(this.schemaFile));
@@ -155,7 +155,6 @@ public class PSchema implements ICommnad {
 		List<TableField> fields = request.getCampiRicerca();	// il campo alias è il campo con cui si presentano nella SELECT (e.di,$1,etc...)
 		
 		//fields se contiene * va convertito
-		
 		
 		try {
 		
@@ -208,6 +207,10 @@ public class PSchema implements ICommnad {
 
 	public int applyCommand(Insert request) throws PSQLException {
 		
+		/**
+		 * Assert
+		 */
+		
 		PInsert prq = new PInsert(this.metaSchema,request);
 
 		try {
@@ -217,7 +220,7 @@ public class PSchema implements ICommnad {
 			
 			String requestPsql = prq.generatePrologRequest();
 			
-			log.debug("psql da eseguire: "+requestPsql);
+			log.debug("psql da eseguire su "+this.metaSchema.getSchemaName()+" : "+requestPsql);
 			
 			SolveInfo info = p.solve(requestPsql);
 			
@@ -241,13 +244,6 @@ public class PSchema implements ICommnad {
 			
 		}
 		
-		
-		
-		
-		/**
-		 * Assert
-		 */
-		
 		return 0;
 	}
 	
@@ -265,22 +261,68 @@ public class PSchema implements ICommnad {
 	public int applyCommand(Delete request) throws PSQLException {
 		
 		/**
+		 * Retract => select delle righe che matchano con la where e loro rimozione
+		 */
+		
+		
+		
+		PDelete deleteReq = new PDelete(this.metaSchema,request);
+		
+		return 0;
+	}
+	
+	public int applyCommand(Drop request) throws PSQLException {
+		
+		/**
 		 * Retract
 		 */
+		
+		PDrop dropReq = new PDrop(this.metaSchema, request);
+		
+		try {
+			
+			Prolog p = new Prolog();
+			p.setTheory(this.current_theory);
+			
+			String requestPsql = dropReq.generatePrologRequest();
+			
+			log.debug("psql da eseguire su "+this.metaSchema.getSchemaName()+" : "+requestPsql);
+			
+			SolveInfo info = p.solve(requestPsql);
+			
+			log.debug(info.toString());
+			int n = 0;
+			while ( info.isSuccess() ) {
+				n++;
+				
+				if (p.hasOpenAlternatives()){ 
+					try {
+						info=p.solveNext();
+					} catch (NoMoreSolutionException e) {
+						break;
+					} 
+				} else { 
+					break;
+				}
+			}
+			
+			this.current_theory = p.getTheory(); //TODO: manca la questione del salvataggio in uscita...
+			System.out.println(this.current_theory.toString());
+			
+			return n;
+ 			
+		} catch (InvalidTheoryException e) {
+			
+		} catch (MalformedGoalException e) {
+			
+		}
+		
 		
 		return 0;
 	}
 
 	public void applyCommand(DropDB request) throws PSQLException {
 		throw new PSQLException("non implemented yet", PSQLState.NOT_IMPLEMENTED);
-	}
-	
-	public void applyCommand(Drop request) throws PSQLException {
-		
-		
-		//ArrayList<Table> tables = request.getTablesList();
-
-		
 	}
 	
 	public void close() {

@@ -19,7 +19,8 @@ public class PSQLState {
     
     public final static PSQLState SYNTAX_ERROR = new PSQLState("42601");
     public final static PSQLState INVALID_NAME = new PSQLState("42602");
-    public final static PSQLState INVALID_POSITION = new PSQLState("42603");
+    public static final PSQLState INVALID_SCHEMA = new PSQLState("42603");
+    public final static PSQLState INVALID_POSITION = new PSQLState("42604");
     
     // UNDEFINITED in DML Class ... sintassi corretta ma semantica sbagliata! 
     public final static PSQLState UNDEFINED_SCHEMA = new PSQLState("42701");
@@ -32,7 +33,7 @@ public class PSQLState {
     public final static PSQLState SYSTEM_ERROR = new PSQLState("60000");
     
     public final static PSQLState NOT_IMPLEMENTED = new PSQLState("0A000");
-    
+
     
     
     

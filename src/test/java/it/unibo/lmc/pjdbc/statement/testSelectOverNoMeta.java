@@ -36,7 +36,7 @@ public class testSelectOverNoMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
 		stmt = conn.createStatement();
 
 		super.setUp();
@@ -73,9 +73,9 @@ public class testSelectOverNoMeta extends TestCase {
 		ts.addTest(new testSelectOverNoMeta("testExecuteQuery"));
 		ts.addTest(new testSelectOverNoMeta("testMultiVarSelect"));
 		ts.addTest(new testSelectOverNoMeta("testVarOverSizeTableSelect"));
-//		ts.addTest(new testSelectOverNoMeta("testAliasSelect"));
-//		ts.addTest(new testSelectOverNoMeta("testAliasSelectMisc"));
-//		ts.addTest(new testSelectOverNoMeta("testSelectWhere"));
+		ts.addTest(new testSelectOverNoMeta("testAliasSelect"));
+		ts.addTest(new testSelectOverNoMeta("testAliasSelectMisc"));
+		ts.addTest(new testSelectOverNoMeta("testSelectWhere"));
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhere2"));
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhereAND"));
 //		ts.addTest(new testSelectOverNoMeta("testSelectWhereOR"));

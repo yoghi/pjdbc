@@ -2,6 +2,7 @@ package it.unibo.lmc.pjdbc.core;
 
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +29,7 @@ public class testPrologDatabase extends TestCase {
 		super(testName);
 		
 		String userDir = System.getProperty("user.dir");
-		this.currentDir = userDir + "/target/classes/";
+		this.currentDir = userDir + "/target/classes/database/";
 	}
 
 	/**
@@ -64,6 +65,7 @@ public class testPrologDatabase extends TestCase {
 	    PropertyConfigurator.configure(properties);
 		
 		TestSuite ts = new TestSuite();
+		ts.addTest(new testPrologDatabase("testCatalog"));
 		ts.addTest(new testPrologDatabase("testSimpleSchema"));
 		ts.addTest(new testPrologDatabase("testFilterSchema"));
 		ts.addTest(new testPrologDatabase("testInvalidSchema"));
@@ -71,9 +73,29 @@ public class testPrologDatabase extends TestCase {
 		return ts;
 	}
 	
+	
+	public void testCatalog() throws InvalidTheoryException {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testCatalog           ");
+ 		System.out.println(" ====================== ");
+		
+ 		try {
+ 			
+			PrologDatabase db = PrologDatabase.getInstance(this.currentDir);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+ 		
+ 		assertTrue(true);
+	}
+	
 	/**
 	 * TEST: provo a selezionare un semplice schema db
 	 * @throws InvalidTheoryException 
+	 * @throws PSQLException 
 	 */
 	public void testSimpleSchema() throws InvalidTheoryException {
 		
@@ -86,6 +108,8 @@ public class testPrologDatabase extends TestCase {
 			PrologDatabase.getInstance(this.currentDir+"prolog.db");
 			
 		} catch (IOException e) {
+			fail(e.getLocalizedMessage());
+		} catch (PSQLException e) {
 			fail(e.getLocalizedMessage());
 		}
  		
@@ -107,6 +131,8 @@ public class testPrologDatabase extends TestCase {
 			PrologDatabase.getInstance(this.currentDir,"db");
 			
 		} catch (IOException e) {
+			fail(e.getLocalizedMessage());
+		} catch (PSQLException e) {
 			fail(e.getLocalizedMessage());
 		}
 		
@@ -131,7 +157,11 @@ public class testPrologDatabase extends TestCase {
 		} catch (IOException e) {
 			assertTrue(true);
 			return;
+		} catch (PSQLException e) {
+			assertTrue(true);
+			return;
 		}
+		
 		
 		fail("il file non era un db valido e il sistema non se ne è accorto!");
  		
@@ -152,6 +182,8 @@ public class testPrologDatabase extends TestCase {
 			PrologDatabase.getInstance(this.currentDir);
 			
 		} catch (IOException e) {
+			fail(e.getLocalizedMessage());
+		} catch (PSQLException e) {
 			fail(e.getLocalizedMessage());
 		}
  		

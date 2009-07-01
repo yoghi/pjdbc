@@ -39,15 +39,15 @@ public class TSchemaRU extends TSchema {
 		this.log.add(request);
 		return this.realSchema.applyCommand(request);
 	}
-
+	
 	@Override
-	public int applyCommand(Update request) throws PSQLException {
+	public int applyCommand(Delete request) throws PSQLException {
 		this.log.add(request);
 		return this.realSchema.applyCommand(request);
 	}
 
 	@Override
-	public int applyCommand(Delete request) throws PSQLException {
+	public int applyCommand(Update request) throws PSQLException {
 		this.log.add(request);
 		return this.realSchema.applyCommand(request);
 	}
@@ -75,9 +75,9 @@ public class TSchemaRU extends TSchema {
 		this.realSchema.applyCommand(request);
 	}
 
-	public void applyCommand(Drop request) throws PSQLException {
+	public int applyCommand(Drop request) throws PSQLException {
 		this.log.add(request);
-		this.realSchema.applyCommand(request);
+		return this.realSchema.applyCommand(request);
 	}
 
 	
