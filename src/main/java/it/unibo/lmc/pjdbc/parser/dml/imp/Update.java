@@ -5,6 +5,7 @@ import java.util.HashMap;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 /**
  * In questo caso ho una richiesta del tipo 
@@ -18,7 +19,9 @@ public class Update extends ParsedCommand {
 
 	private Table table;
 	
-	private HashMap<String, Object> updates = new HashMap<String, Object>();
+	private HashMap<TableField, String> updates = new HashMap<TableField, String>();
+
+	private Expression whereClausole;
 	
 	public Update() {
 		super();
@@ -44,20 +47,29 @@ public class Update extends ParsedCommand {
 	 * @param columnName
 	 * @param expression
 	 */
-	public void update(String columnName,Expression expression){
-		this.updates.put(columnName, expression);
+	public void update(TableField column,String expression){
+		this.updates.put(column, expression);
 	}
 	
 	/**
 	 * Restituisco la lista degli aggiornamenti da fare
 	 * @return
 	 */
-	public HashMap getUpdates(){
+	public HashMap<TableField,String> getUpdates(){
 		return this.updates;
 	}
 	
-	//TODO: da fare la gestione della clausola WHERE
 	public void setWhere(Expression where){
-		
+		this.whereClausole = where;
 	}
+	
+	public Expression getWhereClausole() {
+		return whereClausole;
+	}
+
+	@Override
+	public String toString() {
+		return "update "+this.table.getSchemaName()+"."+this.table.getName()+" ... where "+this.whereClausole.toString();
+	}
+	
 }

@@ -5,6 +5,7 @@ import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.command.ddl.PDrop;
 import it.unibo.lmc.pjdbc.database.command.dml.PDelete;
 import it.unibo.lmc.pjdbc.database.command.dml.PInsert;
+import it.unibo.lmc.pjdbc.database.command.dml.PUpdate;
 import it.unibo.lmc.pjdbc.database.command.dml.Pselect;
 import it.unibo.lmc.pjdbc.database.meta.MCatalog;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
@@ -255,6 +256,48 @@ public class PSchema implements ICommnad {
 		 * Assert => delle righe con la modifica
 		 */
 		
+		PUpdate updateReq = new PUpdate(this.metaSchema, request);
+		
+		try {
+		
+			Prolog p = new Prolog();
+			p.setTheory(this.current_theory);
+			
+			String requestPsql = updateReq.generatePrologRequest();
+			
+			log.debug("psql da eseguire su "+this.metaSchema.getSchemaName()+" : "+requestPsql);
+			
+			SolveInfo info = p.solve(requestPsql);
+			
+			log.debug(info.toString());
+			
+			int n = 0;
+			while ( info.isSuccess() ) {
+				n++;
+				
+				if (p.hasOpenAlternatives()){ 
+					try {
+						info=p.solveNext();
+					} catch (NoMoreSolutionException e) {
+						break;
+					} 
+				} else { 
+					break;
+				}
+			}
+			
+			this.current_theory = p.getTheory(); //TODO: manca la questione del salvataggio in uscita...
+			
+			System.out.println(this.current_theory);
+			
+			return n;
+		
+		} catch (InvalidTheoryException e) {
+			
+		} catch (MalformedGoalException e) {
+			
+		}
+		
 		return 0;
 	}
 	
@@ -265,9 +308,7 @@ public class PSchema implements ICommnad {
 		 */
 		
 		PDelete deleteReq = new PDelete(this.metaSchema,request);
-		
-		
-		
+
 		try {
 			
 			Prolog p = new Prolog();

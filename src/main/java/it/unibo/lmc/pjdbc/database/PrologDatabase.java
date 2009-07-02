@@ -312,13 +312,20 @@ public class PrologDatabase {
 		
 		if ( pRequest instanceof Update ) {	//AGGIORNO UNA RIGA 
 			
-			TSchema tschema = this.availableSchema.get(pRequest.getSchemaName());
+			Update updateReq = ((Update)pRequest);
+			
+			String schema = updateReq.getTable().getSchemaName();
+			
+			if ( null == schema ) {
+				if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
+				else schema = this.currentSchema;
+			}
+			
+			TSchema tschema = this.availableSchema.get(schema);
 			
 			if ( null != tschema  ){
 				
-				Insert insertReq = ((Insert)pRequest);
-				
-				return tschema.applyCommand( insertReq );
+				return tschema.applyCommand( updateReq );
 				
 			} else {
 				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);

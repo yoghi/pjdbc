@@ -70,6 +70,7 @@ public class testUpdateOverMeta extends TestCase {
 		
 		ts.addTest(new testUpdateOverMeta("testDropTable"));
 		ts.addTest(new testUpdateOverMeta("testDeleteRowTable"));
+		ts.addTest(new testUpdateOverMeta("testUpdateRowTable"));
 	
 		return ts;
 	}
@@ -121,5 +122,73 @@ public class testUpdateOverMeta extends TestCase {
 		assertTrue(true);
 		
 	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testDeleteAllRowTable() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testDeleteAllRowTable ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			int n = stmt.executeUpdate("delete from prolog1.dept;");
+			
+			assertEquals(3, n);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testUpdateRowTable() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testUpdateRowTable    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			int n = stmt.executeUpdate("update prolog1.age SET age.age = 5 WHERE age.name = 'smith' ;");
+			
+			assertEquals(1, n);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+//	private static void outputResultSet(ResultSet rs) throws Exception {
+//	    ResultSetMetaData rsMetaData = rs.getMetaData();
+//	    int numberOfColumns = rsMetaData.getColumnCount();
+//	    for (int i = 1; i < numberOfColumns + 1; i++) {
+//	      String columnName = rsMetaData.getColumnName(i);
+//	      System.out.print(columnName + "   ");
+//
+//	    }
+//	    System.out.println();
+//	    System.out.println("----------------------");
+//
+//	    while (rs.next()) {
+//	      for (int i = 1; i < numberOfColumns + 1; i++) {
+//	        System.out.print(rs.getString(i) + "   ");
+//	      }
+//	      System.out.println();
+//	    }
+//
+//	  }
 	
 }

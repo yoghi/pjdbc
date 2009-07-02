@@ -21,6 +21,7 @@ public class PSQLState {
     public final static PSQLState INVALID_NAME = new PSQLState("42602");
     public static final PSQLState INVALID_SCHEMA = new PSQLState("42603");
     public final static PSQLState INVALID_POSITION = new PSQLState("42604");
+    public static final PSQLState INVALID_CLAUSOLE = new PSQLState("42605");;
     
     // UNDEFINITED in DML Class ... sintassi corretta ma semantica sbagliata! 
     public final static PSQLState UNDEFINED_SCHEMA = new PSQLState("42701");
