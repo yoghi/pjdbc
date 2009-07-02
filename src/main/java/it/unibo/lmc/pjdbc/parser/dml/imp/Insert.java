@@ -31,8 +31,8 @@ public class Insert extends ParsedCommand {
 	private List<String> values = new ArrayList<String>();
 	
 
-	public Insert(String schema) {
-		super(schema);
+	public Insert() {
+		super();
 	}
 
 	/**

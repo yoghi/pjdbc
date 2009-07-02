@@ -34,7 +34,7 @@ public class testUpdateOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/"); //prolog_with_meta.db
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database"); //prolog_with_meta.db
 		stmt = conn.createStatement();
 
 		super.setUp();
@@ -69,6 +69,7 @@ public class testUpdateOverMeta extends TestCase {
 		TestSuite ts = new TestSuite();
 		
 		ts.addTest(new testUpdateOverMeta("testDropTable"));
+		ts.addTest(new testUpdateOverMeta("testDeleteRowTable"));
 	
 		return ts;
 	}
@@ -87,6 +88,30 @@ public class testUpdateOverMeta extends TestCase {
 			int n = stmt.executeUpdate("drop table prolog1.employee;");
 			
 			assertEquals(4, n);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testDeleteRowTable() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testDeleteRowTable    ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			int n = stmt.executeUpdate("delete from prolog1.dept where dept.id = 1;");
+			
+			assertEquals(1, n);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -20,8 +20,8 @@ public class Update extends ParsedCommand {
 	
 	private HashMap<String, Object> updates = new HashMap<String, Object>();
 	
-	public Update(String schema) {
-		super(schema);
+	public Update() {
+		super();
 	}
 	
 	/**

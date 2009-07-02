@@ -6,8 +6,8 @@ public class CreateDB extends ParsedCommand {
 
 	private String dbname;
 
-	public CreateDB(String schema) {
-		super(schema);
+	public CreateDB() {
+		super();
 	}
 	
 	public void setDatabase(String databaseName){

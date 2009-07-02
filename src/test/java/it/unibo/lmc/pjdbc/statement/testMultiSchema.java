@@ -35,7 +35,7 @@ public class testMultiSchema extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
 		stmt = conn.createStatement();
 
 		super.setUp();
@@ -53,7 +53,7 @@ public class testMultiSchema extends TestCase {
 		Properties properties = new Properties();
 		
 		String userDir = System.getProperty("user.dir");
-		File propFile = new File(userDir + "/target/classes/prolog.db.properties");
+		File propFile = new File(userDir + "/target/classes/common.properties");
 	    
 	    // carico eventuali opzioni
 	    if ( propFile.exists() ) {
@@ -135,11 +135,12 @@ public class testMultiSchema extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select prolog_with_meta.employee.id from prolog_with_meta.employee;");
+			ResultSet rs = stmt.executeQuery("select prolog1.employee.id from prolog1.employee;");
 
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail(" ExecuteQuery ha ritornato: " + e);
 		}
 		
@@ -158,7 +159,7 @@ public class testMultiSchema extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt.executeQuery("select prolog_with_meta.employee.id, prolog.dept.$0 from prolog_with_meta.employee , prolog.dept;");
+			ResultSet rs = stmt.executeQuery("select prolog1.employee.id, prolog1.dept.$0 from prolog1.employee , prolog1.dept;");
 
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			

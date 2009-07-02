@@ -1,34 +1,66 @@
 package it.unibo.lmc.pjdbc.database.command.dml;
 
-import it.unibo.lmc.pjdbc.database.command.PRequest;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
-import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
-import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
-import it.unibo.lmc.pjdbc.parser.schema.Table;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
-public class PDelete extends PRequest {
+import java.util.List;
 
-	public PDelete(MSchema ms, ParsedCommand req) {
+public class PDelete extends Pselect {
+
+	public PDelete(MSchema ms, Select req) {
 		super(ms, req);
 	}
 
 	@Override
 	public String generatePrologRequest() throws PSQLException {
-
-		//DELETE FROM table_name WHERE (expression) 
 		
-		Table table = ((Delete)this.mcommand).getTable();
+		Delete pDelete = (Delete)this.mcommand;
 		
-		MTable mTable = this.mschema.getMetaTableInfo(table.getName());
+		List<TableField> campi = pDelete.getCampiRicerca();
+		campi.clear();
+		TableField t = new TableField("*");
+		t.setSchema(this.mschema.getSchemaName());
+		campi.add( t );
 		
-		Expression where = ((Delete)this.mcommand).getWhereClausole();
+		//employee(IMP0VAR,IMP1VAR,_),dept(_,IMP2VAR),IMP0VAR=:=IMP2VAR.
+		this.generateAlias();
 		
+		this.anyClausoleConvert();
 		
+		this.generateFromClausole();
 		
-		return null;
+		//where clausole
+		String whereClausole = this.generateWhereClausole();
+		
+		StringBuilder sbuilder = new StringBuilder();
+		for( String key : this.clausole.keySet()){
+			
+			sbuilder.append(this.clausole.get(key).toString());
+			sbuilder.append(",");
+			
+		}
+		if ( !whereClausole.equalsIgnoreCase("") ) {
+			sbuilder.append(whereClausole);
+		}
+		
+		sbuilder.append(",");
+		//ora devo aggiungere le retract! retract(employee(IMP0VAR,IMP1VAR,_)).
+		for( String key : this.clausole.keySet()){
+			
+			sbuilder.append("retract(");
+			sbuilder.append(this.clausole.get(key).toString());
+			sbuilder.append(")");
+			sbuilder.append(",");
+		}
+		sbuilder.reverse();
+		sbuilder.replace(0, 1, ".");
+		sbuilder.reverse();
+		
+		return sbuilder.toString(); 
+		
 	}
 
 }

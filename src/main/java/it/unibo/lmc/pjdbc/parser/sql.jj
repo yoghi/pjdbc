@@ -54,11 +54,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 public class Psql {
-
-	/**
-	 * Default Schema
-	 */
-	private String defaultSchema;
 	
 	/**
 	 * Logger 
@@ -161,10 +156,9 @@ TOKEN :
 }
 
 
-ParsedCommand parseIt(String schema) : 
+ParsedCommand parseIt() : 
 {
 	log = Logger.getLogger(Psql.class);
-	this.defaultSchema = schema;
 	ParsedCommand request;
 }
 {
@@ -195,7 +189,7 @@ ParsedCommand parseIt(String schema) :
 
 Update Update():
 { 
-	Update update = new Update(this.defaultSchema);
+	Update update = new Update();
 	Table t;
 	TableField column;
 	Expression value;
@@ -217,7 +211,7 @@ Update Update():
 
 Insert Insert():
 { 
-	Insert insert = new Insert(this.defaultSchema);
+	Insert insert = new Insert();
 	Table t;
 	TableField column;
 	String exp;
@@ -285,14 +279,15 @@ Token TextItem():
 
 Delete Delete():
 { 
-	Delete delete = new Delete(this.defaultSchema);
-	Table t = null;
+	Delete delete = new Delete();
+	ArrayList<Table> tlist = new ArrayList<Table>();
+	Table t;
 	Expression where = null;
 }
 {
-    <K_DELETE> [<K_FROM>] t=Table() { delete.setTable(t); }
-    [where=WhereClause() { delete.setWhere(where); } ]
-    { return delete; }
+    <K_DELETE> [<K_FROM>] t=Table() { tlist.add(t);  }
+    [where=WhereClause() { delete.where(where); } ]
+    { delete.from(tlist); return delete; }
 }
 
 CreateDB CreateDB():
@@ -303,7 +298,7 @@ CreateDB CreateDB():
 {
 	<K_CREATE> <K_DATABASE> t=RelObjectName() 
 	{ 
-		create=new CreateDB(this.defaultSchema);
+		create=new CreateDB();
 		create.setDatabase(t); 
 	}
 	
@@ -321,7 +316,7 @@ DropDB DropDB():
 	
 	<K_DROP> <K_DATABASE> t=RelObjectName() 
 	{ 
-		drop=new DropDB(this.defaultSchema);
+		drop=new DropDB();
 		drop.setDatabase(t); 
 	}
 	
@@ -332,7 +327,7 @@ DropDB DropDB():
 
 Drop Drop():
 {
-	Drop drop = new Drop(this.defaultSchema);
+	Drop drop = new Drop();
 	Table t = null;
 }
 {
@@ -390,10 +385,10 @@ TableField Column():
     	} else if (name2 != null) {
     		field = new TableField(name2);
     		field.setTableName(name1);
-    		field.setSchema(this.defaultSchema);
+    		//field.setSchema(this.defaultSchema);
     	} else {
     		field = new TableField(name1);
-    		field.setSchema(this.defaultSchema);
+    		//field.setSchema(this.defaultSchema);
     	}
     
     	field.setAlias(alias);	
@@ -438,7 +433,7 @@ Table Table():
 	(LOOKAHEAD(3) 
 		schema=RelObjectName() "." name=RelObjectName()  { table = new Table(schema, name); }
 		|
-		name=RelObjectName() { table = new Table(this.defaultSchema,name); } 
+		name=RelObjectName() { table = new Table(name); } 
 	)	
 	{
 		return table;
@@ -449,7 +444,7 @@ Table Table():
 
 Select Select():
 { 
-	Select select = new Select(this.defaultSchema);
+	Select select = new Select();
 	TableField field;
 	
 	List<Table> fromList;

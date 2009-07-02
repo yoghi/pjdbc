@@ -264,9 +264,49 @@ public class PSchema implements ICommnad {
 		 * Retract => select delle righe che matchano con la where e loro rimozione
 		 */
 		
-		
-		
 		PDelete deleteReq = new PDelete(this.metaSchema,request);
+		
+		
+		
+		try {
+			
+			Prolog p = new Prolog();
+			p.setTheory(this.current_theory);
+			
+			String requestPsql = deleteReq.generatePrologRequest();
+			
+			log.debug("psql da eseguire su "+this.metaSchema.getSchemaName()+" : "+requestPsql);
+			
+			SolveInfo info = p.solve(requestPsql);
+			
+			log.debug(info.toString());
+			
+			int n = 0;
+			while ( info.isSuccess() ) {
+				n++;
+				
+				if (p.hasOpenAlternatives()){ 
+					try {
+						info=p.solveNext();
+					} catch (NoMoreSolutionException e) {
+						break;
+					} 
+				} else { 
+					break;
+				}
+			}
+			
+			this.current_theory = p.getTheory(); //TODO: manca la questione del salvataggio in uscita...
+			
+			return n;
+ 			
+		} catch (InvalidTheoryException e) {
+			
+		} catch (MalformedGoalException e) {
+			
+		}
+		
+		
 		
 		return 0;
 	}
@@ -307,7 +347,6 @@ public class PSchema implements ICommnad {
 			}
 			
 			this.current_theory = p.getTheory(); //TODO: manca la questione del salvataggio in uscita...
-			System.out.println(this.current_theory.toString());
 			
 			return n;
  			

@@ -126,6 +126,7 @@ public class testSelectOverMeta extends TestCase {
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail(" ExecuteQuery ha ritornato: " + e);
 		}
 		

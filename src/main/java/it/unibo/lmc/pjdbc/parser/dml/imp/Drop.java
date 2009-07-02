@@ -18,8 +18,8 @@ public class Drop extends ParsedCommand {
 
 	private Map<String,Table[]> tables = new HashMap<String,Table[]>();
 	
-	public Drop(String schema) {
-		super(schema);
+	public Drop() {
+		super();
 	}
 	
 	public void addTable(Table t){

@@ -23,7 +23,7 @@ public class Pselect extends PRequest {
 	/**
 	 * Tabella di default
 	 */
-	private String primaryTable;
+	protected String primaryTable;
 	
 	/**
 	 * Table: (k)Alias Table Name Sql to Extended Table Name Sql 
@@ -95,12 +95,11 @@ public class Pselect extends PRequest {
 		
 	}
 
-
 	/**
 	 * Analizzo i metadati della richiesta e genero la tabella degli Alias (Table and Var) se presenti
 	 * @throws SQLException 
 	 */
-	private void generateAlias() throws PSQLException {
+	protected void generateAlias() throws PSQLException {
 		
 		/**  
 		 * 0. sql alias table
@@ -163,7 +162,7 @@ public class Pselect extends PRequest {
 	/**
 	 * Trasformo i termini * nei termini corrispondenti della tabella
 	 */
-	private void anyClausoleConvert() {
+	protected void anyClausoleConvert() {
 		
 		List<TableField> fr = ((Select)this.mcommand).getCampiRicerca();
 		
@@ -202,7 +201,7 @@ public class Pselect extends PRequest {
 	 * Genero le clausole riguardanti il campo FROM
 	 * @throws SQLException
 	 */
-	private void generateFromClausole() throws PSQLException {
+	protected void generateFromClausole() throws PSQLException {
 		
 		List<TableField> cr = ((Select)this.mcommand).getCampiRicerca();
 		
@@ -234,7 +233,7 @@ public class Pselect extends PRequest {
 	/**
 	 * Genero le clausole riguardanti il campo WHERE
 	 */
-	private String generateWhereClausole() {
+	protected String generateWhereClausole() {
 		
 		Expression exp = ((Select)this.mcommand).getWhereClausole();
 		

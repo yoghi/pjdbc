@@ -5,12 +5,14 @@ public abstract class ParsedCommand {
 	
 	protected String defaultSchema;
 	
-	public ParsedCommand(String schema){
-		this.defaultSchema = schema;
-	}
+	public ParsedCommand(){}
 	
 	public String getSchemaName(){
 		return this.defaultSchema;
+	}
+	
+	public void setDefaultSchemaName(String schema){
+		this.defaultSchema = schema;
 	}
 	
 	/**

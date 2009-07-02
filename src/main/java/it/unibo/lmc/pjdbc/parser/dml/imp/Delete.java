@@ -1,38 +1,18 @@
 package it.unibo.lmc.pjdbc.parser.dml.imp;
 
-import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 
-public class Delete extends ParsedCommand  {
 
-	private Table table;
-	private Expression whereClausole;
+public class Delete extends Select  {
 
-	public Delete(String schema) {
-		super(schema);
+	public Delete() {
+		super();
 	}
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void setWhere(Expression where) {
-		this.whereClausole = where;
-	}
-
-	public void setTable(Table t) {
-		this.table = t;
-	}
-
-	public Table getTable() {
-		return this.table;
-	}
-	
-	public Expression getWhereClausole(){
-		return this.whereClausole;
+		Table table = this.getFromTable().get(0);
+		return "delete from "+table.getSchemaName()+"."+table.getName()+" where "+this.getWhereClausole().toString();
 	}
 
 }

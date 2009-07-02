@@ -6,8 +6,8 @@ public class DropDB extends ParsedCommand {
 
 	private String dbname;
 	
-	public DropDB(String schema) {
-		super(schema);
+	public DropDB() {
+		super();
 	}
 	
 	public void setDatabase(String databaseName){

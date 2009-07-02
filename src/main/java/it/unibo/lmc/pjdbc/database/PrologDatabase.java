@@ -10,6 +10,7 @@ import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
@@ -146,10 +147,7 @@ public class PrologDatabase {
 							//TODO instanziare TSChema corretto in base alle politiche attuali...
 							TSchemaRU tschema = new TSchemaRU(p);
 				            
-							
 							MSchema mSchema = this.catalogSchema.getMetaSchema(filename);
-							
-							
 							String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
 							
 							this.log.info("Avaible schema : "+nameSchema);
@@ -176,9 +174,11 @@ public class PrologDatabase {
 				//TODO instanziare TSChema corretto in base alle politiche attuali...
 				TSchemaRU tschema = new TSchemaRU(p);
 				
-				String nameSchema = f.getName().split("\\.")[0];
-				this.log.info("Open schema : "+nameSchema);
-				this.availableSchema.put(nameSchema,tschema);
+				//String nameSchema = f.getName().split("\\.")[0];
+				MSchema mSchema = this.catalogSchema.getMetaSchema(f.getName());
+				
+				this.log.info("Open schema : "+mSchema.getSchemaName());
+				this.availableSchema.put(mSchema.getSchemaName(),tschema);
 				
 			} else {
 				log.error("invalid url - not use extension : "+extension);
@@ -230,7 +230,7 @@ public class PrologDatabase {
 		ParsedCommand pRequest = null;
 		
 		try {
-			pRequest = parse.parseIt(this.currentSchema);
+			pRequest = parse.parseIt();
 		} catch (ParseException e) {
 			log.error(e.getLocalizedMessage());
 			throw new PSQLException(e.getMessage(),PSQLState.SYNTAX_ERROR);
@@ -252,14 +252,20 @@ public class PrologDatabase {
 
 		if ( pRequest instanceof Select ) {
 			
-			TSchema tschema = this.availableSchema.get(pRequest.getSchemaName());
+			String schema;	//lo schema può essere anche diverso da quello corrente!
+			if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
+			else schema = this.currentSchema;
+			
+			log.debug("uso lo schema : "+schema);
+			
+			TSchema tschema = this.availableSchema.get(this.currentSchema);
 			
 			if ( null != tschema  ){
 				
 				Select selectReq = ((Select)pRequest);
 
 				for(Table t : selectReq.getFromTable()){
-					if ( ! t.getSchemaName().equalsIgnoreCase(pRequest.getSchemaName()) ) {
+					if ( t.getSchemaName() != null && !t.getSchemaName().equalsIgnoreCase(schema) ) {
 						/**
 						 * MULTI-SCHEMA
 						 * dovrei prendere più lock e poi fare la join delle due theory prima di tutto!
@@ -320,6 +326,22 @@ public class PrologDatabase {
 
 		} 
 		
+		if ( pRequest instanceof Delete ) { //DELETE ROW FROM TABLE
+			
+			Delete deleteReq = ((Delete)pRequest);
+			
+			String schema = deleteReq.getFromTable().get(0).getSchemaName();
+			
+			TSchema tschema = this.availableSchema.get(schema);
+			
+			if ( null != tschema  ){
+				return tschema.applyCommand( deleteReq );
+			} else {
+				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+		
 		if ( pRequest instanceof Drop ) {	// RIMUOVO UNA TABELLA
 			
 			Drop pDropRequest = (Drop)pRequest;
@@ -345,7 +367,7 @@ public class PrologDatabase {
 			
 		}
 		
-		throw new PSQLException("Invalid Drop : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
+		throw new PSQLException("Invalid Update : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
 		
 	}
 

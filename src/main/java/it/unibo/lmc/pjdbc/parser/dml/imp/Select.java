@@ -19,16 +19,16 @@ import java.util.List;
  */
 public class Select extends ParsedCommand {
 	
-	private List<Table> fromTable = null;
+	protected List<Table> fromTable = null;
 	
-	private List<TableField> campiRicerca = new ArrayList<TableField>();
+	protected List<TableField> campiRicerca = new ArrayList<TableField>();
 	
-	private Expression whereClausole = null;
+	protected Expression whereClausole = null;
 
-	private Limit limit = null; 
+	protected Limit limit = null; 
 
-	public Select(String schema) {
-		super(schema);
+	public Select() {
+		super();
 	}
 
 	public void addField(TableField field) {
