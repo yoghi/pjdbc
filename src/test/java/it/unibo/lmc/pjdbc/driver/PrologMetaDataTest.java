@@ -17,8 +17,8 @@ public class PrologMetaDataTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-	     this.c  = DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
-	     this.dbMeta = c.getMetaData();
+	    this.c  = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
+	    this.dbMeta = c.getMetaData();
 	}
 
 	public final void testPrologMetaData() {

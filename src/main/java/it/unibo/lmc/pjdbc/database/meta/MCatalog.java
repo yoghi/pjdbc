@@ -15,6 +15,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.sun.media.jai.opimage.MagnitudeSquaredCRIF;
+
 import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.MalformedGoalException;
 import alice.tuprolog.NoMoreSolutionException;
@@ -259,13 +261,22 @@ public class MCatalog {
 	 * @return
 	 * @throws PSQLException 
 	 */
-	public MSchema getMetaSchema(String schemaFile) throws PSQLException {
+	public MSchema getMetaSchemaFromFilename(String schemaFile) throws PSQLException {
 		
 		String name = this.schemaFiles.get(schemaFile);
 		
 		if ( null == name ) throw new PSQLException("Schema filename : "+schemaFile+" sconosciuto!", PSQLState.INVALID_NAME);
 		
 		return this.schemaList.get(name); 
+	}
+	
+	/**
+	 * Restituisco lo MSchema corrispondente 
+	 * @param schemaName nome dello schema
+	 * @return
+	 */
+	public MSchema getMetaSchemaFromName(String schemaName){
+		return this.schemaList.get(schemaName);		
 	}
 
 	/**
@@ -280,7 +291,7 @@ public class MCatalog {
 		MSchema mSchema = null;
 		boolean create = false;
 		if ( this.schemaFiles.containsKey(schemaShortFileName) ) {
-			mSchema = this.getMetaSchema(schemaShortFileName);
+			mSchema = this.getMetaSchemaFromFilename(schemaShortFileName);
 			if ( null == mSchema ) create = true;
 		} else {
 			create = true;
@@ -340,6 +351,11 @@ public class MCatalog {
 	        }
 		}
 		
+	}
+
+	public String getName() {
+		File f = new File(this.metabaseFile);
+		return f.getParentFile().getAbsolutePath();
 	}
 	
 }

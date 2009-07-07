@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -137,28 +136,24 @@ public class PrologDatabase {
 	            String filename = children[i];
 				
 				if ( new File(dirpath + File.separator + filename).isFile() ) {
-		            
-//					if ( !filename.equalsIgnoreCase("metabase.db") ){	//"metabase.db" è un database particolare
-//					
-						if ( filename.endsWith(extension) ) {
+
+					if ( filename.endsWith(extension) ) {
+					
+						PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
 						
-							PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
-							
-							//TODO instanziare TSChema corretto in base alle politiche attuali...
-							TSchemaRU tschema = new TSchemaRU(p);
-				            
-							MSchema mSchema = this.catalogSchema.getMetaSchema(filename);
-							String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
-							
-							this.log.info("Avaible schema : "+nameSchema);
-							this.availableSchema.put(nameSchema,tschema);
-							
-						} else {
-							log.debug("into dir find file with invalid url - not use extension : "+extension+ " - "+filename);
-						}
-					
-//					}
-					
+						//TODO instanziare TSChema corretto in base alle politiche attuali...
+						TSchemaRU tschema = new TSchemaRU(p);
+			            
+						MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(filename);
+						String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
+						
+						this.log.info("Avaible schema : "+nameSchema);
+						this.availableSchema.put(nameSchema,tschema);
+						
+					} else {
+						log.debug("into dir find file with invalid url - not use extension : "+extension+ " - "+filename);
+					}
+
 				}
 	        } //for
 			
@@ -171,11 +166,11 @@ public class PrologDatabase {
 				this.catalogSchema = new MCatalog( dirpath + File.separator + "metabase.db" );
 				
 				PSchema p = new PSchema(url,this.catalogSchema);
+				
 				//TODO instanziare TSChema corretto in base alle politiche attuali...
 				TSchemaRU tschema = new TSchemaRU(p);
 				
-				//String nameSchema = f.getName().split("\\.")[0];
-				MSchema mSchema = this.catalogSchema.getMetaSchema(f.getName());
+				MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(f.getName());
 				
 				this.log.info("Open schema : "+mSchema.getSchemaName());
 				this.availableSchema.put(mSchema.getSchemaName(),tschema);
@@ -333,11 +328,39 @@ public class PrologDatabase {
 
 		} 
 		
+		if ( pRequest instanceof Insert ) { //INSERT new row
+			
+			Insert insertReq = (Insert)pRequest;
+			
+			String schema = insertReq.getTable().getSchemaName();
+			
+			if ( null == schema ) {
+				if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
+				else schema = this.currentSchema;
+			}
+			
+			TSchema tschema = this.availableSchema.get(schema);
+			
+			if ( null != tschema  ){
+				
+				return tschema.applyCommand( insertReq );
+				
+			} else {
+				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+		
 		if ( pRequest instanceof Delete ) { //DELETE ROW FROM TABLE
 			
 			Delete deleteReq = ((Delete)pRequest);
 			
 			String schema = deleteReq.getFromTable().get(0).getSchemaName();
+			
+			if ( null == schema ) {
+				if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
+				else schema = this.currentSchema;
+			}
 			
 			TSchema tschema = this.availableSchema.get(schema);
 			
@@ -384,6 +407,14 @@ public class PrologDatabase {
 	 */
 	public MCatalog getCatalogInfo() {
 		return this.catalogSchema;
+	}
+
+	/**
+	 * Ottengo lo schema corrente
+	 * @return
+	 */
+	public String getCurrentSchema() {
+		return currentSchema;
 	}
 	
 }

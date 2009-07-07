@@ -138,5 +138,14 @@ public class PResultSet {
 	public int getFetchSize() {
 		return this.rowData.size();
 	}
+
+
+	/**
+	 * Elenco dei campi coinvolti
+	 * @return
+	 */
+	public List<TableField> getFields() {
+		return this.tableFields;
+	}
 	
 }

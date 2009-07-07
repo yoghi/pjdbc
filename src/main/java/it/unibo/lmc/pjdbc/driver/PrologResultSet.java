@@ -1,5 +1,6 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import it.unibo.lmc.pjdbc.database.PrologDatabase;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.udt.PArray;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
@@ -32,9 +33,11 @@ public class PrologResultSet implements ResultSet {
 	private int insertPosition = 0;
 	
 	private PResultSet pResult = null;
+	private PrologDatabase db;
 
-	public PrologResultSet(PResultSet result) {
+	public PrologResultSet(PrologDatabase currentDatabase, PResultSet result) {
 		this.pResult = result;
+		this.db = currentDatabase;
 	}
 
 
@@ -263,8 +266,7 @@ public class PrologResultSet implements ResultSet {
 	 * Restituisco i metadati sui campi del resultset
 	 */
 	public ResultSetMetaData getMetaData() throws SQLException {
-		throw new SQLException("not implemented yet");
-		//return new PrologResultSetMetaData( new ArrayList<MColumn>(this.mfields.values()) );
+		return new PrologResultSetMetaData( this.db , this.pResult );
 	}
 
 	public int getRow() throws SQLException {

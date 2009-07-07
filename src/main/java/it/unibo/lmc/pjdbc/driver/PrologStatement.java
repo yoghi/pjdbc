@@ -83,9 +83,9 @@ public class PrologStatement implements Statement {
 	public ResultSet executeQuery(String sql) throws SQLException {
 
 		//NOTA BENE: qui posso lavorare sull'sql con i "?" da mettere a posto nel caso di query precalcolate o come si dice .. 
-		
 		PResultSet res = this.currentDatabase.executeSelect(sql);
-		return new PrologResultSet(res);
+		return new PrologResultSet(this.currentDatabase,res);
+		
 	}
 	
 	public int executeUpdate(String sql) throws SQLException {

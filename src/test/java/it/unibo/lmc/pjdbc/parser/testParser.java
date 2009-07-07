@@ -91,7 +91,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("schema");
+			pRequest = parse.parseIt();
 			
 			if ( pRequest instanceof Select ) {
 				
@@ -164,7 +164,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("schema");
+			pRequest = parse.parseIt();
 			
 			System.out.println(pRequest);
 			
@@ -192,7 +192,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("schema");
+			pRequest = parse.parseIt();
 			
 			fail();	//TODO: da finire
 			
@@ -223,7 +223,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("schema");
+			pRequest = parse.parseIt();
 			
 			fail();	//TODO: da finire
 			
@@ -254,7 +254,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("schema");
+			pRequest = parse.parseIt();
 			
 			System.out.println(pRequest);
 			
@@ -283,7 +283,7 @@ public class testParser extends TestCase {
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
-			pRequest = parse.parseIt("schema");
+			pRequest = parse.parseIt();
 			
 			System.out.println(pRequest);
 			

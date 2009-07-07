@@ -37,10 +37,11 @@ public class DriverTests {
 		
 		TestSuite suite = new TestSuite("Test for it.unibo.lmc.pjdbc.driver");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(PrologConnectionTest.class);
-		suite.addTestSuite(PrologMetaDataTest.class);
+//		suite.addTestSuite(PrologConnectionTest.class);
+//		suite.addTestSuite(PrologMetaDataTest.class);
 		suite.addTestSuite(PrologResultSetTest.class);
-		suite.addTestSuite(PrologStatementTest.class);
+		suite.addTestSuite(PrologResultSetMetaDataTest.class);
+//		suite.addTestSuite(PrologStatementTest.class);
 		//$JUnit-END$
 		return suite;
 	}

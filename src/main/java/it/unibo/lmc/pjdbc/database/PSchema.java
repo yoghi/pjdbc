@@ -102,7 +102,7 @@ public class PSchema implements ICommnad {
 			catalogSchema.validate(filePrologDB.getName(),this.current_theory);
 			
 			if ( catalogSchema.existMetaSchema(filePrologDB.getName()) ){
-				this.metaSchema = catalogSchema.getMetaSchema(filePrologDB.getName());
+				this.metaSchema = catalogSchema.getMetaSchemaFromFilename(filePrologDB.getName());
 			} else {
 				//qui non ci posso essere se validate ha funzionato....
 				log.error("sono dove non dovrei essere...");

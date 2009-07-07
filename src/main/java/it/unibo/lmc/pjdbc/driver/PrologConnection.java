@@ -122,7 +122,7 @@ public class PrologConnection implements Connection {
 	
 	public Array createArrayOf(String typeName, Object[] elements)
 			throws SQLException {
-		
+			//TODO da usare PArray
 		return null;
 	}
 

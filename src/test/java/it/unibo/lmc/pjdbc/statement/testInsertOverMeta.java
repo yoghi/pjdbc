@@ -34,7 +34,7 @@ public class testInsertOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
 		stmt = conn.createStatement();
 
 		super.setUp();
@@ -137,7 +137,7 @@ public class testInsertOverMeta extends TestCase {
 		
 		try {
 			
-			int rs = stmt.executeUpdate(" insert into emplyee values (100,'babo',1000);");
+			stmt.executeUpdate(" insert into emplyee values (100,'babo',1000);");
 			
 		} catch (Exception e) {
 			assertTrue(true);
