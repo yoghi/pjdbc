@@ -40,6 +40,7 @@ public class Table {
 	}
 	
 	public String toString(){
-		return "["+this.schemaName+"."+this.name+"]";
+		if ( this.schemaName != null ) return "["+this.schemaName+"."+this.name+"]";
+		else return "["+this.name+"]";
 	}
 }

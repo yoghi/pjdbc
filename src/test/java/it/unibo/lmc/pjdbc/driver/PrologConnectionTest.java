@@ -1,9 +1,17 @@
 package it.unibo.lmc.pjdbc.driver;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import junit.framework.TestCase;
 
 public class PrologConnectionTest extends TestCase {
 
+	static private Connection connection;
+	
 	public PrologConnectionTest(String name) {
 		super(name);
 	}
@@ -13,151 +21,160 @@ public class PrologConnectionTest extends TestCase {
 	}
 
 	public final void testPrologConnection() {
-		fail("Not yet implemented"); // TODO
+		try {
+			connection  = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public final void testClearWarnings() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testClose() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCommit() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCreateArrayOf() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCreateBlob() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCreateClob() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCreateStatement() {
-		fail("Not yet implemented"); // TODO
+		try {
+			Statement stmt = connection.createStatement();
+			assertNotNull(stmt);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	public final void testCreateStatementIntInt() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCreateStatementIntIntInt() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testCreateStruct() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testGetAutoCommit() {
-		fail("Not yet implemented"); // TODO
+		try {
+			boolean commit = connection.getAutoCommit();
+			assertEquals(commit, true);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage()); 
+		}
 	}
 
 	public final void testGetCatalog() {
-		fail("Not yet implemented"); // TODO
+		try {
+			String name = connection.getCatalog();	//TODO da sistemare
+			assertEquals("", name);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	public final void testGetClientInfo() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testGetClientInfoString() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testGetHoldability() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testGetMetaData() {
-		fail("Not yet implemented"); // TODO
+		try {
+			DatabaseMetaData meta = connection.getMetaData();
+			assertNotNull(meta);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	public final void testGetTransactionIsolation() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testGetTypeMap() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testGetWarnings() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testIsClosed() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testIsReadOnly() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testIsValid() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testNativeSQL() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareCallString() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareCallStringIntInt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareCallStringIntIntInt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareStatementString() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareStatementStringInt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareStatementStringIntArray() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareStatementStringStringArray() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareStatementStringIntInt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPrepareStatementStringIntIntInt() {
-		fail("Not yet implemented"); // TODO
+		
+		try {
+			
+			String nSql = connection.nativeSQL("select * from employee;");
+			assertEquals("select [*] from [employee]", nSql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
+		
 	}
 
 	public final void testReleaseSavepoint() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testRollback() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testRollbackSavepoint() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetAutoCommit() {
-		fail("Not yet implemented"); // TODO
+		try {
+			connection.setAutoCommit(false);
+			boolean commit = connection.getAutoCommit();
+			assertEquals(false, commit);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+		}
 	}
 
 	public final void testSetCatalog() {
@@ -176,7 +193,7 @@ public class PrologConnectionTest extends TestCase {
 	     * @see #getCatalog
 	     */
 		
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetHoldability() {
@@ -184,31 +201,67 @@ public class PrologConnectionTest extends TestCase {
 	}
 
 	public final void testSetReadOnly() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetSavepoint() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetSavepointString() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetTransactionIsolation() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
 	public final void testSetTypeMap() {
-		fail("Not yet implemented"); // TODO
+		fail("Not yet implemented"); 
 	}
 
-	public final void testIsWrapperFor() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testUnwrap() {
-		fail("Not yet implemented"); // TODO
-	}
+//	public final void testIsWrapperFor() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testUnwrap() {
+//		fail("Not yet implemented"); 
+//	}
+//	
+//	public final void testPrepareCallString() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareCallStringIntInt() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareCallStringIntIntInt() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareStatementString() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareStatementStringInt() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareStatementStringIntArray() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareStatementStringStringArray() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareStatementStringIntInt() {
+//		fail("Not yet implemented"); 
+//	}
+//
+//	public final void testPrepareStatementStringIntIntInt() {
+//		fail("Not yet implemented"); 
+//	}
 
 }

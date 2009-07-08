@@ -35,9 +35,14 @@ public class PrologResultSet implements ResultSet {
 	private PResultSet pResult = null;
 	private PrologDatabase db;
 
-	public PrologResultSet(PrologDatabase currentDatabase, PResultSet result) {
+	private String requestSql;
+	private Statement statement;
+
+	public PrologResultSet(String sql, PResultSet result, PrologDatabase currentDatabase, Statement stmt) {
 		this.pResult = result;
 		this.db = currentDatabase;
+		this.requestSql = sql;
+		this.statement = stmt;
 	}
 
 
@@ -46,7 +51,7 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public void close() throws PSQLException {
-
+		
 	}
 
 	public int findColumn(String columnLabel) throws PSQLException {
@@ -60,11 +65,14 @@ public class PrologResultSet implements ResultSet {
 		return this.pResult.first();
 	}
 
-	public void moveToCurrentRow() throws PSQLException {
-
-	}
+	
+	public void moveToCurrentRow() throws PSQLException {}
 
 	public void moveToInsertRow() throws PSQLException {
+		
+//		this.pResult.getFields(); .. divido per tabella
+//		creo Term[] appropriati e poi uso set campi appropriati where camp
+//		this.db.executeUpdate("INSERT into ... VALUE ...  ");
 		
 	}
 
@@ -77,7 +85,8 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public void refreshRow() throws PSQLException {
-
+		PResultSet rs = this.db.executeSelect(this.requestSql);
+		this.pResult = rs;
 	}
 
 	public byte getByte(int columnIndex) throws PSQLException {
@@ -247,13 +256,19 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public long getLong(int columnIndex) throws SQLException {
-
-		return 0;
+		try {
+			return Long.parseLong(this.pResult.getValue(columnIndex).toString());
+		} catch (NumberFormatException e) {
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+		}
 	}
 
 	public long getLong(String columnLabel) throws SQLException {
-
-		return 0;
+		try {
+			return Long.parseLong(this.pResult.getValue(columnLabel).toString());
+		} catch (NumberFormatException e) {
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+		}
 	}
 
 	/**
@@ -269,18 +284,23 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public short getShort(int columnIndex) throws SQLException {
-
-		return 0;
+		try {
+			return Short.parseShort(this.pResult.getValue(columnIndex).toString());
+		} catch (NumberFormatException e) {
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+		}
 	}
 
 	public short getShort(String columnLabel) throws SQLException {
-
-		return 0;
+		try {
+			return Short.parseShort(this.pResult.getValue(columnLabel).toString());
+		} catch (NumberFormatException e) {
+			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
+		}
 	}
 
 	public Statement getStatement() throws SQLException {
-
-		return null;
+		return this.statement;
 	}
 
 	public String getString(int columnIndex) throws SQLException {

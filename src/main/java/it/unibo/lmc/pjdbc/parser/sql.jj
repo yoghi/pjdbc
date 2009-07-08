@@ -167,7 +167,7 @@ ParsedCommand parseIt() :
 	    |
 	    request = Update()			// UPDATE table_name SET (campo=valore,..) [ WHERE (expression) ] <LIMIT>;
 	    |
-	    request = Insert()			// INSERT INTO table_name (campi) VALUES (valori dei campi)
+	    request = Insert()			// INSERT INTO table_name [(campi)] VALUES (valori dei campi)
 	    |
 	    request = Delete()			// DELETE FROM table_name [ WHERE (expression) ] 
 	    |

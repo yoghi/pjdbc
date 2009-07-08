@@ -57,7 +57,7 @@ public abstract class PrologMetaData implements DatabaseMetaData {
 		PSchema schema = null;
 		
 		PResultSet result = new PResultSet(fields, rows, schema);
-		PrologResultSet a = new PrologResultSet(null,result);
+		PrologResultSet a = new PrologResultSet("sql",result,null,null);
 		
 		//schemaPattern.... serve nel caso di più schemi
 		

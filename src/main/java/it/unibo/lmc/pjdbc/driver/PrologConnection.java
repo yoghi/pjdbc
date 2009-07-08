@@ -2,9 +2,15 @@ package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
 import it.unibo.lmc.pjdbc.database.service.PrologDaemon;
+import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.parser.ParseException;
+import it.unibo.lmc.pjdbc.parser.Psql;
+import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -80,7 +86,7 @@ public class PrologConnection implements Connection {
 			this.sourceUrl = url[0];
 			
 			if ( url.length == 2 ) {
-				this.databaseName = url[1];
+				this.databaseName = url[1];		//TODO : DATABASE NAME:::::::???
 			}
 			
 			if ( this.sourceUrl.contains("@") ) {
@@ -234,10 +240,31 @@ public class PrologConnection implements Connection {
 		return false;
 	}
 
-	
+	/**
+     * Converts the given SQL statement into the system's native SQL grammar.
+     * A driver may convert the JDBC SQL grammar into its system's
+     * native SQL grammar prior to sending it. This method returns the
+     * native form of the statement that the driver would have sent.
+     *
+     * @param sql an SQL statement that may contain one or more '?'
+     * parameter placeholders
+     * @return the native form of this statement
+     * @exception SQLException if a database access error occurs
+     */	
 	public String nativeSQL(String sql) throws SQLException {
 		
-		return null;
+		StringReader currentQuery = new StringReader(sql);
+		Psql parse = new Psql(currentQuery);
+		
+		ParsedCommand pRequest = null;
+		
+		try {
+			pRequest = parse.parseIt();
+		} catch (ParseException e) {
+			throw new PSQLException(e.getMessage(),PSQLState.SYNTAX_ERROR);
+		}
+		return pRequest.toString();
+		
 	}
 
 	
@@ -323,8 +350,7 @@ public class PrologConnection implements Connection {
 
 	
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		
-
+		this.autoCommit = autoCommit;
 	}
 
 	

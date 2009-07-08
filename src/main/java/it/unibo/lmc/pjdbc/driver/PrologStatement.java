@@ -84,7 +84,7 @@ public class PrologStatement implements Statement {
 
 		//NOTA BENE: qui posso lavorare sull'sql con i "?" da mettere a posto nel caso di query precalcolate o come si dice .. 
 		PResultSet res = this.currentDatabase.executeSelect(sql);
-		return new PrologResultSet(this.currentDatabase,res);
+		return new PrologResultSet(sql,res,this.currentDatabase, null);
 		
 	}
 	
