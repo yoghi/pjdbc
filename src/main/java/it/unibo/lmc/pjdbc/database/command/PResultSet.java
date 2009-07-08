@@ -147,5 +147,23 @@ public class PResultSet {
 	public List<TableField> getFields() {
 		return this.tableFields;
 	}
+
+
+	public int findColumn(String columnLabel) throws PSQLException {
+		
+		Integer pos = this.cacheNameVar.get(columnLabel);
+		
+		if ( null == pos ) throw new PSQLException("invalid column label ", PSQLState.UNDEFINED_COLUMN);
+		return pos;
+	}
+
+
+	public boolean previous() {
+		if ( this.currentPosition > 0 ) {
+			this.currentPosition--;
+			return true;
+		}
+		return false;
+	}
 	
 }

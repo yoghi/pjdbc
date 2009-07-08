@@ -17,6 +17,8 @@ import java.util.HashMap;
 
 public class PUpdate extends PRequest {
 
+	private Table updateTable;
+
 	public PUpdate(MSchema ms, ParsedCommand req) {
 		super(ms, req);
 	}
@@ -30,11 +32,10 @@ public class PUpdate extends PRequest {
 		
 		// table_name(X1,X2,X3),X1=1,retract(table_name(X1,X2,X3)),assert(table_name(N1,N2,N3)).
 		
-		
 		Update pUpdage = (Update)this.mcommand;
 		
-		Table t = pUpdage.getTable();
-		MTable mTable = this.mschema.getMetaTableInfo(t.getName());
+		updateTable = pUpdage.getTable();
+		MTable mTable = this.mschema.getMetaTableInfo(updateTable.getName());
 		PClausola clausola = new PClausola(mTable);
 		MColumn[] columns = mTable.getColumns();
 		
@@ -60,6 +61,9 @@ public class PUpdate extends PRequest {
 		
 		HashMap<TableField, String> accoppiamneti = pUpdage.getUpdates();
 		for (TableField field : accoppiamneti.keySet()) {
+			
+			if ( field.getTableName() == null ) field.setTableName(updateTable.getName());
+			
 			if ( field.getTableName().equalsIgnoreCase(mTable.getTableName()) ){
 				
 				int pos = mTable.containsField(field.getColumnName());
@@ -95,6 +99,7 @@ public class PUpdate extends PRequest {
 				
 				TableField tf = exp.getLeftF();
 				if ( tf.getSchema() == null ) tf.setSchema(this.mschema.getSchemaName());
+				if ( tf.getTableName() == null ) tf.setTableName(this.updateTable.getName());
 				String varPsql = null;
 				for(String key : this.mapVariables.keySet() ){
 					if ( this.mapVariables.get(key).equalsIgnoreCase(tf.getQualifiedName()) ){

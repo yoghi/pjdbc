@@ -49,18 +49,14 @@ public class PrologResultSet implements ResultSet {
 
 	}
 
-
 	public int findColumn(String columnLabel) throws PSQLException {
-
-		return 0;
+		return this.pResult.findColumn(columnLabel);
 	}
 
 	/**
 	 * Torno al primo elemento
 	 */
 	public boolean first() throws PSQLException {
-//		this.currentPosition = -1;
-//		return this.rowData.size() > 0;
 		return this.pResult.first();
 	}
 
@@ -69,17 +65,15 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public void moveToInsertRow() throws PSQLException {
+		
 	}
 
 	public boolean next() throws PSQLException {
 		return this.pResult.next();
-//		boolean r = this.currentPosition < this.rowData.size() - 1;
-//		this.currentPosition++;
-//		return r;
 	}
 
 	public boolean previous() throws PSQLException {
-		return false;
+		return this.pResult.previous();
 	}
 
 	public void refreshRow() throws PSQLException {
