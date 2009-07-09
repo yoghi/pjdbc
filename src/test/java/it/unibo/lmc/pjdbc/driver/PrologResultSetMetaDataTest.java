@@ -14,10 +14,9 @@ import junit.framework.TestCase;
 
 public class PrologResultSetMetaDataTest extends TestCase {
 
-	private Connection c;
-	private DatabaseMetaData dbMeta;
+	static private Connection c;
 	private Statement stmt;
-	private ResultSet res;
+	static private ResultSet res;
 	
 	public PrologResultSetMetaDataTest(String name) {
 		super(name);
@@ -25,8 +24,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.c  = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
-	    this.dbMeta = c.getMetaData();
+		if ( null == c ) c  = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/:prolog1"); 
 	    stmt = this.c.createStatement();
 		res = stmt.executeQuery("select * from prolog1.employee;");
 	}
@@ -45,7 +43,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 			
 			ResultSetMetaData meta = res.getMetaData();
 			String userDir = System.getProperty("user.dir");
-			assertEquals(userDir+"/target/classes/database", meta.getCatalogName(0));
+			assertEquals(userDir+"/target/classes/database/catalog1", meta.getCatalogName(0));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

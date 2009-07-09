@@ -70,16 +70,23 @@ public class MCatalog {
 		this.selfAdd();
 	}
 	
+	public MCatalog() throws PSQLException {
+		log = Logger.getLogger(MCatalog.class);
+		this.createEmptyTheory();
+		this.selfAdd();
+	}
+
 	/**
 	 * Aggiungo anche la descrizione del metabase => in questo modo anche se il metabase non esiste posso crearlo (??)
 	 * @throws PSQLException
 	 */
 	private void selfAdd() throws PSQLException {
 		
-		log.debug("selfAdd : metabase");
+		log.debug("auto add metabase");
 		
-		File f = new File(this.metabaseFile);
-		this.schemaFiles.put(f.getName(), "metabase");
+		//File f = new File(this.metabaseFile);
+		//this.schemaFiles.put(f.getName(), "metabase");
+		
 		MSchema schemaMetabase = new MSchema("metabase");
 		
 		MTable tableDatabase = new MTable(schemaMetabase, "database", 2);
@@ -112,6 +119,10 @@ public class MCatalog {
 			log.error("Invalid Theory, inizialized current theory to empty!");
 		}
 		
+		this.createEmptyTheory();
+	}
+	
+	protected void createEmptyTheory() throws PSQLException{
 		try {
 			this.metabaseTheory = new Theory("");
 		} catch (InvalidTheoryException e1) {

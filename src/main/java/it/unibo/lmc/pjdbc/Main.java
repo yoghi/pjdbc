@@ -25,7 +25,8 @@ public class Main {
 		
 			//jdbc:typeJdbcDriver:catalog dir/remote:default schema
 			String user_dir = System.getProperty("user.dir");
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database:prolog1");
+			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog1:prolog1");
+			
 			
 //			conn.setAutoCommit(false);
 //			

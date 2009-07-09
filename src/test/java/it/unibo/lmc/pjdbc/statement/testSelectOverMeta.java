@@ -41,9 +41,9 @@ public class testSelectOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/:prolog1");
 		stmt_1 = conn.createStatement();
-		stmt_2 = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog2.db").createStatement();
+		stmt_2 = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/prolog2.db").createStatement();
 
 		super.setUp();
 	}

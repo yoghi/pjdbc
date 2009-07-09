@@ -36,11 +36,6 @@ import org.apache.log4j.Logger;
  *
  */
 public class PrologDatabase {
-
-	/**
-	 * Ci puo essere un solo PrologDatabase per directory/file
-	 */
-	static private Hashtable<String,PrologDatabase> instances = new Hashtable<String, PrologDatabase>();
 	
 	/**
 	 * Schemi attivi
@@ -68,99 +63,81 @@ public class PrologDatabase {
 	private String currentSchema = null;
 	
 	/**
-	 * 
+	 * Costruttore
 	 * @param url	
 	 * @param extension 
 	 * @throws IOException
 	 * @throws PSQLException 
 	 */
-	public PrologDatabase(String url, String defaultSchema ) throws IOException, PSQLException {
-		
-		String extension = "db";
+	public PrologDatabase(String catalogUrl, String defaultSchema) throws IOException, PSQLException {
 		
 		log = Logger.getLogger(PrologDatabase.class);
 		
-		log.info("URL : " + url);
+		log.info("URL : " + catalogUrl);
 		
-		File f = new File(url);
-
-		// se il file non esiste lancio IOException...
-
-		if ( f.isDirectory() ){
+		File f = new File(catalogUrl);
+		
+		if ( f.isDirectory() ){	//catalog
 			
-			String dirpath = f.getAbsolutePath();
-			this.catalogSchema = new MCatalog( dirpath + File.separator + "metabase.db" );
+			this.loadCatalog(f);
+			this.loadSchemas(f);
 			
-			String[] children = f.list();
+		} else {	//catalog into file??
 			
-			for (int i=0; i<children.length; i++) {
-	            
-				// Get filename of file or directory
-	            String filename = children[i];
-				
-				if ( new File(dirpath + File.separator + filename).isFile() ) {
-
-					if ( filename.endsWith(extension) ) {
-					
-						PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
-						
-						//TODO instanziare TSChema corretto in base alle politiche attuali...
-						TSchemaRU tschema = new TSchemaRU(p);
-			            
-						MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(filename);
-						String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
-						
-						this.log.info("Avaible schema : "+nameSchema);
-						this.availableSchema.put(nameSchema,tschema);
-						
-					} else {
-						log.debug("into dir find file with invalid url - not use extension : "+extension+ " - "+filename);
-					}
-
-				}
-	        } //for
-			
-		} else {
-			
-			if ( url.endsWith(extension) ) {
-				
-				this.catalogSchema = new MCatalog( url );
-				
-				PSchema p = new PSchema(url,this.catalogSchema);
-				
-				//TODO instanziare TSChema corretto in base alle politiche attuali...
-				TSchemaRU tschema = new TSchemaRU(p);
-				
-				MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(f.getName());
-				
-				this.log.info("Open schema : "+mSchema.getSchemaName());
-				this.availableSchema.put(mSchema.getSchemaName(),tschema);
-				
-			} else {
-				log.error("invalid url - not use extension : "+extension);
-				throw new IOException("invalid url");
-			}
+			if ( f.getName().endsWith(".db") ) {
+				this.catalogSchema = new MCatalog();
+				this.addSchema(f.getParent(),f.getName());
+			} 
 			
 		}
 		
-		//se manca il catalog lo devo creare!!
-		this.currentSchema = this.availableSchema.keys().nextElement();
+		if (  null != defaultSchema && this.availableSchema.containsKey(defaultSchema) ){
+			this.currentSchema = defaultSchema;
+		} else {
+			this.currentSchema = this.availableSchema.keys().nextElement();
+		}
+		
+		log.info("current schema : "+this.currentSchema);
 		
 	}
 
-	/**
-	 * Chiudo il database
-	 */
-	public void close() {
-		//TODO: rilascio le risorse
+	
+	protected void loadCatalog(File f) throws PSQLException{
+		String dirpath = f.getAbsolutePath();
+		this.catalogSchema = new MCatalog( dirpath + File.separator + "metabase.db" );
+	}
+	
+	protected void loadSchemas(File f) throws PSQLException{
 		
-		for(String name : this.availableSchema.keySet()) {
+		String dirpath = f.getAbsolutePath();
+		String[] children = f.list();	// Get filename of file or directory
+		
+		for (int i=0; i<children.length; i++) {
+            
+            String filename = children[i];	
 			
-			TSchema p = this.availableSchema.get(name);
-			p.close();
-			this.availableSchema.remove(name);
-			this.log.info("Close schema : "+name);
-		}
+			if ( new File(dirpath + File.separator + filename).isFile() ) {
+
+				if ( filename.endsWith(".db") ) {
+					this.addSchema(dirpath,filename);
+				} 
+
+			}
+        } //for
+	}
+	
+	protected void addSchema(String dirpath,String filename) throws PSQLException{
+
+		PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
+		
+		//TODO instanziare TSChema corretto in base alle politiche attuali...
+		TSchemaRU tschema = new TSchemaRU(p);
+        
+		MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(filename);
+		String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
+		
+		this.log.info("Avaible schema : "+nameSchema);
+		this.availableSchema.put(nameSchema,tschema);
 		
 	}
 
@@ -193,7 +170,6 @@ public class PrologDatabase {
 		}
 		return pRequest;
 	}
-	
 	
 	/**
 	 * Eseguo una select su uno specifico schema del database
@@ -238,22 +214,6 @@ public class PrologDatabase {
 		} else throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
 		
 	}
-	
-//	/**
-//	 * Eseguo un aggiornamento sullo schema corrente
-//	 * @param sql richiesta sql
-//	 * @return numero di righe aggiornate
-//	 * @throws PSQLException
-//	 */
-//	public int executeUpdate(String sql) throws PSQLException{
-//		String nameSchema = null;
-//		try {
-//			nameSchema = this.availableSchema.keys().nextElement();
-//		} catch (NoSuchElementException  e) {
-//			throw new PSQLException("not valid database found!", PSQLState.UNKNOWN_STATE);
-//		}
-//		return this.executeUpdate(sql,nameSchema);
-//	}
 	
 	/**
 	 * Eseguo un aggiornamento sullo schema indicato
@@ -378,4 +338,19 @@ public class PrologDatabase {
 		return currentSchema;
 	}
 	
+	/**
+	 * Chiudo il database
+	 */
+	public void close() {
+		//TODO: rilascio le risorse
+		
+		for(String name : this.availableSchema.keySet()) {
+			
+			TSchema p = this.availableSchema.get(name);
+			p.close();
+			this.availableSchema.remove(name);
+			this.log.info("Close schema : "+name);
+		}
+		
+	}
 }

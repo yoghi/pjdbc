@@ -34,7 +34,7 @@ public class testUpdateOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database"); //prolog_with_meta.db
+		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/"); 
 		stmt = conn.createStatement();
 
 		super.setUp();
