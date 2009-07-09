@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -16,70 +17,60 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		
 		load_config();
-	    
-//	    try {
-//			PSchema psh = new PSchema("target/classes/prolog.db");
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		
 		try {
 		
 			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
-			// SENZA METADATI
+			//jdbc:typeJdbcDriver:catalog dir/remote:default schema
+			String user_dir = System.getProperty("user.dir");
+			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database:prolog1");
 			
-			//CONNECTION DEVE GESTIRE LE TRANSAZIONI TRA GLI STATEMENT DELLA STESSA CONNECTION
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog.db");
-			
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db");
-			
-			//PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:target/classes/prolog_with_meta.db;meta");
-			
-			conn.setAutoCommit(false);
-			
-			conn.setTransactionIsolation(2);	//DEFAULT = 1
-			
-			PrologStatement stmt = (PrologStatement)conn.createStatement();
-			
-			//ResultSet rs = stmt.executeQuery("select $0,$3 from employee;");
-			
-			//ResultSet rs3 = stmt.executeQuery("select pippo from employee;");
-
-			//ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
-			
-			//ResultSet rs5 = stmt.executeQuery("select $0 as pippo,$1,$2 from employee;");
-			
-			//ResultSet rs4 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d;");
-			
-			//ResultSet rs6 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1);");
-			
-			ResultSet rs7 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = (7 * 3 + d.$1) );");
-			
-			/*
-			while(rs.next()) {
-	            String name = rs.getString(0);
-	            String name = rs.getString("name");
-	            System.out.println("$0 = "+name.toString());
-			}
-			*/
-			conn.commit();
+//			conn.setAutoCommit(false);
+//			
+//			conn.setTransactionIsolation(2);	//DEFAULT = 1
+//			
+//			PrologStatement stmt = (PrologStatement)conn.createStatement();
+//			
+//			ResultSet rs = stmt.executeQuery("select * from employee;");
+//			
+//			outputResultSet(rs);
+//			
+//			conn.commit();
 			
 		
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 	}
 
+	private static void outputResultSet(ResultSet rs) throws Exception {
+	    
+		ResultSetMetaData rsMetaData = rs.getMetaData();
+	    int numberOfColumns = rsMetaData.getColumnCount();
+	    for (int i = 1; i < numberOfColumns + 1; i++) {
+	      String columnName = rsMetaData.getColumnName(i);
+	      System.out.print(columnName + "   ");
+	
+	    }
+	    System.out.println();
+	    System.out.println("----------------------");
+	
+	    while (rs.next()) {
+	      for (int i = 1; i < numberOfColumns + 1; i++) {
+	        System.out.print(rs.getString(i) + "   ");
+	      }
+	      System.out.println();
+	    }
+
+	}
+	
 	private static void load_config() {
 	    /**
 		 * Properties / custumization
@@ -121,3 +112,25 @@ public class Main {
 //ResultSet rs3 = stmt.executeQuery("select * from employee limit 5;");
 //
 //ResultSet rs4 = stmt.executeQuery("select * from employee limit 5,15;");
+
+//ResultSet rs = stmt.executeQuery("select $0,$3 from employee;");
+
+//ResultSet rs3 = stmt.executeQuery("select pippo from employee;");
+
+//ResultSet rs2 = stmt.executeQuery("select $0,$1,$2 from employee;");
+
+//ResultSet rs5 = stmt.executeQuery("select $0 as pippo,$1,$2 from employee;");
+
+//ResultSet rs4 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d;");
+
+//ResultSet rs6 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1);");
+
+//ResultSet rs7 = stmt.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = (7 * 3 + d.$1) );");
+
+/*
+while(rs.next()) {
+    String name = rs.getString(0);
+    String name = rs.getString("name");
+    System.out.println("$0 = "+name.toString());
+}
+*/

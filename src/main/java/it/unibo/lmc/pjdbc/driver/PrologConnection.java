@@ -71,8 +71,8 @@ public class PrologConnection implements Connection {
 	 * @param url_specifico informazioni per accedere al database
 	 *  <i>database_location;database_name</i> 
 	 * 	<ul>
-	 * 		<li>database_name : se il database è un contenitore di piu database scelgo quale usare</li>
 	 *  	<li>database_location : indico il percorso per raggiungere il database (host@port or filename)</li>
+	 *  	<li>database_name : se il database è un contenitore (catalog) di piu database(schema) scelgo quale usare</li>
 	 * 	</ul>
 	 * @throws SQLException ...
 	 * TODO gestire le ecezzioni 
@@ -81,23 +81,20 @@ public class PrologConnection implements Connection {
 
 		try {
 			
-			String[] url = url_specifico.split(";");
-			
+			String[] url = url_specifico.split(":");
 			this.sourceUrl = url[0];
-			
-			if ( url.length == 2 ) {
-				this.databaseName = url[1];		//TODO : DATABASE NAME:::::::???
-			}
-			
-			if ( this.sourceUrl.contains("@") ) {
-//				String[] hs = this.sourceUrl.split("@");
-//				String host = hs[0];
-//				int port = Integer.parseInt(hs[1]);
-				//this.db = new PrologRemoteDB();
-			} else {
-				//file
-				this.db = PrologDaemon.openDatabase(this.sourceUrl); 
-				//new PrologLocalDB(this.sourceUrl);
+			if ( url.length == 2 ) this.databaseName = url[1];
+
+			if ( this.sourceUrl.contains("@") ) {	//remote
+				/*
+				String[] hs = this.sourceUrl.split("@");
+				String host = hs[0];
+				int port = Integer.parseInt(hs[1]);
+				this.db = new PrologRemoteDB();
+				*/
+			} else {	//file
+				//this.db = PrologDaemon.openDatabase(this.sourceUrl);
+				this.db = new PrologDatabase(this.sourceUrl,this.databaseName);
 			}
 			
 

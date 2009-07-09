@@ -9,12 +9,10 @@ public class PCreate extends PRequest {
 
 	public PCreate(MSchema ms, ParsedCommand req) {
 		super(ms, req);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public String generatePrologRequest() throws PSQLException {
-		// TODO Auto-generated method stub
 		// devo inserire metadati...
 		return null;
 	}

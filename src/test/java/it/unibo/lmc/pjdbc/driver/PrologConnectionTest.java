@@ -22,7 +22,8 @@ public class PrologConnectionTest extends TestCase {
 
 	public final void testPrologConnection() {
 		try {
-			connection  = DriverManager.getConnection("jdbc:prolog:target/classes/database/prolog.db");
+			String user_dir = System.getProperty("user.dir");
+			connection  = DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database:prolog1");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

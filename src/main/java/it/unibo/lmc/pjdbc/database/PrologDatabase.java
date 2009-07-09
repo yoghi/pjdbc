@@ -68,52 +68,15 @@ public class PrologDatabase {
 	private String currentSchema = null;
 	
 	/**
-	 * Ottengo un PrologDatabase
-	 * @param url
-	 * @param extension
-	 * @return
-	 * @throws IOException
-	 * @throws PSQLException 
-	 */
-	public static PrologDatabase getInstance(String url,String extension) throws IOException, PSQLException{
-		if ( !instances.containsKey(url) ) {
-			instances.put(url, new PrologDatabase(url,extension));
-		}
-		return instances.get(url);
-	}
-	
-	/**
-	 * Ottengo un PrologDatabase
-	 * @param url
-	 * @return
-	 * @throws IOException
-	 * @throws PSQLException 
-	 */
-	public static PrologDatabase getInstance(String url) throws IOException, PSQLException{
-		if ( !instances.containsKey(url) ) {
-			instances.put(url, new PrologDatabase(url));
-		}
-		return instances.get(url);
-	}
-	
-	/**
-	 * 
-	 * @param url
-	 * @throws IOException
-	 * @throws PSQLException 
-	 */
-	private PrologDatabase(String url) throws IOException, PSQLException {
-		this(url,"db");
-	}
-	
-	/**
 	 * 
 	 * @param url	
 	 * @param extension 
 	 * @throws IOException
 	 * @throws PSQLException 
 	 */
-	private PrologDatabase(String url, String extension) throws IOException, PSQLException {
+	public PrologDatabase(String url, String defaultSchema ) throws IOException, PSQLException {
+		
+		String extension = "db";
 		
 		log = Logger.getLogger(PrologDatabase.class);
 		
@@ -161,9 +124,7 @@ public class PrologDatabase {
 			
 			if ( url.endsWith(extension) ) {
 				
-				String dirpath = f.getParent();
-				
-				this.catalogSchema = new MCatalog( dirpath + File.separator + "metabase.db" );
+				this.catalogSchema = new MCatalog( url );
 				
 				PSchema p = new PSchema(url,this.catalogSchema);
 				
