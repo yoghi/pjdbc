@@ -66,6 +66,8 @@ public class testParser extends TestCase {
 		ts.addTest(new testParser("testInsert"));
 		
 		ts.addTest(new testParser("testAnyClausola"));
+		ts.addTest(new testParser("testCreateTable"));
+		
 		
 		ts.addTest(new testParser("testSelectWhere"));
 //		ts.addTest(new testParser("testSelectWhereOR"));
@@ -284,6 +286,34 @@ public class testParser extends TestCase {
 			
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt();
+			
+			System.out.println(pRequest);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST Select con in mezzo ANY
+	 */
+	public void testCreateTable() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testCreateTable       ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "create table prova ( id varchar(255) , age int ); ";
+		
+			Psql parse = new Psql(new StringReader(query));
+			
+			ParsedCommand pRequest = parse.parseIt();
 			
 			System.out.println(pRequest);
 			

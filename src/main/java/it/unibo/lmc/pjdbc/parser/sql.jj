@@ -31,6 +31,7 @@ import it.unibo.lmc.pjdbc.parser.options.Limit;
 import it.unibo.lmc.pjdbc.parser.options.OrderBy;
 
 //DML ( Data manipulation Language)
+import it.unibo.lmc.pjdbc.parser.dml.imp.CreateTable;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.CreateDB;
 import it.unibo.lmc.pjdbc.parser.dml.imp.DropDB;
@@ -43,6 +44,7 @@ import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 //SCHEMA DB
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
+import it.unibo.lmc.pjdbc.parser.schema.ColumnType;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -171,7 +173,11 @@ ParsedCommand parseIt() :
 	    |
 	    request = Delete()			// DELETE FROM table_name [ WHERE (expression) ] 
 	    |
-	    request = CreateDB()		// CREATE database_name
+	    ( LOOKAHEAD(2)
+	    	request = CreateDB()		// CREATE database_name
+	    	| 
+	    	request = CreateTable()		// CREATE TABLE tableName ( tableElement, tableElement ) .... dove tableElement = columnName dataType
+	    )
 	    |
 	    ( LOOKAHEAD(2)
 		    request = Drop()			// DROP TABLE table_name1, table_name2,....
@@ -184,6 +190,52 @@ ParsedCommand parseIt() :
     	log.debug(request.toString());
     	return request;
     }
+}
+
+CreateTable CreateTable():
+{
+	CreateTable ct = new CreateTable();
+	Table table;
+	ColumnType element;
+}
+{
+	<K_CREATE> <K_TABLE> table=Table() { ct.setTable(table); }
+	<S_LPAR>
+		element=TableElement() { ct.addElement(element); }
+		[ "," element=TableElement() { ct.addElement(element); } ]
+	<S_RPAR>
+	
+	{ 
+		return ct; 
+	}
+}
+
+ColumnType TableElement():
+{
+	ColumnType colDataType;
+	Token name;
+	Token typeName;
+	Token tk;
+	ArrayList<String> argumentsStringList = new ArrayList<String>();
+}
+{
+	name=<S_IDENTIFIER>  {  colDataType = new ColumnType(name.image); }  
+	 
+	typeName=<S_IDENTIFIER>  {  colDataType.setType(typeName.image); }
+	 
+	[
+		LOOKAHEAD(2) 
+		"(" 
+		( 
+			(tk=<S_INTEGER> | tk=<S_CHAR_LITERAL>) { argumentsStringList.add(tk.image); } 
+			[","] 
+		)* 
+		")"
+	]
+	{
+		if (argumentsStringList.size() > 0) colDataType.setArgumentsStringList(argumentsStringList);
+		return colDataType;
+	}
 }
 
 

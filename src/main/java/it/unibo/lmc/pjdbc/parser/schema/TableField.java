@@ -113,7 +113,7 @@ public class TableField {
 //	/**
 //	 * @param i the type to set
 //	 */
-//	public void setType(int i) {
+//	public void setType(int type) {
 //		this.type = i;
 //	}
 //
