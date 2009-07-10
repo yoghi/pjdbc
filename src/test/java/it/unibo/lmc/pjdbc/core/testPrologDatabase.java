@@ -2,6 +2,8 @@ package it.unibo.lmc.pjdbc.core;
 
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.meta.MCatalog;
+import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
 import java.io.File;
@@ -65,10 +67,11 @@ public class testPrologDatabase extends TestCase {
 	    PropertyConfigurator.configure(properties);
 		
 		TestSuite ts = new TestSuite();
-		ts.addTest(new testPrologDatabase("testCatalog"));
-		ts.addTest(new testPrologDatabase("testSimpleSchema"));
-		ts.addTest(new testPrologDatabase("testInvalidSchema"));
-		ts.addTest(new testPrologDatabase("testMultiSchema"));
+		ts.addTest(new testPrologDatabase("testCreateSchema"));
+//		ts.addTest(new testPrologDatabase("testCatalog"));
+//		ts.addTest(new testPrologDatabase("testSimpleSchema"));
+//		ts.addTest(new testPrologDatabase("testInvalidSchema"));
+//		ts.addTest(new testPrologDatabase("testMultiSchema"));
 		return ts;
 	}
 	
@@ -155,6 +158,42 @@ public class testPrologDatabase extends TestCase {
  		try {
  			
 			new PrologDatabase(this.currentDir,null);
+			
+		} catch (IOException e) {
+			fail(e.getLocalizedMessage());
+		} catch (PSQLException e) {
+			fail(e.getLocalizedMessage());
+		}
+ 		
+ 		assertTrue(true);
+	}
+	
+	/**
+	 * 
+	 * @throws InvalidTheoryException
+	 */
+	public void testCreateSchema() throws InvalidTheoryException {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testCreateSchema      ");
+ 		System.out.println(" ====================== ");
+		
+ 		try {
+ 			
+			PrologDatabase p = new PrologDatabase(this.currentDir+"test2.db",null);
+			
+			MCatalog cat = p.getCatalogInfo();
+			
+			//p.executeUpdate("..create...");
+			
+			for (String name : cat.getListSchemaName()) {
+				System.out.println(" -- " + name + " -- " );
+				MSchema mschema = cat.getMetaSchemaFromName(name);
+				for (String tname : mschema.getListTableName()) {
+					System.out.println(": "+tname);
+				}
+			}
+			
 			
 		} catch (IOException e) {
 			fail(e.getLocalizedMessage());

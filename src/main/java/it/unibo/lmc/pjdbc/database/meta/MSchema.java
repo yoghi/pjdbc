@@ -2,6 +2,7 @@ package it.unibo.lmc.pjdbc.database.meta;
 
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
@@ -56,6 +57,16 @@ public class MSchema {
 	
 	public String toString(){
 		return this.name;
+	}
+
+	public LinkedList<String> getListTableName() {
+		
+		LinkedList<String> listName = new LinkedList<String>();
+		for (String tableName : this.tables.keySet()) {
+			listName.add(tableName);
+		}
+		return listName;
+		
 	}
 	
 	

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -362,6 +364,14 @@ public class MCatalog {
 	        }
 		}
 		
+	}
+	
+	public List<String> getListSchemaName(){
+		LinkedList<String> listName = new LinkedList<String>();
+		for(String schemaName : this.schemaList.keySet()) {
+			listName.add(schemaName);
+		}
+		return listName;
 	}
 
 	public String getName() {

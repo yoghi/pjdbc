@@ -1,6 +1,5 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.driver.PrologConnection;
 import it.unibo.lmc.pjdbc.driver.PrologStatement;
 
 import java.io.File;
