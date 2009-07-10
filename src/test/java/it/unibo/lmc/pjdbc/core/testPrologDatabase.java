@@ -67,7 +67,6 @@ public class testPrologDatabase extends TestCase {
 		TestSuite ts = new TestSuite();
 		ts.addTest(new testPrologDatabase("testCatalog"));
 		ts.addTest(new testPrologDatabase("testSimpleSchema"));
-		ts.addTest(new testPrologDatabase("testFilterSchema"));
 		ts.addTest(new testPrologDatabase("testInvalidSchema"));
 		ts.addTest(new testPrologDatabase("testMultiSchema"));
 		return ts;
@@ -82,7 +81,7 @@ public class testPrologDatabase extends TestCase {
 		
  		try {
  			
-			PrologDatabase db = PrologDatabase.getInstance(this.currentDir);
+			PrologDatabase db = new PrologDatabase(this.currentDir,null);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -105,7 +104,7 @@ public class testPrologDatabase extends TestCase {
 		
  		try {
  			
-			PrologDatabase.getInstance(this.currentDir+"prolog.db");
+			new PrologDatabase(this.currentDir,"prolog1");
 			
 		} catch (IOException e) {
 			fail(e.getLocalizedMessage());
@@ -114,31 +113,7 @@ public class testPrologDatabase extends TestCase {
 		}
  		
  		assertTrue(true);
-	}
-	
-	/**
-	 * TEST: filtro gli schemi in base all'estensione
-	 * @throws InvalidTheoryException 
-	 */
-	public void testFilterSchema() throws InvalidTheoryException {
-		
-		System.out.println(" ====================== ");
-		System.out.println("  testFilterSchema      ");
- 		System.out.println(" ====================== ");
-		
- 		try {
- 			
-			PrologDatabase.getInstance(this.currentDir,"db");
-			
-		} catch (IOException e) {
-			fail(e.getLocalizedMessage());
-		} catch (PSQLException e) {
-			fail(e.getLocalizedMessage());
-		}
-		
-		assertTrue(true);
-	}
- 	
+	} 	
 	
 	/**
 	 * TEST: provo a selezionare un file non valido
@@ -152,7 +127,7 @@ public class testPrologDatabase extends TestCase {
 		
  		try {
  			
-			PrologDatabase.getInstance(this.currentDir+"prolog.sql");
+			new PrologDatabase(this.currentDir+"prolog.sql",null);
 			
 		} catch (IOException e) {
 			assertTrue(true);
@@ -179,7 +154,7 @@ public class testPrologDatabase extends TestCase {
 		
  		try {
  			
-			PrologDatabase.getInstance(this.currentDir);
+			new PrologDatabase(this.currentDir,null);
 			
 		} catch (IOException e) {
 			fail(e.getLocalizedMessage());

@@ -138,6 +138,8 @@ public class Pselect extends PRequest {
 			
 			TableField current_variable = fr.get(i);
 			
+			if ( current_variable.getSchema() == null ) current_variable.setSchema(this.mschema.getSchemaName());
+			
 			if ( current_variable.getTableName() == null ) {	// id
 				current_variable.setTableName(this.primaryTable);
 				if ( current_variable.getAlias() == null ) current_variable.setAlias(current_variable.getColumnName());
@@ -208,8 +210,8 @@ public class Pselect extends PRequest {
 		for (TableField tf : cr) {
 			
 			log.debug("analizzo - monoschema : "+tf);
-			
 			if ( !this.clausole.containsKey(tf.getTableName()) ) throw new PSQLException("field "+tf.getTableName()+"."+tf.getColumnName()+" use non a valid table",PSQLState.UNDEFINED_COLUMN);  
+			tf.setSchema( this.mschema.getSchemaName() );	//metto lo schema di default
 			
 			//la clausola è legata ad una sola schema.tabella
 			PClausola prolog_clausola = this.clausole.get( tf.getTableName() );
@@ -248,11 +250,17 @@ public class Pselect extends PRequest {
 				
 				TableField tf = exp.getLeftF();
 				String varSql = null;
-				if ( tf.getTableName() == null ){
+				
+				if ( tf.getTableName() == null ) {
 					varSql = this.alias2nameVar(tf.getColumnName());
 				} else {
 					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
 				}
+				
+				if ( null == varSql ){
+					varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
+				}
+				
 				
 				String varPsql = null;
 				for(String key : this.mapVariables.keySet() ){
@@ -275,10 +283,15 @@ public class Pselect extends PRequest {
 				
 				TableField tf = exp.getRightF();
 				String varSql = null;
-				if ( tf.getTableName() == null ){
+				
+				if ( tf.getTableName() == null ) {
 					varSql = this.alias2nameVar(tf.getColumnName());
 				} else {
 					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+				}
+				
+				if ( null == varSql ){
+					varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
 				}
 				
 				String varPsql = null;

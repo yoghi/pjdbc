@@ -21,9 +21,9 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class testSelectOverMeta extends TestCase {
 
-	private Connection conn = null;
-	private Statement stmt_1 = null;
-	private Statement stmt_2 = null;
+	static private Connection conn = null;
+	static private Statement stmt_1 = null;
+	static private Statement stmt_2 = null;
 
 	/**
 	 * Costruttore 
@@ -41,9 +41,9 @@ public class testSelectOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/:prolog1");
-		stmt_1 = conn.createStatement();
-		stmt_2 = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/prolog2.db").createStatement();
+		if ( null == conn ) conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/:prolog1");
+		if ( null == stmt_1 ) stmt_1 = conn.createStatement();
+		if ( null == stmt_2 ) stmt_2 = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/prolog2.db").createStatement();
 
 		super.setUp();
 	}

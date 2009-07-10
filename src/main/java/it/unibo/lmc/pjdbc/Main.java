@@ -5,6 +5,7 @@ import it.unibo.lmc.pjdbc.driver.PrologStatement;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -25,19 +26,19 @@ public class Main {
 		
 			//jdbc:typeJdbcDriver:catalog dir/remote:default schema
 			String user_dir = System.getProperty("user.dir");
-			PrologConnection conn = (PrologConnection)DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog1:prolog1");
+			Connection conn = DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog1:prolog1");
 			
 			
-//			conn.setAutoCommit(false);
-//			
-//			conn.setTransactionIsolation(2);	//DEFAULT = 1
-//			
-//			PrologStatement stmt = (PrologStatement)conn.createStatement();
-//			
-//			ResultSet rs = stmt.executeQuery("select * from employee;");
-//			
-//			outputResultSet(rs);
-//			
+			conn.setAutoCommit(false);
+			
+			conn.setTransactionIsolation(2);	//DEFAULT = 1
+			
+			PrologStatement stmt = (PrologStatement)conn.createStatement();
+			
+			ResultSet rs = stmt.executeQuery("select e.*,d.* from employee as e, dept as d where d.id = e.id;");
+			
+			outputResultSet(rs);
+			
 //			conn.commit();
 			
 		
@@ -56,7 +57,8 @@ public class Main {
 		ResultSetMetaData rsMetaData = rs.getMetaData();
 	    int numberOfColumns = rsMetaData.getColumnCount();
 	    for (int i = 1; i < numberOfColumns + 1; i++) {
-	      String columnName = rsMetaData.getColumnName(i);
+	      String columnName = rsMetaData.getColumnLabel(i);
+	      
 	      System.out.print(columnName + "   ");
 	
 	    }

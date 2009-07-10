@@ -63,7 +63,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public String getColumnClassName(int column) throws SQLException {
-		MColumn c = this.fieldInfo.get(column);
+		MColumn c = this.fieldInfo.get(column-1);
 		return c.getColumnType().name();
 	}
 
@@ -76,12 +76,12 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public String getColumnLabel(int column) throws SQLException {
-		return this.getColumnClassName(column);
+		return this.fieldInfo.get(column-1).getQualifiedName();
 	}
 
 	public String getColumnName(int column) throws SQLException {
 		try { 
-			return this.fieldInfo.get(column).getColumnName();
+			return this.fieldInfo.get(column-1).getColumnName();
 		} catch (Exception e) {
 			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
 		}
@@ -89,14 +89,14 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 
 	public int getColumnType(int column) throws SQLException {
 		try { 
-			return this.fieldInfo.get(column).getColumnType().getSqlType();
+			return this.fieldInfo.get(column-1).getColumnType().getSqlType();
 		} catch (Exception e) {
 			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
 		}
 	}
 
 	public String getColumnTypeName(int column) throws SQLException {
-		return this.fieldInfo.get(column).getColumnType().name();
+		return this.fieldInfo.get(column-1).getColumnType().name();
 	}
 
 	public int getPrecision(int column) throws SQLException {
@@ -109,7 +109,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 
 	public String getSchemaName(int column) throws SQLException {
 		try { 
-			return this.fieldInfo.get(column).getSchemaName();
+			return this.fieldInfo.get(column-1).getSchemaName();
 		} catch (Exception e) {
 			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
 		}
@@ -117,7 +117,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 
 	public String getTableName(int column) throws SQLException {
 		try { 
-			return this.fieldInfo.get(column).getTableName();
+			return this.fieldInfo.get(column-1).getTableName();
 		} catch (Exception e) {
 			throw new PSQLException("column "+column+" not exist",PSQLState.UNDEFINED_COLUMN);
 		}

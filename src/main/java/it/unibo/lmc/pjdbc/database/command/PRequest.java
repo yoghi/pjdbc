@@ -65,7 +65,7 @@ public abstract class PRequest {
 			log.warn("variabile sql : "+sqlVar+" già assegnata una volta");
 			return key;
 		}
-		
+		log.debug("associo "+psql_var+ " a "+sqlVar);
 		this.mapVariables.put(psql_var, sqlVar); 
 		countVar++;
 		return psql_var;

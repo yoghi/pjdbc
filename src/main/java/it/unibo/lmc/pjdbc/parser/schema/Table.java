@@ -40,7 +40,16 @@ public class Table {
 	}
 	
 	public String toString(){
-		if ( this.schemaName != null ) return "["+this.schemaName+"."+this.name+"]";
-		else return "["+this.name+"]";
+		if ( this.schemaName != null ) {
+			if ( null == this.alias ) return "["+this.schemaName+"."+this.name+"]";
+			else return "["+this.schemaName+"."+this.name+" as "+this.alias+"]";
+		}
+		else {
+			if ( null == this.alias ) {
+				return "["+this.name+"]";
+			} else {
+				return "["+this.name+" as "+this.alias+"]";
+			}
+		}
 	}
 }

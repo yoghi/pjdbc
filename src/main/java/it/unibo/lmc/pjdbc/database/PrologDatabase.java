@@ -1,3 +1,4 @@
+
 package it.unibo.lmc.pjdbc.database;
 
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
@@ -79,6 +80,7 @@ public class PrologDatabase {
 		
 		if ( f.isDirectory() ){	//catalog
 			
+			log.debug("carico catalog "+f.getName());
 			this.loadCatalog(f);
 			this.loadSchemas(f);
 			
@@ -101,12 +103,21 @@ public class PrologDatabase {
 		
 	}
 
-	
+	/**
+	 * Carico il catalog da file
+	 * @param f
+	 * @throws PSQLException
+	 */
 	protected void loadCatalog(File f) throws PSQLException{
 		String dirpath = f.getAbsolutePath();
 		this.catalogSchema = new MCatalog( dirpath + File.separator + "metabase.db" );
 	}
 	
+	/**
+	 * Carico gli schema di una catalog dir
+	 * @param f
+	 * @throws PSQLException
+	 */
 	protected void loadSchemas(File f) throws PSQLException{
 		
 		String dirpath = f.getAbsolutePath();
@@ -126,6 +137,12 @@ public class PrologDatabase {
         } //for
 	}
 	
+	/**
+	 * Aggiungo uno schema nel sistema
+	 * @param dirpath
+	 * @param filename
+	 * @throws PSQLException
+	 */
 	protected void addSchema(String dirpath,String filename) throws PSQLException{
 
 		PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
@@ -136,9 +153,8 @@ public class PrologDatabase {
 		MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(filename);
 		String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
 		
-		this.log.info("Avaible schema : "+nameSchema);
 		this.availableSchema.put(nameSchema,tschema);
-		
+		this.log.info("Caricato schema : "+nameSchema);	
 	}
 
 	/**
