@@ -307,6 +307,9 @@ public class PrologDatabase {
 				} else {
 					throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 				}
+				
+				//drop anche dal metabase!!
+				this.systemCatalog.removeSchema(pDropRequest.getTablesList().get(schema)[0].getName());
 			
 			}
 			

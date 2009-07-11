@@ -11,6 +11,8 @@ import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import java.util.Hashtable;
 import java.util.Iterator;
 
+import com.sun.java_cup.internal.shift_action;
+
 import alice.tuprolog.Prolog;
 import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
@@ -117,6 +119,7 @@ public class SCatalog extends Catalog {
 		return "system";
 	}
 
+	@SuppressWarnings("unchecked")
 	public void validate(PSchema pSchema) throws PSQLException {
 		
 		Theory th = pSchema.getTheory();
@@ -175,6 +178,16 @@ public class SCatalog extends Catalog {
 	        }
 		}
 
+		
+	}
+
+	public void removeSchema(String schema) {
+		
+		try {
+			this.database.executeQuery("delete from metabase.mtable where tableName='"+schema+"';");
+		} catch (PSQLException e) {
+			e.printStackTrace();
+		}
 		
 	}
 	

@@ -19,6 +19,8 @@ public class PDelete extends Pselect {
 		
 		Delete pDelete = (Delete)this.mcommand;
 		
+		String tableName = pDelete.getFromTable().get(0).getName();
+		
 		List<TableField> campi = pDelete.getCampiRicerca();
 		campi.clear();
 		TableField t = new TableField("*");
@@ -31,6 +33,14 @@ public class PDelete extends Pselect {
 		this.anyClausoleConvert();
 		
 		this.generateFromClausole();
+		
+		if ( pDelete.getWhereClausole().getLeftF() != null ) {
+			pDelete.getWhereClausole().getLeftF().setTableName(tableName);
+		}
+		
+		if ( pDelete.getWhereClausole().getRightF() != null ) {
+			pDelete.getWhereClausole().getRightF().setTableName(tableName);
+		}
 		
 		//where clausole
 		String whereClausole = this.generateWhereClausole();

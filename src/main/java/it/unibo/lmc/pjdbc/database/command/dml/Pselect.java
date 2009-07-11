@@ -234,8 +234,9 @@ public class Pselect extends PRequest {
 	
 	/**
 	 * Genero le clausole riguardanti il campo WHERE
+	 * @throws PSQLException 
 	 */
-	protected String generateWhereClausole() {
+	protected String generateWhereClausole() throws PSQLException {
 		
 		Expression exp = ((Select)this.mcommand).getWhereClausole();
 		
@@ -253,14 +254,15 @@ public class Pselect extends PRequest {
 				
 				if ( tf.getTableName() == null ) {
 					varSql = this.alias2nameVar(tf.getColumnName());
+					if ( null == varSql ){
+						throw new PSQLException("Colonna non trovata : "+tf.getColumnName(), PSQLState.UNDEFINED_COLUMN);
+					}
 				} else {
 					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+					if ( null == varSql ){
+						varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
+					}
 				}
-				
-				if ( null == varSql ){
-					varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
-				}
-				
 				
 				String varPsql = null;
 				for(String key : this.mapVariables.keySet() ){
