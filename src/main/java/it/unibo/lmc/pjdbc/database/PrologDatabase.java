@@ -281,7 +281,7 @@ public class PrologDatabase {
 			
 		}
 		
-		if ( pRequest instanceof Drop ) {	// RIMUOVO UNA o PIU' TABELLE
+		if ( pRequest instanceof Drop ) {	// DROP TABELLE
 			
 			Drop pDropRequest = (Drop)pRequest;
 			
@@ -290,6 +290,22 @@ public class PrologDatabase {
 			
 			for (String schema : schemaList) {
 			
+				if ( null == schema ) {
+					
+					Table[] listTable =  pDropRequest.getTablesList().get(schema);
+					
+					schema = this.getCurrentSchema();
+					
+					for (Table table : listTable) {
+						table.setSchemaName(schema);
+					}
+					
+					pDropRequest.getTablesList().remove(schema);
+					
+					pDropRequest.getTablesList().put(schema, listTable);
+					
+				}
+				
 				TSchema tschema;
 				if ( baseCatalog.contains(schema) ) {
 					tschema = this.baseCatalog.getSchema(schema);
