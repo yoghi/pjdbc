@@ -103,7 +103,7 @@ public class PrologDatabase {
 			log.debug("carico catalog "+f.getName());
 
 			this.systemCatalog = new SCatalog(this);
-			this.baseCatalog = new PCatalog("base",this);
+			this.baseCatalog = new PCatalog(f.getName(),this);
 			
 			this.loadSchemas(this.systemCatalog,f,".dbs");
 			this.loadSchemas(this.baseCatalog,f,".db");	
@@ -113,7 +113,7 @@ public class PrologDatabase {
 			if ( f.getName().endsWith(".db") ) {
 				
 				this.systemCatalog = new SCatalog(this);
-				this.baseCatalog = new PCatalog("base",this);
+				this.baseCatalog = new PCatalog(f.getName(),this);
 				
 				PSchema p = new PSchema(f.getAbsolutePath(), f.getName().replace(".db", ""));
 				TSchemaRU tschema = new TSchemaRU(this,p);

@@ -42,7 +42,14 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 					schemaName = tableField.getSchema();
 				}
 				
-				MColumn column = db.getMetaSchema(schemaName).getMetaTableInfo(tableField.getTableName()).getColumnMeta(tableField.getColumnName());
+				MColumn column = null;
+				if ( tableField.getColumnName().startsWith("$") ){
+					MColumn[] columns = db.getMetaSchema(schemaName).getMetaTableInfo(tableField.getTableName()).getColumns();
+					int pos = Integer.parseInt( tableField.getColumnName().replace("$", "")  );
+					column = columns[pos];
+				} else {
+					column = db.getMetaSchema(schemaName).getMetaTableInfo(tableField.getTableName()).getColumnMeta(tableField.getColumnName());
+				}
 				
 				this.fieldInfo.add(column);
 			

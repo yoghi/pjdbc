@@ -42,8 +42,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			String userDir = System.getProperty("user.dir");
-			assertEquals(userDir+"/target/classes/database/catalog1", meta.getCatalogName(0));
+			assertEquals("catalog1", meta.getCatalogName(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -67,7 +66,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			assertEquals("id", meta.getColumnName(0));
+			assertEquals("id", meta.getColumnName(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -79,7 +78,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			assertEquals("id", meta.getColumnName(0));
+			assertEquals("id", meta.getColumnName(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -91,7 +90,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			assertEquals(PTypes.INT.getSqlType(), meta.getColumnType(0));
+			assertEquals(PTypes.INT.getSqlType(), meta.getColumnType(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -103,7 +102,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			assertEquals(PTypes.INT.name(), meta.getColumnTypeName(0));
+			assertEquals(PTypes.INT.name(), meta.getColumnTypeName(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -116,7 +115,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			assertEquals("prolog1", meta.getSchemaName(0));
+			assertEquals("prolog1", meta.getSchemaName(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -130,7 +129,7 @@ public class PrologResultSetMetaDataTest extends TestCase {
 		try {
 			
 			ResultSetMetaData meta = res.getMetaData();
-			assertEquals("employee", meta.getTableName(0));
+			assertEquals("employee", meta.getTableName(1));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

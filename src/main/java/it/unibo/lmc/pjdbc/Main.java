@@ -25,7 +25,7 @@ public class Main {
 		
 			//jdbc:typeJdbcDriver:catalog dir/remote:default schema
 			String user_dir = System.getProperty("user.dir");
-			Connection conn = DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog1:prolog1");
+			Connection conn = DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog2:test");
 			
 			
 			conn.setAutoCommit(false);
@@ -34,7 +34,9 @@ public class Main {
 			
 			PrologStatement stmt = (PrologStatement)conn.createStatement();
 			
-			ResultSet rs = stmt.executeQuery("select e.*,d.* from employee as e, dept as d where d.id = e.id;");
+			//ResultSet rs = stmt.executeQuery("select e.*,d.* from employee as e, dept as d where d.id = e.id;");
+			
+			ResultSet rs = stmt.executeQuery("select $0 from employee;");
 			
 			outputResultSet(rs);
 			
