@@ -1,15 +1,11 @@
 package it.unibo.lmc.pjdbc.database.transaction;
 
-import it.unibo.lmc.pjdbc.database.PSchema;
-import it.unibo.lmc.pjdbc.database.command.ICommnad;
+import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.command.PRequest;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.core.PSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
-import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
-import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
-import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
-import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
-import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -18,7 +14,7 @@ import java.util.UUID;
  * Transaction Schema
  *
  */
-public abstract class TSchema implements ICommnad {
+public abstract class TSchema {
 
 	protected UUID currentTransactionID;
 	
@@ -33,9 +29,20 @@ public abstract class TSchema implements ICommnad {
 	 * Schema 
 	 */
 	protected PSchema realSchema;
+
+	/**
+	 * Database
+	 */
+	protected PrologDatabase database;
 	
-	public TSchema(PSchema schema){
+	/**
+	 * Costruttore
+	 * @param db database core
+	 * @param schema schema su cui applicare le richieste
+	 */
+	public TSchema(PrologDatabase db, PSchema schema){
 		this.realSchema = schema;
+		this.database = db;
 		this.currentTransactionID = UUID.randomUUID();
 	}
 	
@@ -57,11 +64,11 @@ public abstract class TSchema implements ICommnad {
 	/*
 	 * A.P.I DML 
 	 */
-	public abstract PResultSet applyCommand(Select request) throws PSQLException;
-	public abstract int applyCommand(Insert request) throws PSQLException;
-	public abstract int applyCommand(Update request) throws PSQLException;
-	public abstract int applyCommand(Delete request) throws PSQLException;
-	public abstract int applyCommand(Drop request) throws PSQLException;
+	public abstract PResultSet applyCommand(ParsedCommand request) throws PSQLException;
+//	public abstract int applyCommand(Insert request) throws PSQLException;
+//	public abstract int applyCommand(Update request) throws PSQLException;
+//	public abstract int applyCommand(Delete request) throws PSQLException;
+//	public abstract int applyCommand(Drop request) throws PSQLException;
 
 	public void close() {
 		this.realSchema.close();

@@ -61,13 +61,13 @@ language=Java 		%linguaggio
 
 \section{Introduzione}
 
-Come progetto per l'esame di Linguaggi e Modelli Computazionali, si è richiesto la relizzazione di un driver JDBC che permettesse di poter eseguire query SQL su un database Prolog. Della sintassi SQL che è molto vasta sono richieste le funzionalità di base che permettano basilarmente : Creation, Read, Update, Delete (CRUD), lasciando l'implementazione completa secondo lo standard SQL ad un secondo momento.
+Come progetto per l'esame di Linguaggi e Modelli Computazionali, ho realizzato un driver JDBC che permetta di poter eseguire query SQL su un database scritto in linguaggio Prolog. Della sintassi SQL che è molto vasta ho realizzato le funzionalità di base che permettano : Creation, Read, Update, Delete (CRUD), lasciando l'implementazione completa secondo lo standard SQL ad un secondo momento.
 \par 
 Questo driver, ho deciso di chiamarlo {\bf PJDBC}, dove la lettera P sta appunto per Prolog ossia il linguaggio in cui è espresso il database da interrogare; le parti coinvolte in questo progetto sono : 
 \begin{enumerate}
 \item il database
 \item il linguaggio con cui interrogarlo (sql)
-\item il driver fisico che permetta l'interazione del database con le richieste dell'utente
+\item il driver jdbc che permetta l'interazione del database con le richieste dell'utente
 \end{enumerate}
 
 \include{database}

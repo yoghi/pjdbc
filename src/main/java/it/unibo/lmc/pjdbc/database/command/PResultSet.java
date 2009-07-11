@@ -1,6 +1,6 @@
 package it.unibo.lmc.pjdbc.database.command;
 
-import it.unibo.lmc.pjdbc.database.PSchema;
+import it.unibo.lmc.pjdbc.database.core.PSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
@@ -42,11 +42,6 @@ public class PResultSet {
 	protected Map<String,Integer> cacheNameVar = new HashMap<String,Integer>();
 	
 	/**
-	 * Schema
-	 */
-	protected PSchema schema;
-	
-	/**
 	 * Mi posiziono prima della prima riga
 	 */
 	protected int currentPosition = -1;
@@ -57,10 +52,9 @@ public class PResultSet {
 	 * @param rows
 	 * @param schema
 	 */
-	public PResultSet(List<TableField> fields , List<Term[]> rows, PSchema schema) {
+	public PResultSet(List<TableField> fields , List<Term[]> rows) {
 		log = Logger.getLogger(PResultSet.class.toString() + "." + this.code);
 		this.rowData = rows;
-		this.schema = schema;
 		this.tableFields = fields;
 		
 		int pos = 1;
@@ -70,8 +64,8 @@ public class PResultSet {
 		}
 		
 	}
-	
-	
+
+
 	/**
 	 * Restituisco il contenuto della riga nella posizione indicata
 	 * @param columnIndex

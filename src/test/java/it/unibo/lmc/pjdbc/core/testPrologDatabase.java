@@ -194,10 +194,11 @@ public class testPrologDatabase extends TestCase {
 				}
 			}
 			
-			
 		} catch (IOException e) {
+			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		} catch (PSQLException e) {
+			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		}
  		

@@ -15,8 +15,8 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class testUpdateOverMeta extends TestCase {
 
-	private Connection conn = null;
-	private Statement stmt = null;
+	static private Connection conn = null;
+	static private Statement stmt = null;
 
 	/**
 	 * Costruttore 
@@ -34,8 +34,10 @@ public class testUpdateOverMeta extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/"); 
-		stmt = conn.createStatement();
+		if ( null == conn ) {
+			conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/");
+			stmt = conn.createStatement();
+		}
 
 		super.setUp();
 	}

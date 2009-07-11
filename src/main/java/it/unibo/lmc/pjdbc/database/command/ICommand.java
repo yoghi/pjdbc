@@ -11,7 +11,7 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import java.sql.SQLException;
 
 
-public interface ICommnad {
+public interface ICommand {
 
 	/**
 	 * SELECT

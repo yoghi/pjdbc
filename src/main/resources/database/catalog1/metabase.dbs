@@ -1,0 +1,20 @@
+%NB: le colonne PARTONO DA 0
+% TABLES DESCRIPTOR
+% table(%schemaName,%tableName,%columnPosition,%columnName,%type).
+
+mtable('prolog1','age',0,'name','string').
+mtable('prolog1','age',1,'age','int').
+mtable('prolog1','dept',0,'department','string').
+mtable('prolog1','dept',1,'id','int').
+mtable('prolog1','employee',0,'id','int').
+mtable('prolog1','employee',1,'name','string').
+mtable('prolog1','employee',2,'salary','string').
+
+mtable('prolog2','multiarray',0,'id','int').
+mtable('prolog2','multiarray',1,'value','array').
+
+% DATABASE DESCRIPTOR
+% database(%schemaName,%other_info).
+database('prolog1','').
+database('prolog2','').
+

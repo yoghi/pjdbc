@@ -16,8 +16,8 @@ import org.apache.log4j.PropertyConfigurator;
 
 public class testMultiSchema extends TestCase {
 
-	private Connection conn = null;
-	private Statement stmt = null;
+	private static Connection conn = null;
+	private static Statement stmt = null;
 
 	/**
 	 * Costruttore 
@@ -35,8 +35,10 @@ public class testMultiSchema extends TestCase {
 		Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
 		
 		// SENZA METADATI
-		conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/:prolog1");
-		stmt = conn.createStatement();
+		if (  null == conn ) {
+			conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/:prolog1");
+			stmt = conn.createStatement();
+		}
 
 		super.setUp();
 	}

@@ -3,8 +3,8 @@
  */
 package it.unibo.lmc.pjdbc.driver;
 
-import it.unibo.lmc.pjdbc.database.PSchema;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.core.PSchema;
 import it.unibo.lmc.pjdbc.database.meta.MColumn;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.meta.MTable;

@@ -2,7 +2,11 @@
 package it.unibo.lmc.pjdbc.database;
 
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
-import it.unibo.lmc.pjdbc.database.meta.MCatalog;
+import it.unibo.lmc.pjdbc.database.core.Catalog;
+import it.unibo.lmc.pjdbc.database.core.PCatalog;
+import it.unibo.lmc.pjdbc.database.core.PSchema;
+import it.unibo.lmc.pjdbc.database.core.SCatalog;
+import it.unibo.lmc.pjdbc.database.executor.ExecuteControl;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
@@ -22,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
-import java.util.Hashtable;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -38,15 +41,25 @@ import org.apache.log4j.Logger;
  */
 public class PrologDatabase {
 	
-	/**
-	 * Schemi attivi
+	
+	/*
+	 * TABLE_TYPE String => table type. 
+	 * Typical types are "TABLE", "VIEW",	
+	 * "SYSTEM TABLE", "GLOBAL TEMPORARY", 
+	 * "LOCAL TEMPORARY", "ALIAS", "SYNONYM".
+	 * 
+	 * Io uso SystemTable e Table
 	 */
-	private Hashtable<String,TSchema> availableSchema = new Hashtable<String, TSchema>();
 	
 	/**
-	 * Metabase
+	 * Catalog di base
 	 */
-	private MCatalog catalogSchema;
+	private PCatalog baseCatalog;
+	
+	/**
+	 * Catalog di sistema
+	 */
+	private SCatalog systemCatalog;
 	
 	/**
 	 * Logger 
@@ -59,9 +72,9 @@ public class PrologDatabase {
 	private Psql parse = null;
 	
 	/**
-	 * Schema corrente
+	 * Control Executors
 	 */
-	private String currentSchema = null;
+	private ExecuteControl control;
 	
 	/**
 	 * Costruttore
@@ -74,6 +87,8 @@ public class PrologDatabase {
 		
 		log = Logger.getLogger(PrologDatabase.class);
 		
+		control = new ExecuteControl();
+		
 		log.info("URL : " + catalogUrl);
 		
 		File f = new File(catalogUrl);
@@ -81,44 +96,41 @@ public class PrologDatabase {
 		if ( f.isDirectory() ){	//catalog
 			
 			log.debug("carico catalog "+f.getName());
-			this.loadCatalog(f);
-			this.loadSchemas(f);
+
+			this.systemCatalog = new SCatalog(this);
+			this.baseCatalog = new PCatalog("base",this);
 			
-		} else {	//catalog into file??
+			this.loadSchemas(this.systemCatalog,f,"dbs");
+			this.loadSchemas(this.baseCatalog,f,"db");	
+			
+		} else {	//catalog-file
 			
 			if ( f.getName().endsWith(".db") ) {
-				this.catalogSchema = new MCatalog();
-				this.addSchema(f.getParent(),f.getName());
-			} 
+				
+				//this.currentCatalogInfo = new MCatalog();
+				this.systemCatalog = new SCatalog(this);
+				this.baseCatalog = new PCatalog("base",this);
+				//this.baseCatalog.addSchema(f.getParent(),f.getName());
+				//TODO da fare l'aggiunta dello schema...
+			}
 			
 		}
 		
-		if (  null != defaultSchema && this.availableSchema.containsKey(defaultSchema) ){
-			this.currentSchema = defaultSchema;
-		} else {
-			this.currentSchema = this.availableSchema.keys().nextElement();
+		if (  null != defaultSchema ){
+			this.baseCatalog.setCurrentSchemaName(defaultSchema);
 		}
 		
-		log.info("current schema : "+this.currentSchema);
+		log.info("current schema : "+this.baseCatalog.getCurrentSchemaName());
 		
-	}
-
-	/**
-	 * Carico il catalog da file
-	 * @param f
-	 * @throws PSQLException
-	 */
-	protected void loadCatalog(File f) throws PSQLException{
-		String dirpath = f.getAbsolutePath();
-		this.catalogSchema = new MCatalog( dirpath + File.separator + "metabase.db" );
 	}
 	
 	/**
 	 * Carico gli schema di una catalog dir
+	 * @param catalog 
 	 * @param f
 	 * @throws PSQLException
 	 */
-	protected void loadSchemas(File f) throws PSQLException{
+	protected void loadSchemas(Catalog catalog, File f,String extension) throws PSQLException{
 		
 		String dirpath = f.getAbsolutePath();
 		String[] children = f.list();	// Get filename of file or directory
@@ -129,34 +141,19 @@ public class PrologDatabase {
 			
 			if ( new File(dirpath + File.separator + filename).isFile() ) {
 
-				if ( filename.endsWith(".db") ) {
-					this.addSchema(dirpath,filename);
+				if ( filename.endsWith(extension.toLowerCase()) ) {
+					
+					String nameSchema = filename.replace(extension, "");
+					PSchema p = new PSchema(dirpath + File.separator + filename,nameSchema);
+					TSchemaRU tschema = new TSchemaRU(this,p); 						//TODO instanziare TSChema corretto in base alle politiche attuali...
+
+					catalog.addSchema(tschema,nameSchema);
 				} 
 
 			}
         } //for
 	}
 	
-	/**
-	 * Aggiungo uno schema nel sistema
-	 * @param dirpath
-	 * @param filename
-	 * @throws PSQLException
-	 */
-	protected void addSchema(String dirpath,String filename) throws PSQLException{
-
-		PSchema p = new PSchema(dirpath + File.separator + filename,this.catalogSchema);
-		
-		//TODO instanziare TSChema corretto in base alle politiche attuali...
-		TSchemaRU tschema = new TSchemaRU(p);
-        
-		MSchema mSchema = this.catalogSchema.getMetaSchemaFromFilename(filename);
-		String nameSchema = mSchema.getSchemaName();  //filename.split("\\.")[0];
-		
-		this.availableSchema.put(nameSchema,tschema);
-		this.log.info("Caricato schema : "+nameSchema);	
-	}
-
 	/**
 	 * Parso l'sql e ottengo un oggetto descrittivo
 	 * @param sql 
@@ -200,31 +197,35 @@ public class PrologDatabase {
 
 		if ( pRequest instanceof Select ) {
 			
-			String schema;	//lo schema può essere anche diverso da quello corrente!
-			if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
-			else schema = this.currentSchema;
+			Select selectReq = ((Select)pRequest);
+			
+			String schema = selectReq.getFromTable().get(0).getSchemaName();	//lo schema può essere anche diverso da quello corrente!
+			
+			if ( schema == null ) schema = this.baseCatalog.getCurrentSchemaName();
 			
 			log.debug("uso lo schema : "+schema);
 			
-			TSchema tschema = this.availableSchema.get(this.currentSchema);
-			
-			if ( null != tschema  ){
-				
-				Select selectReq = ((Select)pRequest);
-
-				for(Table t : selectReq.getFromTable()){
-					if ( t.getSchemaName() != null && !t.getSchemaName().equalsIgnoreCase(schema) ) {
-						/**
-						 * MULTI-SCHEMA
-						 * dovrei prendere più lock e poi fare la join delle due theory prima di tutto!
-						 */
-						throw new PSQLException("not implemented yet!",PSQLState.NOT_IMPLEMENTED);
-					}
+			for(Table t : selectReq.getFromTable()){
+				if ( t.getSchemaName() != null && !t.getSchemaName().equalsIgnoreCase(schema) ) {
+					/**
+					 * MULTI-SCHEMA
+					 * dovrei prendere più lock e poi fare la join delle due theory prima di tutto!
+					 */
+					throw new PSQLException("not implemented yet!",PSQLState.NOT_IMPLEMENTED);
 				}
-				
+			}
+			
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
+			
+			if ( null != tschema ){
 				return tschema.applyCommand( selectReq );
 			} else {
-				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 			}
 
 		} else throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
@@ -249,18 +250,21 @@ public class PrologDatabase {
 			String schema = updateReq.getTable().getSchemaName();
 			
 			if ( null == schema ) {
-				if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
-				else schema = this.currentSchema;
+				schema = this.baseCatalog.getCurrentSchemaName();
 			}
 			
-			TSchema tschema = this.availableSchema.get(schema);
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
 			
 			if ( null != tschema  ){
-				
-				return tschema.applyCommand( updateReq );
-				
+				PResultSet res = tschema.applyCommand( updateReq );
+				return Integer.parseInt(res.getValue(0).toString());
 			} else {
-				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 			}
 
 		} 
@@ -272,18 +276,21 @@ public class PrologDatabase {
 			String schema = insertReq.getTable().getSchemaName();
 			
 			if ( null == schema ) {
-				if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
-				else schema = this.currentSchema;
+				schema = this.baseCatalog.getCurrentSchemaName();
 			}
 			
-			TSchema tschema = this.availableSchema.get(schema);
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
 			
 			if ( null != tschema  ){
-				
-				return tschema.applyCommand( insertReq );
-				
+				PResultSet res = tschema.applyCommand( insertReq );
+				return Integer.parseInt(res.getValue(0).toString());
 			} else {
-				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 			}
 			
 		}
@@ -295,16 +302,21 @@ public class PrologDatabase {
 			String schema = deleteReq.getFromTable().get(0).getSchemaName();
 			
 			if ( null == schema ) {
-				if ( pRequest.getSchemaName() != null ) schema = pRequest.getSchemaName();
-				else schema = this.currentSchema;
+				schema = this.baseCatalog.getCurrentSchemaName();
 			}
 			
-			TSchema tschema = this.availableSchema.get(schema);
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
 			
 			if ( null != tschema  ){
-				return tschema.applyCommand( deleteReq );
+				PResultSet res = tschema.applyCommand( deleteReq );
+				return Integer.parseInt(res.getValue(0).toString());
 			} else {
-				throw new PSQLException("Invalid Schema : "+pRequest.getSchemaName(),PSQLState.SYNTAX_ERROR);
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 			}
 			
 		}
@@ -318,11 +330,17 @@ public class PrologDatabase {
 			
 			for (String schema : schemaList) {
 			
-				TSchema tschema = this.availableSchema.get(schema);
+				TSchema tschema;
+				if ( baseCatalog.contains(schema) ) {
+					tschema = this.baseCatalog.getSchema(schema);
+				} else {
+					tschema = this.systemCatalog.getSchema(schema);
+				}
 				
 				if ( null != tschema  ){
 					
-					n += tschema.applyCommand( pDropRequest );
+					PResultSet res = tschema.applyCommand( pDropRequest );
+					n += Integer.parseInt(res.getValue(0).toString());
 					
 				} else {
 					throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
@@ -337,36 +355,38 @@ public class PrologDatabase {
 		throw new PSQLException("Invalid Update : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
 		
 	}
+//	/**
 
 	/**
-	 * Ottengo le metainformazioni sul catalog corrente
-	 * @return
+	 * Ottengo le metainformazioni sullo schema richiesto
+	 * @param schemaName nome dello schema
 	 */
-	public MCatalog getCatalogInfo() {
-		return this.catalogSchema;
+	public MSchema getMetaSchema(String schemaName){
+		return this.systemCatalog.getMSchema(schemaName);
 	}
-
+	
 	/**
 	 * Ottengo lo schema corrente
 	 * @return
 	 */
 	public String getCurrentSchema() {
-		return currentSchema;
+		return this.baseCatalog.getCurrentSchemaName();
 	}
 	
 	/**
 	 * Chiudo il database
 	 */
 	public void close() {
-		//TODO: rilascio le risorse
-		
-		for(String name : this.availableSchema.keySet()) {
-			
-			TSchema p = this.availableSchema.get(name);
-			p.close();
-			this.availableSchema.remove(name);
-			this.log.info("Close schema : "+name);
-		}
-		
+		this.baseCatalog.close();	//la gestione dei commit in-sospeso è a carico del Pcatalog
+		this.systemCatalog.close();
+	}
+
+	
+	/**
+	 * Executor
+	 * @return 
+	 */
+	public ExecuteControl getExecutor() {
+		return this.control;	
 	}
 }

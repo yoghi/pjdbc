@@ -7,13 +7,13 @@ public abstract class ParsedCommand {
 	
 	public ParsedCommand(){}
 	
-	public String getSchemaName(){
-		return this.defaultSchema;
-	}
-	
-	public void setDefaultSchemaName(String schema){
-		this.defaultSchema = schema;
-	}
+//	public String getSchemaName(){
+//		return this.defaultSchema;
+//	}
+//	
+//	public void setDefaultSchemaName(String schema){
+//		this.defaultSchema = schema;
+//	}
 	
 	/**
 	 * Rappresentazione interna delle informazioni del comando richiesto
