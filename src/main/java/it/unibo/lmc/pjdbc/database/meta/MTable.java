@@ -132,15 +132,26 @@ public class MTable {
 	}
 	
 	/**
-	 * Verifico se la colonna esiste in questa tabella
+	 * Ottengo la posizione della colonna nella tabella
 	 * @param columnName
 	 * @return
 	 * @throws PSQLException 
 	 */
-	public int containsField(String columnName) throws PSQLException {
+	public int findField(String columnName) throws PSQLException {
 		Integer pos = this.tcolumns.get(columnName);
 		if ( null == pos ) throw new PSQLException("invalid column "+columnName, PSQLState.UNDEFINED_COLUMN);
 		return pos;
+	}
+	
+	/**
+	 * Verifico se la colonna esiste in questa tabella
+	 * @param columnName
+	 * @return
+	 */
+	public boolean containsField(String columnName){
+		Integer pos = this.tcolumns.get(columnName);
+		if ( null == pos ) return false;
+		return true;
 	}
 
 	/**

@@ -2,11 +2,8 @@ package it.unibo.lmc.pjdbc.database.core;
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
-import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
-
-import java.io.File;
 
 public class PCatalog extends Catalog {
 
@@ -52,6 +49,10 @@ public class PCatalog extends Catalog {
 	public void setCurrentSchemaName(String schema) throws PSQLException {
 		if ( this.contains(schema) ) this.currentSchemaName = schema;
 		else throw new PSQLException("schema name non valido: "+schema, PSQLState.INVALID_SCHEMA);
+	}
+
+	public String getName() {
+		return catalogName;
 	}
 
 }

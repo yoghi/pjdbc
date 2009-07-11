@@ -46,7 +46,7 @@ public class PInsert extends PRequest {
 		if ( fields.size() > 0) {
 			int i = 0;
 			for (TableField field : fields) {
-				int pos = infoTable.containsField(field.getColumnName());
+				int pos = infoTable.findField(field.getColumnName());
 				request[pos] = values.get(i);
 				i++;
 			}

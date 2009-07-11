@@ -6,6 +6,8 @@ import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
 import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -44,13 +46,6 @@ public abstract class Catalog {
 		return this.availableSchema.get(schema);
 	}
 	
-	public MSchema getMSchema(String schemaName){
-		
-		//TODO da fare
-		
-		return null;
-	}
-	
 	/**
 	 * Verifico se uno schema è contenuto in questo catalog
 	 * @param schema
@@ -69,6 +64,22 @@ public abstract class Catalog {
 		}
 	}
 	
+	/**
+	 * Ritorna la lista degli schemi presenti in questo catalog
+	 * @return
+	 */
+	public List<String> getListSchemaName() {
+		LinkedList<String> list = new LinkedList<String>();
+		for(String key : this.availableSchema.keySet()){
+			list.add(key);
+		}
+		return list;
+	}
+	
 	abstract public void addSchema(TSchema tschema,String nameSchema) throws PSQLException;
+
+	abstract public String getName();
+
+	
 	
 }

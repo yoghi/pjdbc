@@ -35,7 +35,7 @@ public class testUpdateOverMeta extends TestCase {
 		
 		// SENZA METADATI
 		if ( null == conn ) {
-			conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1/");
+			conn = DriverManager.getConnection("jdbc:prolog:target/classes/database/catalog1:prolog1");
 			stmt = conn.createStatement();
 		}
 

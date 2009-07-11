@@ -21,14 +21,19 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+
+import alice.tuprolog.InvalidTermException;
+import alice.tuprolog.Term;
 
 /**
  * Database scritto in Prolog
@@ -100,18 +105,20 @@ public class PrologDatabase {
 			this.systemCatalog = new SCatalog(this);
 			this.baseCatalog = new PCatalog("base",this);
 			
-			this.loadSchemas(this.systemCatalog,f,"dbs");
-			this.loadSchemas(this.baseCatalog,f,"db");	
+			this.loadSchemas(this.systemCatalog,f,".dbs");
+			this.loadSchemas(this.baseCatalog,f,".db");	
 			
 		} else {	//catalog-file
 			
 			if ( f.getName().endsWith(".db") ) {
 				
-				//this.currentCatalogInfo = new MCatalog();
 				this.systemCatalog = new SCatalog(this);
 				this.baseCatalog = new PCatalog("base",this);
-				//this.baseCatalog.addSchema(f.getParent(),f.getName());
-				//TODO da fare l'aggiunta dello schema...
+				
+				PSchema p = new PSchema(f.getAbsolutePath(), f.getName().replace(".db", ""));
+				TSchemaRU tschema = new TSchemaRU(this,p);
+				this.baseCatalog.addSchema(tschema, p.getName());
+				this.systemCatalog.validate(p);
 			}
 			
 		}
@@ -148,6 +155,7 @@ public class PrologDatabase {
 					TSchemaRU tschema = new TSchemaRU(this,p); 						//TODO instanziare TSChema corretto in base alle politiche attuali...
 
 					catalog.addSchema(tschema,nameSchema);
+					this.systemCatalog.validate(p);
 				} 
 
 			}
@@ -185,16 +193,144 @@ public class PrologDatabase {
 	}
 	
 	/**
-	 * Eseguo una select su uno specifico schema del database
+	 * Eseguo una select/insert/update/delete/drop/create su uno specifico schema del database
 	 * @param sql
 	 * @param schemaName
 	 * @return
 	 * @throws SQLException
 	 */
-	public PResultSet executeSelect(String sql) throws PSQLException {
+	public PResultSet executeQuery(String sql) throws PSQLException {
 		
 		ParsedCommand pRequest = this.analizeSql(sql);
 
+		if ( pRequest instanceof Update ) {	//AGGIORNO UNA RIGA 
+			
+			Update updateReq = ((Update)pRequest);
+			
+			String schema = updateReq.getTable().getSchemaName();
+			
+			if ( null == schema ) {
+				schema = this.baseCatalog.getCurrentSchemaName();
+			}
+			
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
+			
+			if ( null != tschema  ){
+				PResultSet res = tschema.applyCommand( updateReq );
+				return res;
+			} else {
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
+			}
+
+		} 
+		
+		if ( pRequest instanceof Insert ) { //INSERT new row
+			
+			Insert insertReq = (Insert)pRequest;
+			
+			String schema = insertReq.getTable().getSchemaName();
+			
+			if ( null == schema ) {
+				schema = this.baseCatalog.getCurrentSchemaName();
+			}
+			
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
+			
+			if ( null != tschema  ){
+				PResultSet res = tschema.applyCommand( insertReq );
+				return res;
+			} else {
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+		
+		if ( pRequest instanceof Delete ) { //DELETE ROW FROM TABLE
+			
+			Delete deleteReq = ((Delete)pRequest);
+			
+			String schema = deleteReq.getFromTable().get(0).getSchemaName();
+			
+			if ( null == schema ) {
+				schema = this.baseCatalog.getCurrentSchemaName();
+			}
+			
+			TSchema tschema;
+			if ( baseCatalog.contains(schema) ) {
+				tschema = this.baseCatalog.getSchema(schema);
+			} else {
+				tschema = this.systemCatalog.getSchema(schema);
+			}
+			
+			if ( null != tschema  ){
+				PResultSet res = tschema.applyCommand( deleteReq );
+				return res;
+			} else {
+				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+		
+		if ( pRequest instanceof Drop ) {	// RIMUOVO UNA o PIU' TABELLE
+			
+			Drop pDropRequest = (Drop)pRequest;
+			
+			Set<String> schemaList = pDropRequest.getTablesList().keySet();
+			int n = 0;
+			
+			for (String schema : schemaList) {
+			
+				TSchema tschema;
+				if ( baseCatalog.contains(schema) ) {
+					tschema = this.baseCatalog.getSchema(schema);
+				} else {
+					tschema = this.systemCatalog.getSchema(schema);
+				}
+				
+				if ( null != tschema  ){
+					
+					PResultSet res = tschema.applyCommand( pDropRequest );
+					while(res.next()){
+						n += Integer.parseInt(res.getValue("AffectedRow").toString());
+					}
+					
+				} else {
+					throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
+				}
+			
+			}
+			
+			try {
+				
+				LinkedList<Term[]> rows = new LinkedList<Term[]>();
+				LinkedList<TableField> fields = new LinkedList<TableField>();
+				TableField tf = new TableField();
+				tf.setAlias("AffectedRow");
+				fields.add(tf);
+				
+				Term[] affectedRows = new Term[1];
+				affectedRows[0] = Term.createTerm(""+n);
+				rows.add(affectedRows);
+				
+				PResultSet res = new PResultSet(fields, rows);
+				return res;
+			
+			} catch (InvalidTermException e) {
+				throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+		
 		if ( pRequest instanceof Select ) {
 			
 			Select selectReq = ((Select)pRequest);
@@ -228,141 +364,18 @@ public class PrologDatabase {
 				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 			}
 
-		} else throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
+		}
+		
+		throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
 		
 	}
-	
-	/**
-	 * Eseguo un aggiornamento sullo schema indicato
-	 * @param sql richiesta sql
-	 * @param schemaName
-	 * @return numero di righe aggiornate
-	 * @throws PSQLException
-	 */
-	public int executeUpdate(String sql) throws PSQLException {
-		
-		ParsedCommand pRequest = this.analizeSql(sql);
-		
-		if ( pRequest instanceof Update ) {	//AGGIORNO UNA RIGA 
-			
-			Update updateReq = ((Update)pRequest);
-			
-			String schema = updateReq.getTable().getSchemaName();
-			
-			if ( null == schema ) {
-				schema = this.baseCatalog.getCurrentSchemaName();
-			}
-			
-			TSchema tschema;
-			if ( baseCatalog.contains(schema) ) {
-				tschema = this.baseCatalog.getSchema(schema);
-			} else {
-				tschema = this.systemCatalog.getSchema(schema);
-			}
-			
-			if ( null != tschema  ){
-				PResultSet res = tschema.applyCommand( updateReq );
-				return Integer.parseInt(res.getValue(0).toString());
-			} else {
-				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
-			}
-
-		} 
-		
-		if ( pRequest instanceof Insert ) { //INSERT new row
-			
-			Insert insertReq = (Insert)pRequest;
-			
-			String schema = insertReq.getTable().getSchemaName();
-			
-			if ( null == schema ) {
-				schema = this.baseCatalog.getCurrentSchemaName();
-			}
-			
-			TSchema tschema;
-			if ( baseCatalog.contains(schema) ) {
-				tschema = this.baseCatalog.getSchema(schema);
-			} else {
-				tschema = this.systemCatalog.getSchema(schema);
-			}
-			
-			if ( null != tschema  ){
-				PResultSet res = tschema.applyCommand( insertReq );
-				return Integer.parseInt(res.getValue(0).toString());
-			} else {
-				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
-			}
-			
-		}
-		
-		if ( pRequest instanceof Delete ) { //DELETE ROW FROM TABLE
-			
-			Delete deleteReq = ((Delete)pRequest);
-			
-			String schema = deleteReq.getFromTable().get(0).getSchemaName();
-			
-			if ( null == schema ) {
-				schema = this.baseCatalog.getCurrentSchemaName();
-			}
-			
-			TSchema tschema;
-			if ( baseCatalog.contains(schema) ) {
-				tschema = this.baseCatalog.getSchema(schema);
-			} else {
-				tschema = this.systemCatalog.getSchema(schema);
-			}
-			
-			if ( null != tschema  ){
-				PResultSet res = tschema.applyCommand( deleteReq );
-				return Integer.parseInt(res.getValue(0).toString());
-			} else {
-				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
-			}
-			
-		}
-		
-		if ( pRequest instanceof Drop ) {	// RIMUOVO UNA TABELLA
-			
-			Drop pDropRequest = (Drop)pRequest;
-			
-			Set<String> schemaList = pDropRequest.getTablesList().keySet();
-			int n = 0;
-			
-			for (String schema : schemaList) {
-			
-				TSchema tschema;
-				if ( baseCatalog.contains(schema) ) {
-					tschema = this.baseCatalog.getSchema(schema);
-				} else {
-					tschema = this.systemCatalog.getSchema(schema);
-				}
-				
-				if ( null != tschema  ){
-					
-					PResultSet res = tschema.applyCommand( pDropRequest );
-					n += Integer.parseInt(res.getValue(0).toString());
-					
-				} else {
-					throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
-				}
-			
-			}
-			
-			return n;
-			
-		}
-		
-		throw new PSQLException("Invalid Update : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);
-		
-	}
-//	/**
 
 	/**
 	 * Ottengo le metainformazioni sullo schema richiesto
 	 * @param schemaName nome dello schema
 	 */
 	public MSchema getMetaSchema(String schemaName){
-		return this.systemCatalog.getMSchema(schemaName);
+		return this.systemCatalog.getAvailableMSchema(schemaName);
 	}
 	
 	/**
@@ -381,12 +394,20 @@ public class PrologDatabase {
 		this.systemCatalog.close();
 	}
 
-	
 	/**
 	 * Executor
 	 * @return 
 	 */
 	public ExecuteControl getExecutor() {
 		return this.control;	
+	}
+
+	
+	/**
+	 * Restituisce il catalog corrente
+	 * @return Catalog
+	 */
+	public Catalog getCatalog() {
+		return this.baseCatalog;
 	}
 }

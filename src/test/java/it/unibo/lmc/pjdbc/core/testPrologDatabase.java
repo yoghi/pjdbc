@@ -2,6 +2,7 @@ package it.unibo.lmc.pjdbc.core;
 
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.core.Catalog;
 import it.unibo.lmc.pjdbc.database.meta.MCatalog;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
@@ -182,13 +183,13 @@ public class testPrologDatabase extends TestCase {
  			
 			PrologDatabase p = new PrologDatabase(this.currentDir+"test2.db",null);
 			
-			MCatalog cat = p.getCatalogInfo();
+			Catalog cat = p.getCatalog();
 			
 			//p.executeUpdate("..create...");
 			
 			for (String name : cat.getListSchemaName()) {
 				System.out.println(" -- " + name + " -- " );
-				MSchema mschema = cat.getMetaSchemaFromName(name);
+				MSchema mschema = p.getMetaSchema(name);
 				for (String tname : mschema.getListTableName()) {
 					System.out.println(": "+tname);
 				}

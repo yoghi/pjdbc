@@ -34,7 +34,7 @@ public class PClausola {
 	
 	
 	public boolean setTerm(String item,String name,boolean override) throws PSQLException {
-		int pos = this.metadati.containsField(name);
+		int pos = this.metadati.findField(name);
 		return this.setTerm(item, pos, override);
 	}
 	

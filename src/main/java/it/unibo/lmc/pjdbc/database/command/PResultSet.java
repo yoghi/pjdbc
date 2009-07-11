@@ -1,6 +1,5 @@
 package it.unibo.lmc.pjdbc.database.command;
 
-import it.unibo.lmc.pjdbc.database.core.PSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;

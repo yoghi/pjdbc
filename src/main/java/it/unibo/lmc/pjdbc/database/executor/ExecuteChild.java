@@ -1,18 +1,6 @@
 package it.unibo.lmc.pjdbc.database.executor;
 
-import java.util.List;
-import java.util.Vector;
-
-import org.apache.log4j.Logger;
-
-import alice.tuprolog.InvalidTheoryException;
-import alice.tuprolog.MalformedGoalException;
-import alice.tuprolog.NoMoreSolutionException;
-import alice.tuprolog.NoSolutionException;
-import alice.tuprolog.Prolog;
-import alice.tuprolog.SolveInfo;
-import alice.tuprolog.Term;
-import it.unibo.lmc.pjdbc.database.command.ICommand;
+import it.unibo.lmc.pjdbc.database.command.PRequest;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.command.ddl.PDrop;
 import it.unibo.lmc.pjdbc.database.command.dml.PDelete;
@@ -31,7 +19,22 @@ import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
-public class ExecuteChild implements ICommand,Runnable {
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.Callable;
+
+import org.apache.log4j.Logger;
+
+import alice.tuprolog.InvalidTermException;
+import alice.tuprolog.MalformedGoalException;
+import alice.tuprolog.NoMoreSolutionException;
+import alice.tuprolog.NoSolutionException;
+import alice.tuprolog.Prolog;
+import alice.tuprolog.SolveInfo;
+import alice.tuprolog.Term;
+
+public class ExecuteChild implements Callable<PResultSet> {
 
 	private ParsedCommand request;
 	private Prolog engine;
@@ -51,7 +54,7 @@ public class ExecuteChild implements ICommand,Runnable {
 		
 	}
 
-	public PResultSet applyCommand(Select request) throws PSQLException {
+	protected PResultSet find(Select request) throws PSQLException {
 		
 		Pselect prq = new Pselect(this.metaSchema,request);
 		String gen_psql = prq.generatePrologRequest();
@@ -104,63 +107,42 @@ public class ExecuteChild implements ICommand,Runnable {
 
 	}
 	
-	public int applyCommand(Insert request) throws PSQLException {
+	protected PResultSet apply(ParsedCommand request) throws PSQLException {
 
-		/**
-		 * Assert
-		 */
-
-		PInsert prq = new PInsert(this.metaSchema, request);
+		PRequest prq = null;
+		
+		if ( request instanceof Insert ){
+			prq = new PInsert(this.metaSchema, (Insert)request);
+		}
+		
+		if ( request instanceof Delete ){
+			prq = new PDelete(this.metaSchema, (Delete)request);
+		}
+		
+		if ( request instanceof Drop ){
+			prq = new PDrop(this.metaSchema, (Drop)request);
+		}
+		
+		if ( request instanceof Update ){
+			prq = new PUpdate(this.metaSchema, (Update)request);
+		}
+		
+		int n = 0;
 
 		try {
 
 			String requestPsql = prq.generatePrologRequest();
 
-			log.debug("psql da eseguire su " + this.metaSchema.getSchemaName()
-					+ " : " + requestPsql);
+			log.debug("psql da eseguire su " + this.metaSchema.getSchemaName() + " : " + requestPsql);
 
 			SolveInfo info = this.engine.solve(requestPsql);
 
 			log.debug(info.toString());
 
-			if (info.isSuccess()) {
-				return 1;
-			} else {
-				log.error("errore");
-				throw new PSQLException("", PSQLState.SYSTEM_ERROR);
-			}
-
-		} catch (MalformedGoalException e) {
-
-		}
-
-		return 0;
-	}
-
-	public int applyCommand(Update request) throws PSQLException {
-
-		/**
-		 * Retract => select delle righe che matchano con la where e loro
-		 * rimozione + Assert => delle righe con la modifica
-		 */
-
-		PUpdate updateReq = new PUpdate(this.metaSchema, request);
-
-		try {
-
-			String requestPsql = updateReq.generatePrologRequest();
-
-			log.debug("psql da eseguire su " + this.metaSchema.getSchemaName()
-					+ " : " + requestPsql);
-
-			SolveInfo info = this.engine.solve(requestPsql);
-
-			log.debug(info.toString());
-
-			int n = 0;
 			while (info.isSuccess()) {
+				
 				n++;
-
+				
 				if (this.engine.hasOpenAlternatives()) {
 					try {
 						info = this.engine.solveNext();
@@ -170,114 +152,46 @@ public class ExecuteChild implements ICommand,Runnable {
 				} else {
 					break;
 				}
-			}
-
-			return n;
+							
+			} 
 
 		} catch (MalformedGoalException e) {
-
+			throw new PSQLException("errore nell'analisi di un goal",PSQLState.SYNTAX_ERROR);
 		}
-
-		return 0;
-	}
-
-	public int applyCommand(Delete request) throws PSQLException {
-
-		/**
-		 * Retract => select delle righe che matchano con la where e loro
-		 * rimozione
-		 */
-
-		PDelete deleteReq = new PDelete(this.metaSchema, request);
 
 		try {
-
-			String requestPsql = deleteReq.generatePrologRequest();
-
-			log.debug("psql da eseguire su " + this.metaSchema.getSchemaName()
-					+ " : " + requestPsql);
-
-			SolveInfo info = this.engine.solve(requestPsql);
-
-			log.debug(info.toString());
-
-			int n = 0;
-			while (info.isSuccess()) {
-				n++;
-
-				if (this.engine.hasOpenAlternatives()) {
-					try {
-						info = this.engine.solveNext();
-					} catch (NoMoreSolutionException e) {
-						break;
-					}
-				} else {
-					break;
-				}
-			}
-
-			return n;
-
-		} catch (MalformedGoalException e) {
-
+		
+			LinkedList<Term[]> rows = new LinkedList<Term[]>();
+			LinkedList<TableField> fields = new LinkedList<TableField>();
+			TableField tf = new TableField();
+			tf.setAlias("AffectedRow");
+			fields.add(tf);
+			
+			Term[] affectedRows = new Term[1];
+			affectedRows[0] = Term.createTerm(""+n);
+			rows.add(affectedRows);
+			
+			PResultSet res = new PResultSet(fields, rows);
+			return res;
+		
+		} catch (InvalidTermException e) {
+			throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
 		}
-
-		return 0;
+		
 	}
 
-	public int applyCommand(Drop request) throws PSQLException {
 
-		/**
-		 * Retract
-		 */
+//	protected void applyCommand(DropDB request) throws PSQLException {
+//		throw new PSQLException("non implemented yet",PSQLState.NOT_IMPLEMENTED);
+//	}
 
-		PDrop dropReq = new PDrop(this.metaSchema, request);
-
-		try {
-
-			String requestPsql = dropReq.generatePrologRequest();
-
-			log.debug("psql da eseguire su " + this.metaSchema.getSchemaName()
-					+ " : " + requestPsql);
-
-			SolveInfo info = this.engine.solve(requestPsql);
-
-			log.debug(info.toString());
-			int n = 0;
-			while (info.isSuccess()) {
-				n++;
-
-				if (this.engine.hasOpenAlternatives()) {
-					try {
-						info = this.engine.solveNext();
-					} catch (NoMoreSolutionException e) {
-						break;
-					}
-				} else {
-					break;
-				}
-			}
-
-			return n;
-
-		} catch (MalformedGoalException e) {
-
+	public PResultSet call() throws PSQLException {
+		
+		if ( this.request instanceof Select && !(this.request instanceof Delete) ) {
+			return this.find((Select) this.request);
+		} else {
+			return this.apply(this.request);
 		}
-
-		return 0;
-	}
-
-	public void applyCommand(DropDB request) throws PSQLException {
-		throw new PSQLException("non implemented yet",
-				PSQLState.NOT_IMPLEMENTED);
-	}
-
-	public void run() {
-		
-		
-		// TODO da fare....
-		
-		
 		
 	}
 

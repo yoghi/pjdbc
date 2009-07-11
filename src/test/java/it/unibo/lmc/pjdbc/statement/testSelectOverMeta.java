@@ -267,6 +267,7 @@ public class testSelectOverMeta extends TestCase {
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail(" ExecuteQuery<"+i+"> ha ritornato: " + e);
 		}
 		
@@ -643,9 +644,7 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt_1.executeQuery("select *.$0,d.$1 from employee as e, dept as d;");
-			
-			
+			stmt_1.executeQuery("select *.$0,d.$1 from employee as e, dept as d;");
 			
 		} catch (Exception e) {
 			assertTrue(true);

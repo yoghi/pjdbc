@@ -85,7 +85,7 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public void refreshRow() throws PSQLException {
-		PResultSet rs = this.db.executeSelect(this.requestSql);
+		PResultSet rs = this.db.executeQuery(this.requestSql);
 		this.pResult = rs;
 	}
 

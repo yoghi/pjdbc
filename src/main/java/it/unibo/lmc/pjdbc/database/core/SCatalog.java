@@ -8,12 +8,18 @@ import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
-import java.io.File;
 import java.util.Hashtable;
+import java.util.Iterator;
+
+import alice.tuprolog.Prolog;
+import alice.tuprolog.Struct;
+import alice.tuprolog.Term;
+import alice.tuprolog.Number;
+import alice.tuprolog.Theory;
 
 public class SCatalog extends Catalog {
 
-	private Hashtable<String,MSchema> availableMSchema;
+	private Hashtable<String,MSchema> availableMSchema = new Hashtable<String, MSchema>();
 
 
 	public SCatalog(PrologDatabase db) {
@@ -41,7 +47,7 @@ public class SCatalog extends Catalog {
 			tableDatabase.setField(1, "fileName", "string");
 			schemaMetabase.addMetaTableInfo(tableDatabase);
 			
-			MTable tableTable = new MTable(schemaMetabase, "table", 5);
+			MTable tableTable = new MTable(schemaMetabase, "mtable", 5);
 			tableTable.setField(0, "schemaName", "string");
 			tableTable.setField(1, "tableName", "string");
 			tableTable.setField(2, "columnPosition", "int");
@@ -53,17 +59,40 @@ public class SCatalog extends Catalog {
 			this.availableMSchema.put("metabase", schemaMetabase);
 			
 			//analizzo il database
-			PResultSet result = this.database.executeSelect("select * from metabase.mtable;");
+			PResultSet result = this.database.executeQuery("select schemaName,tableName,columnPosition,columnName,type from metabase.mtable;");
 			
-			result.getFields();
-			
-			System.exit(1);
-			
-			//devo cachare il risultato...
+			String nSchema, tname, cpos, cname, ctype;
+			while(result.next()){
+				
+				nSchema = result.getValue("schemaName").toString();
+				
+				MSchema mSchema = this.getAvailableMSchema(nSchema);
+				if ( null == mSchema ) {
+					mSchema = new MSchema(nSchema);
+					this.availableMSchema.put(nSchema, mSchema);
+				}
+				
+				tname = result.getValue("tableName").toString();
+				
+				MTable mTable = mSchema.getMetaTableInfo(tname);
+				if ( null == mTable ) {
+					mTable = new MTable(mSchema,tname,1);
+					mSchema.addMetaTableInfo(mTable);
+				}
+				
+				cpos = result.getValue("columnPosition").toString();
+				cname = result.getValue("columnName").toString();
+				ctype = result.getValue("type").toString();
+				
+				if ( !mTable.containsField(cname) ) {
+					mTable.setField(Integer.parseInt(cpos), cname, ctype);
+				}
+				
+				log.debug("checked : "+mSchema.getSchemaName()+"."+mTable.getTableName());
+				
+			}
 			
 		}
-		
-		
 		
 		// DEVO VALIDARE lo schema e in caso caricarlo in memoria
 		//catalogSchema.validate(filePrologDB.getName(),this.current_theory);
@@ -80,13 +109,73 @@ public class SCatalog extends Catalog {
 	}
 	
 
-	public MSchema validate(PSchema pSchema){
-		
-		return null;
-	}
-
 	public MSchema getAvailableMSchema(String nameSchema) {
 		return this.availableMSchema.get(nameSchema);
+	}
+	
+	public String getName(){
+		return "system";
+	}
+
+	public void validate(PSchema pSchema) throws PSQLException {
+		
+		Theory th = pSchema.getTheory();
+		String schemaName = pSchema.getName();
+		
+		
+		MSchema mSchema = null;
+		if ( this.availableMSchema.containsKey(schemaName) ){
+			mSchema = this.getAvailableMSchema(schemaName);
+		}
+		
+		if ( null == mSchema ){
+			mSchema = new MSchema(schemaName);
+			this.availableMSchema.put(schemaName, mSchema);
+		}
+		
+		Prolog engine = new Prolog();
+		Iterator i = th.iterator(engine);
+		
+		while(i.hasNext()){
+			Term t = (Term)i.next();
+			if ( t instanceof Struct ){
+	        	
+	        	Struct s = (Struct)t;
+	        	
+	        	// rimane il caso "predicato(...):-!"
+	        	if ( s.isGround() && s.isCompound() && !s.isList() ){
+	        		//NB: X e _ sono due variabili
+	        		int l = s.getArity();
+	        		
+	        		MTable mTable = mSchema.getMetaTableInfo(s.getName());
+        			if ( null == mTable ){ //non presente nel metabase
+        				mTable = new MTable(mSchema, s.getName(), l);
+	        			log.debug("trovata nuova tabella "+s.getName()+" di dimensione "+l+" in "+mSchema.getSchemaName());
+	        			mSchema.addMetaTableInfo(mTable);
+	        			
+	        			//analisi del campo
+	        			for (int j = 0; j < s.getArity(); j++) {
+							Term c1 = s.getArg(j);
+							
+							if ( c1.isList() ) mTable.setField(j, ""+j, "array");
+							else if ( c1 instanceof Number ) mTable.setField(j, ""+j, "real");
+							else mTable.setField(j, ""+j, "real");
+							
+						}
+	        			
+        			}
+        			if ( mTable.numColum() != l ) {
+        				log.warn("incoerenza tra metabase e dati sulla tabella :"+mSchema.getSchemaName()+"."+mTable.getTableName());
+        				log.warn("metabase column : "+mTable.numColum()+" real column "+l);
+        				//TODO decidere sul dafarsi
+        			}
+	        		
+	        		
+	        	}
+	        }
+		}
+
+		
 	}
 	
 	

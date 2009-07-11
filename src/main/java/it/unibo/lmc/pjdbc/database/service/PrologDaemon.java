@@ -2,6 +2,7 @@ package it.unibo.lmc.pjdbc.database.service;
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,23 +22,25 @@ public class PrologDaemon {
 	
 	public static PrologDatabase openDatabase(String url) throws FileNotFoundException, IOException, PSQLException{
 		
+		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		
 		/**
 		 * TODO: capire come è url e come è la key da usare per memorizzare il database
 		 * 
 		 * TODO: che transizione uso???
 		 */
 		
-		String key = url;
-		
-		PrologDatabase p;
-		if ( !attivi.containsKey(key) ){
-			p = PrologDatabase.getInstance(url);
-			attivi.put(key, p);
-		}
-		
-		p = attivi.get(key);
-			
-		return p;	
+//		String key = url;
+//		
+//		PrologDatabase p;
+//		if ( !attivi.containsKey(key) ){
+//			p = new PrologDatabase(url, null);
+//			attivi.put(key, p);
+//		}
+//		
+//		p = attivi.get(key);
+//			
+//		return p;	
 	}
 	
 	public static void close(String url) {

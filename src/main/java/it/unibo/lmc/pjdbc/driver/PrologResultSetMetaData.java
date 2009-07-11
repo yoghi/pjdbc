@@ -17,7 +17,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 
 	
 	private List<MColumn> fieldInfo = new ArrayList<MColumn>();
-	private MCatalog catalog;
+	private PrologDatabase database;
 
 	/**
 	 * Costruttore
@@ -28,7 +28,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 		
 		List<TableField> fields = pResult.getFields();
 		
-		this.catalog = db.getCatalogInfo();
+		this.database = db;
 		
 		for (TableField tableField : fields) {
 		
@@ -42,7 +42,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 					schemaName = tableField.getSchema();
 				}
 				
-				MColumn column = catalog.getMetaSchemaFromName(schemaName).getMetaTableInfo(tableField.getTableName()).getColumnMeta(tableField.getColumnName());
+				MColumn column = db.getMetaSchema(schemaName).getMetaTableInfo(tableField.getTableName()).getColumnMeta(tableField.getColumnName());
 				
 				this.fieldInfo.add(column);
 			
@@ -59,7 +59,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	 */
 	public String getCatalogName(int column) throws SQLException {
 		// TODO essendo un solo catalog possibile
-		return this.catalog.getName();
+		return this.database.getCatalog().getName();
 	}
 
 	public String getColumnClassName(int column) throws SQLException {

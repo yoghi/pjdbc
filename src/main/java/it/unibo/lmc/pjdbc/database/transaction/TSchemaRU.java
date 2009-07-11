@@ -13,6 +13,7 @@ import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
+import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.Prolog;
 
 /**
@@ -65,22 +66,16 @@ public class TSchemaRU extends TSchema {
 			
 			ExecuteChild task = new ExecuteChild(pEngine,minfo,request);
 			
-			Future<PResultSet> res = control.execute(task);
-			
-			while(res.isDone()){
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+			PResultSet pRes = control.execute(task);
 			
 			this.realSchema.setTheory(pEngine.getTheory());	//lo applico subito!!
 			
-			return res.get();
+			return pRes; 
 			
-		} catch (Exception e) {
-			throw new PSQLException("Errore durante l'esecuzione di "+request, PSQLState.SYSTEM_ERROR);
+		} catch (PSQLException e) {
+			throw e;
+		} catch (InvalidTheoryException e) {
+			throw new PSQLException("Theory error nell'esecuzione di "+request, PSQLState.SYSTEM_ERROR);
 		}
 	}
 	

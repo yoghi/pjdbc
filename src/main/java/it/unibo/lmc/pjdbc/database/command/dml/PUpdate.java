@@ -66,7 +66,7 @@ public class PUpdate extends PRequest {
 			
 			if ( field.getTableName().equalsIgnoreCase(mTable.getTableName()) ){
 				
-				int pos = mTable.containsField(field.getColumnName());
+				int pos = mTable.findField(field.getColumnName());
 				clausola.setTerm(accoppiamneti.get(field), pos, true);
 				
 			} else throw new PSQLException("clausola "+field.toString()+" "+accoppiamneti.get(field), PSQLState.INVALID_CLAUSOLE);
