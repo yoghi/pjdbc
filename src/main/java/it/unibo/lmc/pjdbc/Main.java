@@ -1,14 +1,11 @@
 package it.unibo.lmc.pjdbc;
 
-import it.unibo.lmc.pjdbc.driver.PrologStatement;
+import it.unibo.lmc.pjdbc.gui.CRUDGuiApp;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import org.apache.log4j.PropertyConfigurator;
@@ -19,43 +16,45 @@ public class Main {
 
 		load_config();
 		
-		try {
+		CRUDGuiApp.main(args);
 		
-			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
-		
-			//jdbc:typeJdbcDriver:catalog dir/remote:default schema
-			String user_dir = System.getProperty("user.dir");
-			Connection conn = DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog2:test");
-			
-			
-			conn.setAutoCommit(false);
-			
-			conn.setTransactionIsolation(2);	//DEFAULT = 1
-			
-			PrologStatement stmt = (PrologStatement)conn.createStatement();
-			
-			//ResultSet rs = stmt.executeQuery("select e.*,d.* from employee as e, dept as d where d.id = e.id;");
-			
-			stmt.execute("insert into employee values(10,'smith',1000); ");
-			
-			ResultSet rs = stmt.getResultSet();
-			
-			outputResultSet(rs);
-			
-			rs = stmt.executeQuery("select * from employee;");
-			
-			outputResultSet(rs);
-			
-//			conn.commit();
-			
-		
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//		
+//			Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
+//		
+//			//jdbc:typeJdbcDriver:catalog dir/remote:default schema
+//			String user_dir = System.getProperty("user.dir");
+//			Connection conn = DriverManager.getConnection("jdbc:prolog:"+user_dir+"/target/classes/database/catalog2:test");
+//			
+//			
+//			conn.setAutoCommit(false);
+//			
+//			conn.setTransactionIsolation(2);	//DEFAULT = 1
+//			
+//			PrologStatement stmt = (PrologStatement)conn.createStatement();
+//			
+//			//ResultSet rs = stmt.executeQuery("select e.*,d.* from employee as e, dept as d where d.id = e.id;");
+//			
+//			stmt.execute("insert into employee values(10,'smith',1000); ");
+//			
+//			ResultSet rs = stmt.getResultSet();
+//			
+//			outputResultSet(rs);
+//			
+//			rs = stmt.executeQuery("select * from employee;");
+//			
+//			outputResultSet(rs);
+//			
+////			conn.commit();
+//			
+//		
+//		} catch (ClassNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		
 	}
 
