@@ -36,7 +36,13 @@ public class Main {
 			
 			//ResultSet rs = stmt.executeQuery("select e.*,d.* from employee as e, dept as d where d.id = e.id;");
 			
-			ResultSet rs = stmt.executeQuery("select $0 from employee;");
+			stmt.execute("insert into employee values(10,'smith',1000); ");
+			
+			ResultSet rs = stmt.getResultSet();
+			
+			outputResultSet(rs);
+			
+			rs = stmt.executeQuery("select * from employee;");
 			
 			outputResultSet(rs);
 			

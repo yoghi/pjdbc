@@ -2,10 +2,12 @@ package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
 import it.unibo.lmc.pjdbc.database.command.PResultSet;
-import it.unibo.lmc.pjdbc.database.meta.MCatalog;
 import it.unibo.lmc.pjdbc.database.meta.MColumn;
+import it.unibo.lmc.pjdbc.database.meta.MSchema;
+import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.utils.PTypes;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.sql.ResultSetMetaData;
@@ -48,7 +50,14 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 					int pos = Integer.parseInt( tableField.getColumnName().replace("$", "")  );
 					column = columns[pos];
 				} else {
-					column = db.getMetaSchema(schemaName).getMetaTableInfo(tableField.getTableName()).getColumnMeta(tableField.getColumnName());
+					MSchema mschema = db.getMetaSchema(schemaName);
+					MTable mtable = mschema.getMetaTableInfo(tableField.getTableName());
+					if ( mtable == null ){
+						column = new MColumn(mschema, new MTable(mschema, "", 1) , tableField.getColumnName(), PTypes.STRING);
+					} else {
+						column = db.getMetaSchema(schemaName).getMetaTableInfo(tableField.getTableName()).getColumnMeta(tableField.getColumnName());
+					}
+					
 				}
 				
 				this.fieldInfo.add(column);

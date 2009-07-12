@@ -1,9 +1,9 @@
 \section{Structured Query Language}
 
-Lo Structured Query Language o SQL in forma abbreviata, è un linguaggio standard utilizzato per interrogare i database relazionali; allo stato attuale i moderni database implementano solo la parte \emph{Entry Level} di tale standard. 
+Lo Structured Query Language o SQL [sql] in forma abbreviata, è un linguaggio standard utilizzato per interrogare i database relazionali; allo stato attuale i moderni database implementano solo la parte \emph{Entry Level} di tale standard. 
 
 \subsection{Il parser}
-Per poter interpretare le richieste sql dell'utente si è reso necessario la creazione di un parser; in particolare dovrà essere in grado di poter riconoscere un sottoinsieme dello standard SQL/92. La sua realizzazione è avvenuta usando un tool chiamato javacc della Sun che mi ha permesso di specificare solo la grammatica da riconoscere e di lasciare allo strumento la generazione del codice relativa all'effettiva analisi del testo. La grammatica utilizzata per generare il parser comprende :
+Per poter interpretare le richieste sql dell'utente si è reso necessario la creazione di un parser; in particolare dovrà essere in grado di poter riconoscere un sottoinsieme dello standard SQL/92 [SQL92]. La sua realizzazione è avvenuta usando un tool chiamato javacc [javacc] della Sun che mi ha permesso di specificare solo la grammatica da riconoscere e di lasciare allo strumento la generazione del codice relativa all'effettiva analisi del testo. Ho trovato particolare difficoltà nella parte delle clausole {\bf where}, quando ho dovuto risolvere la questione degli annidamenti; alla fine ho deciso di lasciarli da parte e di realizzare solo le clausole {\bf where} dirette. La difficoltà degli annidamenti risiede non tanto nella grammatica quanto nella conversione in prolog. La grammatica utilizzata per generare il parser comprende :
 \begin{itemize}
 \item {\bf Operatori del linguaggio}, ossia le parole significative, che nel nostro caso possono essere di due tipi : 
 \begin{itemize}
@@ -105,4 +105,24 @@ Gli operatori, messi a disposizione dal SQL/92 si dividono in quattro categorie:
 \item Operatori logici
 \end{enumerate}
 Di questi sono stati presi in considerazione solo quelli di confronto, che sono solitamente i più utilizzati; questi operatori sono comunque tutti supportati dal prolog.
+
+\subsubsection{Operatori di confronto}
+\begin{enumerate}
+\item ==
+\item !=
+\item >
+\item <
+\item >=
+\item <=
+\end{enumerate}
+che in prolog si trasformano nei seguenti 
+\begin{enumerate}
+\item ==
+\item {\textbackslash}==
+\item @>
+\item @<
+\item @>=
+\item @<=
+\end{enumerate}
+da non confonderli con gli operatori di confronto tra espressioni 
 

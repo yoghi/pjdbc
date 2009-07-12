@@ -1,34 +1,21 @@
 \section{Il driver}
 
-Il driver è stato sviluppato secondo le specifiche \emph{JDBC 4.0} (JSR 221) del Novembre 2006; secondo queste specifiche il driver è di tipo 4, ossia interamente scritto in java con accesso diretto alle risorse che compongono il database. Per aderire a queste specifiche è necessario che vengano implementate le seguenti interfacce : 
+Il driver è stato sviluppato secondo le specifiche \emph{JDBC 4.0} (JSR 221) del Novembre 2006; secondo queste specifiche il driver è di tipo 4, ossia interamente scritto in java con accesso diretto alle risorse che compongono il database. Per aderire a queste specifiche ho parzialmente implementato le seguenti interfacce : 
 \begin{itemize}
-\item[-] java.sql.Driver
-\item[-] java.sql.DataSource
-\item[-] java.sql.DatabaseMetaData
-\item[-] java.sql.ParameterMetaData
-\item[-] java.sql.ResultSetMetaData
-\item[-] java.sql.Wrapper
+\item[-] java.sql.Driver (parziale)
+\item[-] java.sql.DataSource (non implementata)
+\item[-] java.sql.DatabaseMetaData (parziale)
+\item[-] java.sql.ParameterMetaData (parziale)
+\item[-] java.sql.ResultSetMetaData (parziale)
+\item[-] java.sql.Wrapper (non implementata) 
 \end{itemize}
-e supportare nei ResultSet la capacita di concorrenza in lettura. 
 
-%Java Specification 
+In particolare il supporto al \emph{cursor} , alle transazioni , alle funzioni, al wrapping e alla creazione di strutture dati non è attualmente presente. Inoltre in Stantement non ho implementato la parte di PrepareStantement, quindi della figura sottostante [Fig.2] solo il ramo di sinistra è implementato e funzionante. 
 
-%-- immagine riassuntiva di come è strutturato un driver JDBC 
 
-%-- classi introdotte 
 
- %--- Come interprete/risolutore prolog è stato scelto il tuProlog nella sua ultima versione disponibile. ---
- 
-% -- se manca il metabase, ne creo cmq. uno io all'avvio e lo tengo in memoria ---- 
-
-\subsection{Struttura}
-
-Catalog è la cartella in cui si opera
-Schema è il nome del file .db su cui si opera
-Table è il funtore che si usa all'interno della teoria prolog
-
-Nella cartella ci sono anche dei file .log(??) che servono per tenere traccia delle transizioni
-
-\subsection{Operazion}	% CRUD
-
-\subsection{Transazioni}	% ACID
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\textwidth]{immagini/jdbc.png}
+\caption{JDBC Class Relationship}\label{fig:immagini/jdbc.png}
+\end{figure}
