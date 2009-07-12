@@ -66,7 +66,13 @@ public class PUpdate extends PRequest {
 			
 			if ( field.getTableName().equalsIgnoreCase(mTable.getTableName()) ){
 				
-				int pos = mTable.findField(field.getColumnName());
+				int pos = 0;
+				if ( field.getColumnName().startsWith("$") ){
+					pos = Integer.parseInt(field.getColumnName().replace("$", "")); 
+				} else {
+					pos = mTable.findField(field.getColumnName());
+				}
+				
 				clausola.setTerm(accoppiamneti.get(field), pos, true);
 				
 			} else throw new PSQLException("clausola "+field.toString()+" "+accoppiamneti.get(field), PSQLState.INVALID_CLAUSOLE);
@@ -100,10 +106,24 @@ public class PUpdate extends PRequest {
 				TableField tf = exp.getLeftF();
 				if ( tf.getSchema() == null ) tf.setSchema(this.mschema.getSchemaName());
 				if ( tf.getTableName() == null ) tf.setTableName(this.updateTable.getName());
+				
 				String varPsql = null;
-				for(String key : this.mapVariables.keySet() ){
-					if ( this.mapVariables.get(key).equalsIgnoreCase(tf.getQualifiedName()) ){
-						varPsql = key;
+				
+				if ( tf.getColumnName().startsWith("$") ){
+					MTable info = this.mschema.getMetaTableInfo(tf.getTableName());
+					MColumn[] columns = info.getColumns();
+					int pos = Integer.parseInt(tf.getColumnName().replace("$", ""));
+					for(String key : this.mapVariables.keySet() ){
+						if ( this.mapVariables.get(key).equalsIgnoreCase(columns[pos].getQualifiedName()) ){
+							varPsql = key;
+						}
+					}
+				} else {
+			
+					for(String key : this.mapVariables.keySet() ){
+						if ( this.mapVariables.get(key).equalsIgnoreCase(tf.getQualifiedName()) ){
+							varPsql = key;
+						}
 					}
 				}
 				

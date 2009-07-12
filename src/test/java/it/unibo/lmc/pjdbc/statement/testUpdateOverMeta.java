@@ -160,7 +160,7 @@ public class testUpdateOverMeta extends TestCase {
 		
 		try {
 			
-			int n = stmt.executeUpdate("update prolog1.age SET age = 5 WHERE name = 'smith' ;");
+			int n = stmt.executeUpdate("update prolog1.age SET $1 = 5 WHERE $0 = 'smith' ;");
 			
 			assertEquals(1, n);
 			

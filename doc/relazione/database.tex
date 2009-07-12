@@ -3,31 +3,23 @@
 Una definizione di database può essere {\bf il database rappresenta un archivio di dati strutturati}; la struttura più diffusa in questo momento è quella chiamata \emph{relazionale}, che si compone di tabelle e di relazioni tra di esse.
 
 \subsection{Database Prolog}
-Il database avrà una struttura relazionale e sarà contenuto in una teoria prolog; le relazioni saranno espresse mediante l'uso di opportuni predicati. La tabella all'interno di questo database sarà rappresenta da un insieme di termini \emph{compound} prolog che rappresenteranno le righe delle tabelle; le righe avranno come sintassi:  
+Il database sarà una teoria prolog, dove le tabelle verranno espresse come una lista di fatti (\emph{facts}) dove ogni atomo della lista rappresenterà una riga di tale tabella. Il nome della tabella sarà il predicato mentre gli argomenti saranno i valori delle colonne. Per rappresentare una tabella di nome nomeTabella con N colonne (col1...colN) potrò usare la seguente sintassi:
 \begin{lstlisting}[language=Prolog]
  nomeTabella(col1,col2,......,colN).
 \end{lstlisting}
-I termini per appartenere ad una tabella dovranno avere come nome il nome della tabella. Esempio:
+Un caso particolare può essere: 
 \begin{lstlisting}[language=Prolog]
- ta(col1,col2,col3).
- ta(col11,col21,col31).
+ tabella(col1,col2,col3).
+ tabella(col1,col2).
 \end{lstlisting}
-questi due termini rappresentano due righe di una tabella;
-\begin{lstlisting}[language=Prolog]
- ta(col1,col2,col3).
- tb(col1,col2,col3).
-\end{lstlisting}
-questi due termini rappresentano due righe di due tabelle rispettivamente ta e tb;
-\begin{lstlisting}[language=Prolog]
- ta(col1,col2,col3).
- ta(col1,col2).
-\end{lstlisting}
-questi due termini sono ambigui, non si sa cosa si voglia rappresentare; potrebbe essere che la col3 è null e quindi è stata omessa? la seconda tabella è una tabella diversa dalla prima? per semplificare ritengo che nel caso si presenti una situazione del genere venga generata un'eccezione e si lasci all'utente decidere come disambinguare la situazione. Per esprimere che una colonna è non settata basta usare il valore \emph{NULL} come valore, esempio : 
+questi due termini sono ambigui, non si sa cosa si voglia rappresentare; potrebbe essere che la col3 è null e quindi è stata omessa? oppure la seconda tabella è una tabella diversa dalla prima? per semplificare ho retenuto che nel caso si presenti una situazione del genere venga generata un'eccezione e si lasci all'utente decidere come disambinguare la situazione. Un modo per risolvere potrebbe essere quello usare il termine \emph{null} come valore, esempio : 
 
 \begin{lstlisting}[language=Prolog]
  ta(col1,col2,col3).
- ta(col1,NULL,col2).
+ ta(col1,null,col2).
 \end{lstlisting} 
+
+Il termine \emph{null} ovviamente dovrà essere minuscolo altrimenti dal prolog verrebbe considerato una variabile. Il database così costruito ha come tipi di dati primitivi gli stessi supportati dal prolog; come strutture dati ha anche il supporto agli Array in quanto sono facilmente rappresentabili in prolog come delle liste. 
 
 \subsection{Il metabase}
 Per avere la completezza di informazioni tipiche di un moderno database relazionale è necessario avere delle ulteriori informazioni su come è strutturato il database ed in particolare sulla struttura delle tabelle; queste informazioni solitamente compongono quello che è chiamato \emph{metabase} o \emph{metadatabase}. Un possibile insieme di informazioni utili possono essere : 
@@ -36,9 +28,9 @@ Per avere la completezza di informazioni tipiche di un moderno database relazion
 \item il tipo di dato che contiene una colonna
 \item la descrizione del contenuto di una colonna 
 \end{enumerate}
-questi sono solo alcuni possibili elementi. Nel nostro caso il \emph{metabase} può essere descritto attraverso l'uso di una tabella di sistema dal nome {\bf metabase}; la sintassi sarà : 
+questi sono solo alcuni possibili elementi. Nel nostro caso il \emph{metabase} può essere descritto attraverso l'uso di una tabella di sistema dal nome {\bf mtable}; la sintassi sarà : 
 \begin{lstlisting}[language=Prolog,showstringspaces=false]
- metabase(
+ mtable(
 	"nome tabella",
 	"posizione della colonna tra gli argomenti",
 	"nome della colonna",
@@ -47,14 +39,9 @@ questi sono solo alcuni possibili elementi. Nel nostro caso il \emph{metabase} p
 \end{lstlisting}
 Questa particolare tabella non è pero necessaria, il database sarà comuque consistente, ma la sua presenza facilita l'interazione dell'utente nello scrivere query sql. Un esempio :
 \begin{lstlisting}[language=Prolog,showstringspaces=false]
- metabase("ta",1,"colonna1","string").
+ mtable("ta",1,"colonna1","string").
 \end{lstlisting}
 Permetterà all'utente di usare il nome della colonna nelle clausole sql.
 
-\subsection{Tipi di dato}
-
-\subsubsection{Dati primitivi e Strutture Dati}
-
-Il database essendo scritto in prolog avrà come tipi di dati primitivi gli stessi supportati dal prolog; ossia \emph {int,double,float,string} con l'aggiunta dei \emph{boolean}: true e false. 
-Come strutture dati ho preso in considerazione gli Array che posso tranquillamente mappare come \emph{List} in Prolog.
-
+\subsection{Store Procedure e Function}
+E' possibile pensare a far supportare al database prolog anche le \emph{store procedure} e le \emph{function}  in quanto in una teoria prolog oltre ai fatti si possono inserire anche delle regole (\emph{rules}). Il supporto a tale funzionalità è stato rimandato a estensioni future. 

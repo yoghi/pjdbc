@@ -14,24 +14,87 @@ Per poter interpretare le richieste sql dell'utente si è reso necessario la cre
 \end{itemize}
 
 \subsection{Comandi}
-I Comandi possibili sono suddivisi in due categorie Data Definition Language o DDL e Data Manipulation Language o DML. Quelli che ho implementato sono:
+I Comandi possibili sono suddivisi in due categorie :
 \begin{itemize}
-\item DDL :
+\item Data Definition Language (DDL) :
 \begin{itemize}
 \item[-] Create "Database"
 \item[-] Drop "Database"
 \end{itemize}
-\item DML :
+\item Data Manipulation Language (DML) :
 \begin{itemize}
 \item[-] Create Table
 \item[-] Select
 \item[-] Update
 \item[-] Insert 
 \item[-] Delete
-\item[-] Truncate Table 
 \item[-] Drop Table
 \end{itemize}
 \end{itemize}
+
+I vadi comandi sono pensati in modo da far compiere all'engine del prolog l'intera operazione sql richiesta facendo fare al java il solo ruolo di conversione sql alla sintassi prolog. Inoltre per sopperire all'eventuale mancanza di informazioni sul nome delle colonne è possibile specificare in ogni momento al posto del nome la posizione della colonna all'interno della tabella; per fare questo basta anteporre alla posizione il carattere speciale {\$}. Questo è possibile in quanto al caricamento del database in memoria viene creato un metabase virtuale che fornisca le informazioni minime necessarie al funzionamento del sistema e che possa essere arricchito da informazioni presenti su un eventuale file contenente il metabase vero e proprio. 
+
+\subsubsection{Select}
+Prendo come query di esempio : 
+\begin{lstlisting}[language=Sql]
+ Select $3 from nometabella where $2 = 1;
+\end{lstlisting}
+a questa query sql viene prima applicato un filtro per completare le parti sottointese : 
+\begin{lstlisting}[language=Sql]
+ Select [nomeschema.nometabella.$3] 
+ from [nomeschema.nometabella] 
+ where [nomeschema.nometabella.$2 = 1];
+\end{lstlisting}
+e poi viene trasformata in una query prolog : 
+\begin{lstlisting}[language=Prolog]
+ nometabella(_,VAR2,VAR3),VAR2==1.
+\end{lstlisting}
+che verrà eseguita nella teoria prolog relativa allo schema selezionato. 
+
+\subsubsection{Insert}
+Prendo come query di esempio : 
+\begin{lstlisting}[language=Sql]
+ insert into employee values (100,'paperino',1000);
+\end{lstlisting}
+verrà trasformata ,dopo gli opportuni filtri, nella seguente query prolog : 
+\begin{lstlisting}[language=Prolog]
+ assert(employee(100,'paperino',1000)).
+\end{lstlisting}
+
+\subsubsection{Delete}
+Prendo come query di esempio : 
+\begin{lstlisting}[language=Sql]
+ delete from prolog1.dept where dept.id = 1;
+\end{lstlisting}
+verrà trasformata ,dopo gli opportuni filtri, nella seguente query prolog : 
+\begin{lstlisting}[language=Prolog]
+ dept(VAR0,VAR1),VAR1==1,retract(dept(VAR0,VAR1)).
+\end{lstlisting}
+
+\subsubsection{Update}
+Prendo come query di esempio : 
+\begin{lstlisting}[language=Sql]
+ update prolog1.age SET age = 5 WHERE name = 'smith' ;
+\end{lstlisting}
+verrà trasformata ,dopo gli opportuni filtri, nella seguente query prolog : 
+\begin{lstlisting}[language=Prolog]
+ age(VAR0,VAR1),
+ VAR0=='smith',
+ retract(age(VAR0,VAR1)),
+ assert(age(VAR0,5)).
+\end{lstlisting}
+
+\subsubsection{Drop}
+Prendo come query di esempio : 
+\begin{lstlisting}[language=Sql]
+ drop table prolog1.employee;
+\end{lstlisting}
+verrà trasformata ,dopo gli opportuni filtri, nella seguente query prolog : 
+\begin{lstlisting}[language=Prolog]
+ retract(employee(_,_,_)).
+\end{lstlisting}
+Questa particolare query oltre al normale comportamente lancia anche l'esecuzione di una query secondaria per rimuovere le informazioni di questa tabella sul metabase. 
+
 
 \subsection{Operatori}
 Gli operatori, messi a disposizione dal SQL/92 si dividono in quattro categorie:
@@ -41,4 +104,5 @@ Gli operatori, messi a disposizione dal SQL/92 si dividono in quattro categorie:
 \item Operatori condizionali
 \item Operatori logici
 \end{enumerate}
-Di questi sono stati presi in considerazione solo quelli di confronto, che sono solitamente i più utili. 
+Di questi sono stati presi in considerazione solo quelli di confronto, che sono solitamente i più utilizzati; questi operatori sono comunque tutti supportati dal prolog.
+
