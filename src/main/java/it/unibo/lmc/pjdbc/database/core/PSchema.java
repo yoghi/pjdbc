@@ -103,8 +103,18 @@ public class PSchema {
 		}
 	}
 	
-	public void close() {
-		//TODO: devo rilasciare le risorse : theory e quant'altro a esso collegata
+	public void close() throws PSQLException {
+		FileOutputStream fout;
+		try {
+			fout = new FileOutputStream(this.schemaFile);
+			fout.write(this.current_theory.toString().getBytes());
+			log.debug("saved & closed "+this.schemaFile);
+		} catch (FileNotFoundException e) {
+			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
+		} catch (IOException e) {
+			throw new PSQLException(e.getLocalizedMessage(), PSQLState.SYSTEM_ERROR);
+		}
+		
 	}
 
 	public void commit() throws PSQLException {

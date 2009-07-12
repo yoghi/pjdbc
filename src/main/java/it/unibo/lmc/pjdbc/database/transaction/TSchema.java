@@ -70,7 +70,7 @@ public abstract class TSchema {
 //	public abstract int applyCommand(Delete request) throws PSQLException;
 //	public abstract int applyCommand(Drop request) throws PSQLException;
 
-	public void close() {
+	public void close() throws PSQLException {
 		this.realSchema.close();
 	}
 	

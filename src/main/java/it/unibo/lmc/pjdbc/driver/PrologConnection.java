@@ -114,7 +114,8 @@ public class PrologConnection implements Connection {
 
 	
 	public void close() throws SQLException {
-		PrologDaemon.close(this.sourceUrl);
+		//PrologDaemon.close(this.sourceUrl);
+		this.db.close();
 	}
 
 	

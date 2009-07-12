@@ -60,7 +60,12 @@ public abstract class Catalog {
 	 */
 	public void close() {
 		for (String schemaName : this.availableSchema.keySet()) {
-			this.availableSchema.get(schemaName).close();
+			try {
+				this.availableSchema.get(schemaName).close();
+			} catch (PSQLException e) {
+				e.printStackTrace();
+				log.error(e.getLocalizedMessage());
+			}
 		}
 	}
 	

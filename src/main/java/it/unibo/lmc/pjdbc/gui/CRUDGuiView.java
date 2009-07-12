@@ -4,11 +4,6 @@
 
 package it.unibo.lmc.pjdbc.gui;
 
-import org.jdesktop.application.Action;
-import org.jdesktop.application.ResourceMap;
-import org.jdesktop.application.SingleFrameApplication;
-import org.jdesktop.application.FrameView;
-import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -17,14 +12,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
+
+import org.jdesktop.application.Action;
+import org.jdesktop.application.FrameView;
+import org.jdesktop.application.ResourceMap;
+import org.jdesktop.application.SingleFrameApplication;
+import org.jdesktop.application.TaskMonitor;
 
 
 /**
@@ -266,7 +266,7 @@ public class CRUDGuiView extends FrameView {
                     connection = DriverManager.getConnection(url);
 
                 } catch (Exception e){
-                    e.printStackTrace();
+                	JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
                 }
 
                 this.jConnectButton.setText("Disconnect");
@@ -278,11 +278,11 @@ public class CRUDGuiView extends FrameView {
 
             try {
                 this.connection.close();
+                this.connected = false;
+                this.jConnectButton.setText("Connect");
             } catch (Exception e){
-                e.printStackTrace();
+            	JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
             }
-
-            this.jConnectButton.setText("Connect");
 
         }
 
