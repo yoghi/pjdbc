@@ -111,13 +111,14 @@ public class PrologDatabase {
 			this.baseCatalog = new PCatalog(f.getName(),this);
 			
 			this.loadSchemas(this.systemCatalog,f,".dbs");
-			this.loadSchemas(this.baseCatalog,f,".db");
 			
 			if ( this.systemCatalog.getAvailableMSchema("metabase") == null ){
 				PSchema pM = new PSchema(f.getAbsolutePath()+"/metabase.dbs", "metabase");
 				TSchemaRU tschemaM = new TSchemaRU(this,pM);
 				this.systemCatalog.addSchema(tschemaM, "metabase");
 			}
+			
+			this.loadSchemas(this.baseCatalog,f,".db");
 			
 		} else {	//catalog-file
 			
@@ -126,16 +127,16 @@ public class PrologDatabase {
 				this.systemCatalog = new SCatalog(this);
 				this.baseCatalog = new PCatalog(f.getName(),this);
 				
-				PSchema p = new PSchema(f.getAbsolutePath(), f.getName().replace(".db", ""));
-				TSchemaRU tschema = new TSchemaRU(this,p);
-				this.baseCatalog.addSchema(tschema, p.getName());
-				this.systemCatalog.validate(p);
-				
 				if ( this.systemCatalog.getAvailableMSchema("metabase") == null ){
 					PSchema pM = new PSchema(System.getProperty("java.io.tmpdir")+"/metabase.dbs", "metabase");
 					TSchemaRU tschemaM = new TSchemaRU(this,pM);
 					this.systemCatalog.addSchema(tschemaM, "metabase");
 				}
+				
+				PSchema p = new PSchema(f.getAbsolutePath(), f.getName().replace(".db", ""));
+				TSchemaRU tschema = new TSchemaRU(this,p);
+				this.baseCatalog.addSchema(tschema, p.getName());
+				this.systemCatalog.validate(p);
 				
 			}
 			
