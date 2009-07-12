@@ -1,56 +1,41 @@
 
 
-DUE QUERY IN FILA FUNZIONANO?? query1; query2; ... no ma dovrebbero??
+## INFO UTILIZZO ##
 
-NB: due colonne con lo stesso nome non possono esistere!!!
+Il driver si puo attivare con l'url 
 
+	jdbc:prolog:catalogDir
+	
+	oppure 
 
-Sintassi del javacc 
+	jdbc:prolog:catalogDir:defaultSchema
+	
+Il database fornisce : 
 
-void methodName():
-{
-	// linguaggio java 
-	// inizializzo variabili etc etc
-}
-{
-  	//linguaggio javacc per esprireme il parsing  
-    // ES. ci deve essere quello che è espresso da methodName2 seguito da ;
-    methodName2() ";" { //java da eseguire dopo che si è trovato il matching }
-
-}
-
-
-
-> NOTE 
-In caso di presenza di . nella sintassi si considera : 
-schema.table_name.column
-
-> NOTE 2 
-Ho una richiesta diversa a seconda che sia 
 SELECT
 INSERT
-DELETE
 UPDATE
+DELETE
 
-ognuna di loro ha campi diversi 
+DROP TABLE
+CREATE TABLE
+
+con cluasole WHERE semplici (Es: id == 1) senza annidamenti
+
+Alcuni database di test si trovano dentro main/resources/database, dove catalog1 è il catalog completo , catalog2 catalog parziale. 
+
+Nel jar è contenuta anche una semplice GUI per poter provare immediatamente le potenzialità del driver. Per avviarla basta lanciare il Main. 
+
+il covering a livello di test delle classi non è completo.
 
 
-******** COSE DA FARE
+## CODICE ##
 
-Expression,Simple Expression
+Il repository con il codice : http://code.google.com/p/pjdbc/
 
-Caso Insert con values presi da una SubSelect();
-
-
+Testato con la JAVA VM : 1.5.0 (MacOsX 10.5.7)
 
 
-/* predicati */
-/* Es. lookAll(10,[10,20,10,30,10],L) tutte le posizioni del 10 */
-lookAll(X,L,Ps):- findall(P,lookAny(X,L,P),Ps).
-/* da definire meglio ...*/
+## RELAZIONE ##
 
-max([H|T],M):-max([H|T],M,H). 
-max([H|T],M,Temp):-H>Temp, max(T,M,H). 
-max([H|T],M,Temp):-H<=Temp, max(T,M,Temp). 
-max([],M,M).
-maggiore([H|T],Paragone,Risultato) :-  true.
+il sorgente della relazione e la relazione si trovano nell cartella doc
