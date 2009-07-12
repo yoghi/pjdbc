@@ -35,4 +35,12 @@ public class ColumnType {
 		return this.columnName+"{" + this.typeName  + "}";
 	}
 
+	public String getType() {
+		return this.typeName;
+	}
+	
+	public String getName(){
+		return this.columnName;
+	}
+
 }

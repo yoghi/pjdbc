@@ -73,9 +73,10 @@ public class testInsertOverMeta extends TestCase {
 	    
 		TestSuite ts = new TestSuite();
 		
-		ts.addTest(new testInsertOverMeta("testBaseInsert"));
-		ts.addTest(new testInsertOverMeta("testShortInsert"));
-		ts.addTest(new testInsertOverMeta("testInvalidInsert"));
+		ts.addTest(new testInsertOverMeta("testCreate"));
+//		ts.addTest(new testInsertOverMeta("testBaseInsert"));
+//		ts.addTest(new testInsertOverMeta("testShortInsert"));
+//		ts.addTest(new testInsertOverMeta("testInvalidInsert"));
 	
 		return ts;
 	}
@@ -150,6 +151,30 @@ public class testInsertOverMeta extends TestCase {
 		
 		
 	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testCreate() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testCreate            ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			int rs = stmt.executeUpdate("create table prova ( id string , age int );");
+			assertEquals(1, rs);
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	
 
 	
 }

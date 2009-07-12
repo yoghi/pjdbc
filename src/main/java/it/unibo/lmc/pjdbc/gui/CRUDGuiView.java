@@ -263,6 +263,7 @@ public class CRUDGuiView extends FrameView {
                 try{
 
                     Class.forName("it.unibo.lmc.pjdbc.driver.PrologDriver");
+                    
                     connection = DriverManager.getConnection(url);
 
                 } catch (Exception e){

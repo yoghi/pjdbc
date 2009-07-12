@@ -16,9 +16,14 @@ public class CreateTable extends ParsedCommand {
 	public void addElement(ColumnType element) {
 		this.columns.add(element);
 	}
+	
 
 	public void setTable(Table table) {
 		this.table = table;
+	}
+	
+	public Table getTable(){
+		return this.table;
 	}
 	
 	public String toString(){
@@ -29,6 +34,10 @@ public class CreateTable extends ParsedCommand {
 		}
 		
 		return "create table "+table+" ( " +c+ " );";
+	}
+
+	public ArrayList<ColumnType> getColumnsElement() {
+		return columns;
 	}
 
 }

@@ -7,19 +7,23 @@ import it.unibo.lmc.pjdbc.database.core.PCatalog;
 import it.unibo.lmc.pjdbc.database.core.PSchema;
 import it.unibo.lmc.pjdbc.database.core.SCatalog;
 import it.unibo.lmc.pjdbc.database.executor.ExecuteControl;
+import it.unibo.lmc.pjdbc.database.meta.MColumn;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.utils.PTypes;
 import it.unibo.lmc.pjdbc.parser.ParseException;
 import it.unibo.lmc.pjdbc.parser.Psql;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.imp.CreateTable;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Delete;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Drop;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Insert;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
+import it.unibo.lmc.pjdbc.parser.schema.ColumnType;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
@@ -27,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -106,7 +111,13 @@ public class PrologDatabase {
 			this.baseCatalog = new PCatalog(f.getName(),this);
 			
 			this.loadSchemas(this.systemCatalog,f,".dbs");
-			this.loadSchemas(this.baseCatalog,f,".db");	
+			this.loadSchemas(this.baseCatalog,f,".db");
+			
+			if ( this.systemCatalog.getAvailableMSchema("metabase") == null ){
+				PSchema pM = new PSchema(f.getAbsolutePath()+"/metabase.dbs", "metabase");
+				TSchemaRU tschemaM = new TSchemaRU(this,pM);
+				this.systemCatalog.addSchema(tschemaM, "metabase");
+			}
 			
 		} else {	//catalog-file
 			
@@ -119,6 +130,13 @@ public class PrologDatabase {
 				TSchemaRU tschema = new TSchemaRU(this,p);
 				this.baseCatalog.addSchema(tschema, p.getName());
 				this.systemCatalog.validate(p);
+				
+				if ( this.systemCatalog.getAvailableMSchema("metabase") == null ){
+					PSchema pM = new PSchema(System.getProperty("java.io.tmpdir")+"/metabase.dbs", "metabase");
+					TSchemaRU tschemaM = new TSchemaRU(this,pM);
+					this.systemCatalog.addSchema(tschemaM, "metabase");
+				}
+				
 			}
 			
 		}
@@ -383,6 +401,63 @@ public class PrologDatabase {
 				throw new PSQLException("Invalid Schema : "+schema,PSQLState.SYNTAX_ERROR);
 			}
 
+		}
+		
+		if ( pRequest instanceof CreateTable ){
+			
+			CreateTable createReq = (CreateTable)pRequest;
+			
+			Table toCreate = createReq.getTable();
+			
+			String nameTable = toCreate.getName();
+			
+			String schemaName;
+			if ( toCreate.getSchemaName() == null ) schemaName = this.getCurrentSchema();
+			else schemaName = toCreate.getSchemaName();
+			
+			ArrayList<ColumnType> columns = createReq.getColumnsElement();
+			
+			int i = 0;
+			for (ColumnType columnType : columns) {
+				String cType = columnType.getType();
+				
+				PTypes t = null;
+				try {
+					t = PTypes.valueOf(cType.toUpperCase());
+				} catch (Exception e) {
+					throw new PSQLException("invalid type "+cType, PSQLState.INVALID_CLAUSOLE);
+				}
+				
+				String cName = columnType.getName();
+				// mtable(%schemaName,%tableName,%columnPosition,%columnName,%type).
+				PResultSet res = this.executeQuery("insert into metabase.mtable values ('"+schemaName+"','"+nameTable+"',"+i+",'"+cName+"','"+t.toString().toLowerCase()+"');");
+				if ( res.next() ) {
+					// OK;
+				}
+				i++;
+			}
+			
+			this.systemCatalog.reload();
+			
+			try {
+				
+				LinkedList<Term[]> rows = new LinkedList<Term[]>();
+				LinkedList<TableField> fields = new LinkedList<TableField>();
+				TableField tf = new TableField();
+				tf.setAlias("AffectedRow");
+				fields.add(tf);
+				
+				Term[] affectedRows = new Term[1];
+				affectedRows[0] = Term.createTerm("1");
+				rows.add(affectedRows);
+				
+				PResultSet res = new PResultSet(fields, rows);
+				return res;
+			
+			} catch (InvalidTermException e) {
+				throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+			}
+			
 		}
 		
 		throw new PSQLException("Invalid Select : "+pRequest.toString(),PSQLState.DATA_TYPE_MISMATCH);

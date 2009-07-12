@@ -5,24 +5,20 @@ import it.unibo.lmc.pjdbc.database.command.PResultSet;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
-import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import com.sun.java_cup.internal.shift_action;
-
+import alice.tuprolog.Number;
 import alice.tuprolog.Prolog;
 import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
-import alice.tuprolog.Number;
 import alice.tuprolog.Theory;
 
 public class SCatalog extends Catalog {
 
 	private Hashtable<String,MSchema> availableMSchema = new Hashtable<String, MSchema>();
-
 
 	public SCatalog(PrologDatabase db) {
 		super(db);
@@ -41,59 +37,7 @@ public class SCatalog extends Catalog {
 		this.log.info("Caricato schema : "+nameSchema);	
 		
 		if ( nameSchema.equalsIgnoreCase("metabase")  ){
-			
-			MSchema schemaMetabase = new MSchema("metabase");
-			
-			MTable tableDatabase = new MTable(schemaMetabase, "database", 2);
-			tableDatabase.setField(0, "schemaName", "string");
-			tableDatabase.setField(1, "fileName", "string");
-			schemaMetabase.addMetaTableInfo(tableDatabase);
-			
-			MTable tableTable = new MTable(schemaMetabase, "mtable", 5);
-			tableTable.setField(0, "schemaName", "string");
-			tableTable.setField(1, "tableName", "string");
-			tableTable.setField(2, "columnPosition", "int");
-			tableTable.setField(3, "columnName", "string");
-			tableTable.setField(4, "type", "string");
-			schemaMetabase.addMetaTableInfo(tableTable);
-			
-			//this.schemaList.put("metabase", schemaMetabase);
-			this.availableMSchema.put("metabase", schemaMetabase);
-			
-			//analizzo il database
-			PResultSet result = this.database.executeQuery("select schemaName,tableName,columnPosition,columnName,type from metabase.mtable;");
-			
-			String nSchema, tname, cpos, cname, ctype;
-			while(result.next()){
-				
-				nSchema = result.getValue("schemaName").toString();
-				
-				MSchema mSchema = this.getAvailableMSchema(nSchema);
-				if ( null == mSchema ) {
-					mSchema = new MSchema(nSchema);
-					this.availableMSchema.put(nSchema, mSchema);
-				}
-				
-				tname = result.getValue("tableName").toString();
-				
-				MTable mTable = mSchema.getMetaTableInfo(tname);
-				if ( null == mTable ) {
-					mTable = new MTable(mSchema,tname,1);
-					mSchema.addMetaTableInfo(mTable);
-				}
-				
-				cpos = result.getValue("columnPosition").toString();
-				cname = result.getValue("columnName").toString();
-				ctype = result.getValue("type").toString();
-				
-				if ( !mTable.containsField(cname) ) {
-					mTable.setField(Integer.parseInt(cpos), cname, ctype);
-				}
-				
-				log.debug("checked : "+mSchema.getSchemaName()+"."+mTable.getTableName());
-				
-			}
-			
+			this.loadMetabase(tschema,nameSchema);
 		}
 		
 		// DEVO VALIDARE lo schema e in caso caricarlo in memoria
@@ -110,6 +54,76 @@ public class SCatalog extends Catalog {
 		
 	}
 	
+	public void reload() throws PSQLException{
+		for(String nameSchema :  this.availableSchema.keySet()){
+			TSchema tschema = this.availableSchema.get(nameSchema);
+			this.loadMetabase(tschema,nameSchema);
+		}
+	}
+	
+
+	private void loadMetabase(TSchema tschema, String nameSchema) throws PSQLException {
+		
+		this.availableMSchema.clear();
+		
+		this.selfAdd();
+		
+		//analizzo il database
+		PResultSet result = this.database.executeQuery("select schemaName,tableName,columnPosition,columnName,type from metabase.mtable;");
+		
+		String nSchema, tname, cpos, cname, ctype;
+		while(result.next()){
+			
+			nSchema = result.getValue("schemaName").toString();
+			
+			MSchema mSchema = this.getAvailableMSchema(nSchema);
+			if ( null == mSchema ) {
+				mSchema = new MSchema(nSchema);
+				this.availableMSchema.put(nSchema, mSchema);
+			}
+			
+			tname = result.getValue("tableName").toString();
+			
+			MTable mTable = mSchema.getMetaTableInfo(tname);
+			if ( null == mTable ) {
+				mTable = new MTable(mSchema,tname,1);
+				mSchema.addMetaTableInfo(mTable);
+			}
+			
+			cpos = result.getValue("columnPosition").toString();
+			cname = result.getValue("columnName").toString();
+			ctype = result.getValue("type").toString();
+			
+			if ( !mTable.containsField(cname) ) {
+				mTable.setField(Integer.parseInt(cpos), cname, ctype);
+			}
+			
+			log.debug("checked : "+mSchema.getSchemaName()+"."+mTable.getTableName());
+			
+		}
+	}
+
+	private void selfAdd() throws PSQLException {
+		
+		MSchema schemaMetabase = new MSchema("metabase");
+		
+		MTable tableDatabase = new MTable(schemaMetabase, "database", 2);
+		tableDatabase.setField(0, "schemaName", "string");
+		tableDatabase.setField(1, "fileName", "string");
+		schemaMetabase.addMetaTableInfo(tableDatabase);
+		
+		MTable tableTable = new MTable(schemaMetabase, "mtable", 5);
+		tableTable.setField(0, "schemaName", "string");
+		tableTable.setField(1, "tableName", "string");
+		tableTable.setField(2, "columnPosition", "int");
+		tableTable.setField(3, "columnName", "string");
+		tableTable.setField(4, "type", "string");
+		schemaMetabase.addMetaTableInfo(tableTable);
+		
+		//this.schemaList.put("metabase", schemaMetabase);
+		this.availableMSchema.put("metabase", schemaMetabase);
+		
+	}
 
 	public MSchema getAvailableMSchema(String nameSchema) {
 		return this.availableMSchema.get(nameSchema);

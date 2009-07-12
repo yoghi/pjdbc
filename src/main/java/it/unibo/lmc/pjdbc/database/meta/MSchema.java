@@ -68,7 +68,7 @@ public class MSchema {
 		return listName;
 		
 	}
-	
+
 	
 //	public void printMetaInfo(PrintStream stream){
 //		//stampo a video le informazioni sulla tabella

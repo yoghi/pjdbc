@@ -1,6 +1,6 @@
 %NB: le colonne PARTONO DA 0
 % TABLES DESCRIPTOR
-% table(%schemaName,%tableName,%columnPosition,%columnName,%type).
+% mtable(%schemaName,%tableName,%columnPosition,%columnName,%type).
 
 mtable('prolog1','age',0,'name','string').
 mtable('prolog1','age',1,'age','int').
