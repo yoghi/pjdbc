@@ -16,7 +16,7 @@ public class Main {
 
 		load_config();
 		
-		CRUDGuiApp.main(args);
+//		CRUDGuiApp.main(args);
 		
 //		try {
 //		

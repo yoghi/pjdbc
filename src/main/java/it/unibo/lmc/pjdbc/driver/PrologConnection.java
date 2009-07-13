@@ -199,7 +199,7 @@ public class PrologConnection implements Connection {
 	 * Restituisce un wrapper per ottenere MetaDati
 	 */
 	public DatabaseMetaData getMetaData() throws SQLException {
-		return new PrologMetaData(this.db);
+		return new PrologMetaData(this.db,this);
 	}
 
 	

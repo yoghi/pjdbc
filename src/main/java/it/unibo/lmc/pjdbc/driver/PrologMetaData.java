@@ -4,21 +4,34 @@
 package it.unibo.lmc.pjdbc.driver;
 
 import it.unibo.lmc.pjdbc.database.PrologDatabase;
+import it.unibo.lmc.pjdbc.database.command.PResultSet;
+import it.unibo.lmc.pjdbc.database.core.Catalog;
+import it.unibo.lmc.pjdbc.database.meta.MColumn;
+import it.unibo.lmc.pjdbc.database.meta.MSchema;
+import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
+
+import alice.tuprolog.InvalidTermException;
+import alice.tuprolog.Term;
 
 
 public class PrologMetaData implements DatabaseMetaData {
 	
 	private PrologDatabase database;
+	private PrologConnection connection;
 
-	public PrologMetaData(PrologDatabase db) {
+	public PrologMetaData(PrologDatabase db, PrologConnection connection) {
 		this.database = db;
+		this.connection = connection;
 	}
 
 	public boolean allProceduresAreCallable() throws SQLException {
@@ -30,11 +43,11 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean deletesAreDetected(int type) throws SQLException {
@@ -56,8 +69,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getCatalogSeparator() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return ".";
 	}
 
 	public String getCatalogTerm() throws SQLException {
@@ -66,8 +78,28 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public ResultSet getCatalogs() throws SQLException {
+		Catalog catalog = this.database.getCatalog();
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		try {
+			
+			LinkedList<Term[]> rows = new LinkedList<Term[]>();
+			LinkedList<TableField> fields = new LinkedList<TableField>();
+			TableField tf = new TableField();
+			tf.setAlias("TABLE_CAT");
+			fields.add(tf);
+			
+			Term[] affectedRows = new Term[1];
+			affectedRows[0] = Term.createTerm(catalog.getName());
+			rows.add(affectedRows);
+			
+			PResultSet res = new PResultSet(fields, rows);
+			
+			return new PrologResultSet("", res, this.database, null);
+		
+		} catch (InvalidTermException e) {
+			throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+		}
+		
 	}
 
 	public ResultSet getColumnPrivileges(String catalog, String schema,
@@ -80,12 +112,81 @@ public class PrologMetaData implements DatabaseMetaData {
 			String tableNamePattern, String columnNamePattern)
 			throws SQLException {
 		
+		MSchema mSchema = this.database.getMetaSchema(schemaPattern);
+		
+		if (  null == mSchema  ) throw new PSQLException("schema non valido: "+schemaPattern, PSQLState.INVALID_SCHEMA);
+		
+		MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern);
+		
+		if (  null == tSchema ) throw new PSQLException("table non valida: "+tableNamePattern, PSQLState.INVALID_NAME);
+		
+		MColumn column = tSchema.getColumnMeta(columnNamePattern);
+		
+		if ( null != column  ){
+
+			try {
+				
+				LinkedList<Term[]> rows = new LinkedList<Term[]>();
+				LinkedList<TableField> fields = new LinkedList<TableField>();
+				
+				TableField tf = new TableField();
+				tf.setAlias("TABLE_CAT");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("TABLE_SCHEM");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("TABLE_NAME");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("COLUMN_NAME");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("DATA_TYPE");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("TYPE_NAME");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("COLUMN_SIZE");
+				fields.add(tf);
+				
+				
+				
+				Term[] affectedRows = new Term[7];
+				affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
+				affectedRows[1] = Term.createTerm(schemaPattern);
+				affectedRows[2] = Term.createTerm(tableNamePattern);
+				affectedRows[3] = Term.createTerm(column.getColumnName());
+				affectedRows[4] = Term.createTerm(""+column.getColumnType().ordinal());
+				affectedRows[5] = Term.createTerm(column.getColumnType().toString().toLowerCase());
+				affectedRows[6] = Term.createTerm("255");
+				rows.add(affectedRows);
+				
+				PResultSet res = new PResultSet(fields, rows);
+				
+				return new PrologResultSet("", res, this.database, null);
+			
+			} catch (InvalidTermException e) {
+				throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+			
+		
+		
+		
 		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
 	}
 
 	public Connection getConnection() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return this.connection;
 	}
 
 	public ResultSet getCrossReference(String primaryCatalog,
@@ -95,24 +196,20 @@ public class PrologMetaData implements DatabaseMetaData {
 		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
 	}
 
-	public int getDatabaseMajorVersion() throws SQLException {
-		
+	public int getDatabaseMajorVersion() throws SQLException {	
 		return 0;
 	}
 
 	public int getDatabaseMinorVersion() throws SQLException {
-		
 		return 0;
 	}
 
 	public String getDatabaseProductName() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "Prolog Database";
 	}
 
 	public String getDatabaseProductVersion() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "0.0.1";
 	}
 
 	public int getDefaultTransactionIsolation() throws SQLException {
@@ -128,11 +225,11 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getDriverName() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "Stefano Tamagnini Prolog Database Driver JDBC";
 	}
 
 	public String getDriverVersion() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "0.0.1";
 	}
 
 	public ResultSet getExportedKeys(String catalog, String schema, String table) throws SQLException {
@@ -140,11 +237,11 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getExtraNameCharacters() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public String getIdentifierQuoteString() throws SQLException {	
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "'";
 	}
 
 	public ResultSet getImportedKeys(String catalog, String schema, String table)throws SQLException {
@@ -156,37 +253,30 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public int getJDBCMajorVersion() throws SQLException {
-		
 		return 0;
 	}
 
 	public int getJDBCMinorVersion() throws SQLException {
-		
 		return 0;
 	}
 
 	public int getMaxBinaryLiteralLength() throws SQLException {
-		
 		return 0;
 	}
 
 	public int getMaxCatalogNameLength() throws SQLException {
-		
-		return 0;
+		return 255;
 	}
 
 	public int getMaxCharLiteralLength() throws SQLException {
-		
-		return 0;
+		return 255;
 	}
 
 	public int getMaxColumnNameLength() throws SQLException {
-		
-		return 0;
+		return 255;
 	}
 
 	public int getMaxColumnsInGroupBy() throws SQLException {
-		
 		return 0;
 	}
 
@@ -201,18 +291,15 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public int getMaxColumnsInSelect() throws SQLException {
-		
-		return 0;
+		return 255;
 	}
 
 	public int getMaxColumnsInTable() throws SQLException {
-		
-		return 0;
+		return 255;
 	}
 
 	public int getMaxConnections() throws SQLException {
-		
-		return 0;
+		return 1;
 	}
 
 	public int getMaxCursorNameLength() throws SQLException {
@@ -266,8 +353,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getNumericFunctions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public ResultSet getPrimaryKeys(String catalog, String schema, String table)
@@ -299,14 +385,20 @@ public class PrologMetaData implements DatabaseMetaData {
 		return 0;
 	}
 
+	/**
+     * Retrieves a comma-separated list of all of this database's SQL keywords
+     * that are NOT also SQL92 keywords.
+     *
+     * @return the list of this database's keywords that are not also
+     *         SQL92 keywords
+     * @exception SQLException if a database access error occurs
+     */
 	public String getSQLKeywords() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public int getSQLStateType() throws SQLException {
-		
-		return 0;
+		return sqlStateSQL99;
 	}
 
 	public String getSchemaTerm() throws SQLException {
@@ -316,7 +408,38 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public ResultSet getSchemas() throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		List<String> nameSchemas = this.database.getCatalog().getListSchemaName();
+		
+		try {
+			
+			LinkedList<Term[]> rows = new LinkedList<Term[]>();
+			LinkedList<TableField> fields = new LinkedList<TableField>();
+			
+			TableField tf = new TableField();
+			tf.setAlias("TABLE_SCHEM");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("TABLE_CAT");
+			fields.add(tf);
+			
+			String catalogName = this.database.getCatalog().getName();
+			
+			Term[] affectedRows;  
+			for (String name : nameSchemas) {
+				affectedRows = new Term[2];
+				affectedRows[0] = Term.createTerm(name);
+				affectedRows[1] = Term.createTerm(catalogName);
+				rows.add(affectedRows);
+			}
+			
+			PResultSet res = new PResultSet(fields, rows);
+			
+			return new PrologResultSet("", res, this.database, null);
+		
+		} catch (InvalidTermException e) {
+			throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+		}
 	}
 
 	public String getSearchStringEscape() throws SQLException {
@@ -325,8 +448,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getStringFunctions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public ResultSet getSuperTables(String catalog, String schemaPattern,
@@ -342,8 +464,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getSystemFunctions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public ResultSet getTablePrivileges(String catalog, String schemaPattern,
@@ -354,13 +475,79 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public ResultSet getTableTypes() throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		try {
+			
+			LinkedList<Term[]> rows = new LinkedList<Term[]>();
+			LinkedList<TableField> fields = new LinkedList<TableField>();
+			TableField tf = new TableField();
+			tf.setAlias("TABLE_TYPE");
+			fields.add(tf);
+			
+			Term[] affectedRows = new Term[2];
+			affectedRows[0] = Term.createTerm("TABLE");
+			affectedRows[1] = Term.createTerm("SYSTEM TABLE");
+			rows.add(affectedRows);
+			
+			PResultSet res = new PResultSet(fields, rows);
+			
+			return new PrologResultSet("", res, this.database, null);
+		
+		} catch (InvalidTermException e) {
+			throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+		}
 	}
 
-	public ResultSet getTables(String catalog, String schemaPattern,
-			String tableNamePattern, String[] types) throws SQLException {
+	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		
+		MSchema mSchema = this.database.getMetaSchema(schemaPattern);
+		
+		if (  null == mSchema  ) throw new PSQLException("schema non valido: "+schemaPattern, PSQLState.INVALID_SCHEMA);
+		
+		MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern);
+		
+		LinkedList<Term[]> rows = new LinkedList<Term[]>();
+		LinkedList<TableField> fields = new LinkedList<TableField>();
+		
+		if ( null != tSchema ){
+
+			try {
+				
+				TableField tf = new TableField();
+				tf.setAlias("TABLE_CAT");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("TABLE_SCHEM");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("TABLE_NAME");
+				fields.add(tf);
+				
+				tf = new TableField();
+				tf.setAlias("TABLE_TYPE");
+				fields.add(tf);
+								
+				Term[] affectedRows = new Term[4];
+				affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
+				affectedRows[1] = Term.createTerm(schemaPattern);
+				affectedRows[2] = Term.createTerm(tableNamePattern);
+				affectedRows[3] = Term.createTerm("TABLE");
+				rows.add(affectedRows);				
+				
+				PResultSet res = new PResultSet(fields, rows);
+				
+				return new PrologResultSet("", res, this.database, null);
+			
+			} catch (InvalidTermException e) {
+				throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+			}
+			
+		}
+		
+		return new PrologResultSet("", null, this.database, null);
+
 	}
 
 	public String getTimeDateFunctions() throws SQLException {
@@ -730,110 +917,89 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public boolean supportsResultSetConcurrency(int type, int concurrency)
 			throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsResultSetHoldability(int holdability)
 			throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsResultSetType(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true; //VEDI java.sql.ResultSet...
 	}
 
 	public boolean supportsSavepoints() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false; //dovra diventare true
 	}
 
 	public boolean supportsSchemasInDataManipulation() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean supportsSchemasInIndexDefinitions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSchemasInPrivilegeDefinitions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSchemasInProcedureCalls() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSchemasInTableDefinitions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean supportsSelectForUpdate() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsStatementPooling() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsStoredProcedures() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSubqueriesInComparisons() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSubqueriesInExists() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSubqueriesInIns() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsSubqueriesInQuantifieds() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsTableCorrelationNames() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean supportsTransactionIsolationLevel(int level)
 			throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsTransactions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsUnion() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsUnionAll() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean updatesAreDetected(int type) throws SQLException {
@@ -842,13 +1008,11 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public boolean usesLocalFilePerTable() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean usesLocalFiles() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 
