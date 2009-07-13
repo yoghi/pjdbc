@@ -11,6 +11,7 @@ import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
+import it.unibo.lmc.pjdbc.database.utils.PTypes;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 import java.sql.Connection;
@@ -73,8 +74,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getCatalogTerm() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "catalog";
 	}
 
 	public ResultSet getCatalogs() throws SQLException {
@@ -402,8 +402,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getSchemaTerm() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "schema";
 	}
 
 	public ResultSet getSchemas() throws SQLException {
@@ -443,7 +442,6 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getSearchStringEscape() throws SQLException {
-		
 		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
 	}
 
@@ -453,13 +451,11 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public ResultSet getSuperTables(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		
 		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
 	}
 
 	public ResultSet getSuperTypes(String catalog, String schemaPattern,
 			String typeNamePattern) throws SQLException {
-		
 		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
 	}
 
@@ -484,8 +480,8 @@ public class PrologMetaData implements DatabaseMetaData {
 			fields.add(tf);
 			
 			Term[] affectedRows = new Term[2];
-			affectedRows[0] = Term.createTerm("TABLE");
-			affectedRows[1] = Term.createTerm("SYSTEM TABLE");
+			affectedRows[0] = Term.createTerm("'TABLE'");
+			affectedRows[1] = Term.createTerm("'SYSTEM TABLE'");
 			rows.add(affectedRows);
 			
 			PResultSet res = new PResultSet(fields, rows);
@@ -493,8 +489,9 @@ public class PrologMetaData implements DatabaseMetaData {
 			return new PrologResultSet("", res, this.database, null);
 		
 		} catch (InvalidTermException e) {
-			throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+			throw new PSQLException("errore nella creazione di un term "+e.getLocalizedMessage(),PSQLState.SYNTAX_ERROR);
 		}
+		
 	}
 
 	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
@@ -551,13 +548,40 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getTimeDateFunctions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public ResultSet getTypeInfo() throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		try {
+			
+			LinkedList<Term[]> rows = new LinkedList<Term[]>();
+			LinkedList<TableField> fields = new LinkedList<TableField>();
+			TableField tf = new TableField();
+			tf.setAlias("TYPE_NAME");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("DATA_TYPE");
+			fields.add(tf);
+			
+			for ( PTypes type : PTypes.values() ){
+				
+				Term[] affectedRows = new Term[2];
+				affectedRows[0] = Term.createTerm(type.name());
+				affectedRows[1] = Term.createTerm(""+type.getSqlType());
+				rows.add(affectedRows);
+				
+			}
+			
+			PResultSet res = new PResultSet(fields, rows);
+			
+			return new PrologResultSet("", res, this.database, null);
+		
+		} catch (InvalidTermException e) {
+			throw new PSQLException("errore nella creazione di un term "+e.getLocalizedMessage(),PSQLState.SYNTAX_ERROR);
+		}
+		
 	}
 
 	public ResultSet getUDTs(String catalog, String schemaPattern,
@@ -572,8 +596,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getUserName() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public ResultSet getVersionColumns(String catalog, String schema,
@@ -583,336 +606,270 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public boolean insertsAreDetected(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean isCatalogAtStart() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean isReadOnly() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean locatorsUpdateCopy() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean nullPlusNonNullIsNull() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean nullsAreSortedAtEnd() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean nullsAreSortedAtStart() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean nullsAreSortedHigh() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean nullsAreSortedLow() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean othersDeletesAreVisible(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean othersInsertsAreVisible(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean othersUpdatesAreVisible(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean ownDeletesAreVisible(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean ownInsertsAreVisible(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean ownUpdatesAreVisible(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean storesLowerCaseIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean storesLowerCaseQuotedIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean storesMixedCaseIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean storesMixedCaseQuotedIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean storesUpperCaseIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean storesUpperCaseQuotedIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsANSI92EntryLevelSQL() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean supportsANSI92FullSQL() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsANSI92IntermediateSQL() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsAlterTableWithAddColumn() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsAlterTableWithDropColumn() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsBatchUpdates() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCatalogsInDataManipulation() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCatalogsInIndexDefinitions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCatalogsInPrivilegeDefinitions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCatalogsInProcedureCalls() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCatalogsInTableDefinitions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsColumnAliasing() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return true;
 	}
 
 	public boolean supportsConvert() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsConvert(int fromType, int toType)
 			throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCoreSQLGrammar() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsCorrelatedSubqueries() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsDataDefinitionAndDataManipulationTransactions()
 			throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsDataManipulationTransactionsOnly()
 			throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsDifferentTableCorrelationNames() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsExpressionsInOrderBy() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsExtendedSQLGrammar() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsFullOuterJoins() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsGetGeneratedKeys() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsGroupBy() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsGroupByBeyondSelect() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsGroupByUnrelated() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsIntegrityEnhancementFacility() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsLikeEscapeClause() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsLimitedOuterJoins() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsMinimumSQLGrammar() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsMixedCaseIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsMixedCaseQuotedIdentifiers() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsMultipleOpenResults() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsMultipleResultSets() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsMultipleTransactions() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsNamedParameters() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsNonNullableColumns() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsOpenCursorsAcrossCommit() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsOpenCursorsAcrossRollback() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsOpenStatementsAcrossCommit() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsOpenStatementsAcrossRollback() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsOrderByUnrelated() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsOuterJoins() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsPositionedDelete() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsPositionedUpdate() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean supportsResultSetConcurrency(int type, int concurrency)
@@ -1003,8 +960,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public boolean updatesAreDetected(int type) throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean usesLocalFilePerTable() throws SQLException {

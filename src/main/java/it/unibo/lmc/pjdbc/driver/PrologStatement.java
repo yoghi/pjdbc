@@ -55,6 +55,7 @@ public class PrologStatement implements Statement {
 	}
 
 	public boolean execute(String sql) throws SQLException {
+		log.debug("query: "+sql);
 		PResultSet res = this.currentDatabase.executeQuery(sql);
 		this.lastResultSet = new PrologResultSet(sql,res,this.currentDatabase, null);
 		return true;
@@ -80,7 +81,7 @@ public class PrologStatement implements Statement {
 	 * Select type query
 	 */
 	public ResultSet executeQuery(String sql) throws SQLException {
-
+		log.debug("select : "+sql);
 		//NOTA BENE: qui posso lavorare sull'sql con i "?" da mettere a posto nel caso di query precalcolate o come si dice .. 
 		PResultSet res = this.currentDatabase.executeQuery(sql);
 		return new PrologResultSet(sql,res,this.currentDatabase, null);
@@ -88,6 +89,7 @@ public class PrologStatement implements Statement {
 	}
 	
 	public int executeUpdate(String sql) throws SQLException {
+		log.debug("update : "+sql);
 		PResultSet affectedRow = this.currentDatabase.executeQuery(sql);
 		affectedRow.next(); //vado alla prima riga
 		return Integer.parseInt(affectedRow.getValue("AffectedRow").toString());

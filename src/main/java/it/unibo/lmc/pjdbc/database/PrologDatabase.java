@@ -227,6 +227,10 @@ public class PrologDatabase {
 	 */
 	public PResultSet executeQuery(String sql) throws PSQLException {
 		
+		if ( !sql.trim().endsWith(";") ){
+			sql = sql.trim().concat(";");
+		}
+		
 		ParsedCommand pRequest = this.analizeSql(sql);
 
 		if ( pRequest instanceof Update ) {	//AGGIORNO UNA RIGA 
