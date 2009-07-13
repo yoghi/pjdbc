@@ -6,6 +6,7 @@ import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.meta.MTable;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.utils.PSQLException;
+import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -77,9 +78,13 @@ public class SCatalog extends Catalog {
 			nSchema = result.getValue("schemaName").toString();
 			
 			MSchema mSchema = this.getAvailableMSchema(nSchema);
-			if ( null == mSchema ) {
+			if ( null == mSchema && null != nSchema ) {
 				mSchema = new MSchema(nSchema);
 				this.availableMSchema.put(nSchema, mSchema);
+			} else {
+				if ( null == nSchema ) {
+					throw new PSQLException("Theory errata, schemaName cannot null", PSQLState.INVALID_THEORY);
+				}
 			}
 			
 			tname = result.getValue("tableName").toString();

@@ -7,7 +7,6 @@ import it.unibo.lmc.pjdbc.database.core.PCatalog;
 import it.unibo.lmc.pjdbc.database.core.PSchema;
 import it.unibo.lmc.pjdbc.database.core.SCatalog;
 import it.unibo.lmc.pjdbc.database.executor.ExecuteControl;
-import it.unibo.lmc.pjdbc.database.meta.MColumn;
 import it.unibo.lmc.pjdbc.database.meta.MSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchema;
 import it.unibo.lmc.pjdbc.database.transaction.TSchemaRU;
@@ -119,6 +118,14 @@ public class PrologDatabase {
 			}
 			
 			this.loadSchemas(this.baseCatalog,f,".db");
+			
+			if ( this.baseCatalog.getCurrentSchemaName() == null ){
+				//non ho schemi caricati, ne creo uno
+				PSchema p = new PSchema(f.getAbsolutePath()+"/prolog.db", "prolog");
+				TSchemaRU tschema = new TSchemaRU(this,p);
+				this.baseCatalog.addSchema(tschema, p.getName());
+				this.systemCatalog.validate(p);
+			}
 			
 		} else {	//catalog-file
 			
