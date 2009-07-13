@@ -181,7 +181,7 @@ public class SCatalog extends Catalog {
 							
 							if ( c1.isList() ) mTable.setField(j, ""+j, "array");
 							else if ( c1 instanceof Number ) mTable.setField(j, ""+j, "real");
-							else mTable.setField(j, ""+j, "real");
+							else mTable.setField(j, ""+j, "string");
 							
 							// mtable(%schemaName,%tableName,%columnPosition,%columnName,%type).
 		        			this.database.executeQuery("insert into metabase.mtable values('"+schemaName+"','"+s.getName()+"',"+j+",'"+j+"','"+mTable.getColumns()[j].getColumnType().toString().toLowerCase()+"');");
