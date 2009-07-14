@@ -91,6 +91,7 @@ public class PrologResultSet implements ResultSet {
 
 	public byte getByte(int columnIndex) throws PSQLException {
 		Term value = this.pResult.getValue(columnIndex);
+		if ( value == null ) return 0;
 		try {
 			return Byte.parseByte(value.toString());
 		} catch (NumberFormatException e) {
@@ -100,6 +101,7 @@ public class PrologResultSet implements ResultSet {
 
 	public byte getByte(String columnLabel) throws PSQLException {
 		Term value = this.pResult.getValue(columnLabel);
+		if ( null == value ) return 0;
 		try {
 			return Byte.parseByte(value.toString());
 		} catch (NumberFormatException e) {
@@ -140,6 +142,7 @@ public class PrologResultSet implements ResultSet {
 
 	public Date getDate(int columnIndex) throws SQLException {
 		Term value = this.pResult.getValue(columnIndex);
+		if ( null == value ) return null;
 		try {
 			return Date.valueOf(value.toString());	//s a String object representing a date in in the format "yyyy-mm-dd"
 		} catch (IllegalArgumentException e) {
@@ -149,6 +152,7 @@ public class PrologResultSet implements ResultSet {
 
 	public Date getDate(String columnLabel) throws SQLException {
 		Term value = this.pResult.getValue(columnLabel);
+		if ( null == value )return null;
 		try {
 			return Date.valueOf(value.toString());	//s a String object representing a date in in the format "yyyy-mm-dd"
 		} catch (IllegalArgumentException e) {
@@ -225,7 +229,9 @@ public class PrologResultSet implements ResultSet {
 
 	public float getFloat(int columnIndex) throws SQLException {
 		try {
-			return Float.parseFloat(this.pResult.getValue(columnIndex).toString());
+			Term value = this.pResult.getValue(columnIndex);
+			if ( null == value ) return 0;
+			return Float.parseFloat(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -233,7 +239,9 @@ public class PrologResultSet implements ResultSet {
 
 	public float getFloat(String columnLabel) throws SQLException {
 		try {
-			return Float.parseFloat(this.pResult.getValue(columnLabel).toString());
+			Term value = this.pResult.getValue(columnLabel);
+			if ( null == value ) return 0;
+			return Float.parseFloat(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -241,7 +249,9 @@ public class PrologResultSet implements ResultSet {
 
 	public int getInt(int columnIndex) throws SQLException {
 		try {
-			return Integer.parseInt(this.pResult.getValue(columnIndex).toString());
+			Term value = this.pResult.getValue(columnIndex);
+			if ( null == value ) return 0;
+			return Integer.parseInt(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -249,7 +259,9 @@ public class PrologResultSet implements ResultSet {
 
 	public int getInt(String columnLabel) throws SQLException {
 		try {
-			return Integer.parseInt(this.pResult.getValue(columnLabel).toString());
+			Term value = this.pResult.getValue(columnLabel);
+			if ( null == value ) return 0;
+			return Integer.parseInt(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -257,7 +269,9 @@ public class PrologResultSet implements ResultSet {
 
 	public long getLong(int columnIndex) throws SQLException {
 		try {
-			return Long.parseLong(this.pResult.getValue(columnIndex).toString());
+			Term value = this.pResult.getValue(columnIndex);
+			if ( null == value ) return 0;
+			return Long.parseLong(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -265,7 +279,9 @@ public class PrologResultSet implements ResultSet {
 
 	public long getLong(String columnLabel) throws SQLException {
 		try {
-			return Long.parseLong(this.pResult.getValue(columnLabel).toString());
+			Term value = this.pResult.getValue(columnLabel);
+			if ( null == value ) return 0;
+			return Long.parseLong(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -285,7 +301,9 @@ public class PrologResultSet implements ResultSet {
 
 	public short getShort(int columnIndex) throws SQLException {
 		try {
-			return Short.parseShort(this.pResult.getValue(columnIndex).toString());
+			Term value = this.pResult.getValue(columnIndex);
+			if ( null == value ) return 0;
+			return Short.parseShort(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -293,7 +311,9 @@ public class PrologResultSet implements ResultSet {
 
 	public short getShort(String columnLabel) throws SQLException {
 		try {
-			return Short.parseShort(this.pResult.getValue(columnLabel).toString());
+			Term value = this.pResult.getValue(columnLabel);
+			if ( null == value ) return 0;
+			return Short.parseShort(value.toString());
 		} catch (NumberFormatException e) {
 			throw new PSQLException("problema nella conversione : "+e.getLocalizedMessage(), PSQLState.DATA_TYPE_MISMATCH);
 		}
@@ -304,11 +324,15 @@ public class PrologResultSet implements ResultSet {
 	}
 
 	public String getString(int columnIndex) throws SQLException {
-		return this.pResult.getValue(columnIndex).toString();
+		Term vv = this.pResult.getValue(columnIndex);
+		if ( null == vv ) return null;
+		else return vv.toString().replace("'", "");
 	}
 
 	public String getString(String columnLabel) throws SQLException {
-		return this.pResult.getValue(columnLabel).toString();
+		Term vv = this.pResult.getValue(columnLabel);
+		if ( null == vv ) return null;
+		else return vv.toString().toString().replace("'", "");
 	}
 
 	public Time getTime(int columnIndex) throws SQLException {

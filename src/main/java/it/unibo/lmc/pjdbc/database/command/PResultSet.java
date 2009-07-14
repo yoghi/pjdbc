@@ -74,12 +74,11 @@ public class PResultSet {
 	public Term getValue(int columnIndex) throws PSQLException {
 		
 		Term[] info = this.rowData.get(this.currentPosition);
-		
 		try {
-			Term t = info[columnIndex-1];			
+			Term t = info[columnIndex-1];
 			return t;
 		} catch (IndexOutOfBoundsException e) {
-			throw new PSQLException("Column " + columnIndex + "not exist", PSQLState.DATA_TYPE_MISMATCH );
+			throw new PSQLException("Column " + columnIndex + " not exist", PSQLState.DATA_TYPE_MISMATCH );
 		}
 		
 		// if ( vresult.getTerm() instanceof alice.tuprolog.Number )

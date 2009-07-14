@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import alice.tuprolog.InvalidTermException;
 import alice.tuprolog.Term;
 
@@ -29,14 +31,20 @@ public class PrologMetaData implements DatabaseMetaData {
 	
 	private PrologDatabase database;
 	private PrologConnection connection;
+	
+	/**
+	 * Logger 
+	 */
+	private Logger log = null;
 
 	public PrologMetaData(PrologDatabase db, PrologConnection connection) {
 		this.database = db;
 		this.connection = connection;
+		log = Logger.getLogger(PrologMetaData.class);
 	}
 
 	public boolean allProceduresAreCallable() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean allTablesAreSelectable() throws SQLException {
@@ -56,7 +64,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public boolean doesMaxRowSizeIncludeBlobs() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public ResultSet getAttributes(String catalog, String schemaPattern,String typeNamePattern, String attributeNamePattern)throws SQLException {
@@ -366,18 +374,54 @@ public class PrologMetaData implements DatabaseMetaData {
 			String procedureNamePattern, String columnNamePattern)
 			throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		throw new PSQLException("getProcedureColumns", PSQLState.NOT_IMPLEMENTED);
 	}
 
 	public String getProcedureTerm() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "";
 	}
 
 	public ResultSet getProcedures(String catalog, String schemaPattern,
 			String procedureNamePattern) throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		LinkedList<Term[]> rows = new LinkedList<Term[]>();
+		LinkedList<TableField> fields = new LinkedList<TableField>();
+		TableField tf = new TableField();
+		tf.setAlias("PROCEDURE_SCAT");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("PROCEDURE_SCHEM");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("PROCEDURE_NAME");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("REMARKS");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("PROCEDURE_TYPE");
+		fields.add(tf);
+		
+		PResultSet res = new PResultSet(fields, rows);
+		
+		return new PrologResultSet("", res, this.database, null);
+		
 	}
 
 	public int getResultSetHoldability() throws SQLException {
@@ -407,6 +451,8 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public ResultSet getSchemas() throws SQLException {
 		
+		log.debug("getSchemas request");
+		
 		List<String> nameSchemas = this.database.getCatalog().getListSchemaName();
 		
 		try {
@@ -426,6 +472,7 @@ public class PrologMetaData implements DatabaseMetaData {
 			
 			Term[] affectedRows;  
 			for (String name : nameSchemas) {
+				log.debug("add "+name);
 				affectedRows = new Term[2];
 				affectedRows[0] = Term.createTerm(name);
 				affectedRows[1] = Term.createTerm(catalogName);
@@ -442,7 +489,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getSearchStringEscape() throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return "'";
 	}
 
 	public String getStringFunctions() throws SQLException {
@@ -451,7 +498,29 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public ResultSet getSuperTables(String catalog, String schemaPattern,
 			String tableNamePattern) throws SQLException {
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		
+		LinkedList<Term[]> rows = new LinkedList<Term[]>();
+		LinkedList<TableField> fields = new LinkedList<TableField>();
+		TableField tf = new TableField();
+		tf.setAlias("TABLE_CAT");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TABLE_SCHEM");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TABLE_NAME");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("SUPERTABLE_NAME");
+		fields.add(tf);
+		
+		PResultSet res = new PResultSet(fields, rows);
+		
+		return new PrologResultSet("", res, this.database, null);
+		
 	}
 
 	public ResultSet getSuperTypes(String catalog, String schemaPattern,
@@ -479,10 +548,13 @@ public class PrologMetaData implements DatabaseMetaData {
 			tf.setAlias("TABLE_TYPE");
 			fields.add(tf);
 			
-			Term[] affectedRows = new Term[2];
+			Term[] affectedRows = new Term[1];
 			affectedRows[0] = Term.createTerm("'TABLE'");
-			affectedRows[1] = Term.createTerm("'SYSTEM TABLE'");
 			rows.add(affectedRows);
+			
+			//affectedRows = new Term[1];
+			//affectedRows[0] = Term.createTerm("'SYSTEM TABLE'");
+			//rows.add(affectedRows);
 			
 			PResultSet res = new PResultSet(fields, rows);
 			
@@ -496,54 +568,191 @@ public class PrologMetaData implements DatabaseMetaData {
 
 	public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern, String[] types) throws SQLException {
 		
-		
-		MSchema mSchema = this.database.getMetaSchema(schemaPattern);
-		
-		if (  null == mSchema  ) throw new PSQLException("schema non valido: "+schemaPattern, PSQLState.INVALID_SCHEMA);
-		
-		MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern);
+		if ( null == tableNamePattern ) {
+			//throw new PSQLException("tablePattern cannot null", PSQLState.INVALID_NAME);
+			log.error("tableNamePattern null ... considero come se fosse ANY");
+		}
 		
 		LinkedList<Term[]> rows = new LinkedList<Term[]>();
 		LinkedList<TableField> fields = new LinkedList<TableField>();
 		
-		if ( null != tSchema ){
-
-			try {
-				
-				TableField tf = new TableField();
-				tf.setAlias("TABLE_CAT");
-				fields.add(tf);
-				
-				tf = new TableField();
-				tf.setAlias("TABLE_SCHEM");
-				fields.add(tf);
-				
-				tf = new TableField();
-				tf.setAlias("TABLE_NAME");
-				fields.add(tf);
-				
-				tf = new TableField();
-				tf.setAlias("TABLE_TYPE");
-				fields.add(tf);
-								
-				Term[] affectedRows = new Term[4];
-				affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
-				affectedRows[1] = Term.createTerm(schemaPattern);
-				affectedRows[2] = Term.createTerm(tableNamePattern);
-				affectedRows[3] = Term.createTerm("TABLE");
-				rows.add(affectedRows);				
-				
-				PResultSet res = new PResultSet(fields, rows);
-				
-				return new PrologResultSet("", res, this.database, null);
+		TableField tf = new TableField();
+		tf.setAlias("TABLE_CAT");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TABLE_SCHEM");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TABLE_NAME");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TABLE_TYPE");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("REMARKS");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TYPE_CAT");	//null
+		fields.add(tf);
+		tf = new TableField();
+		tf.setAlias("TYPE_SCHEM");	//null
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TYPE_NAME");	//null
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("SELF_REFERENCING_COL_NAME");	//null
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("REF_GENERATION");	//null
+		fields.add(tf);
+		
+		
+		if (  null == schemaPattern  ) {
 			
-			} catch (InvalidTermException e) {
-				throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
-			}
+			log.debug("cerco su tutti gli schema il pattern "+tableNamePattern);
+			
+			List<String> schemaNames =  this.database.getCatalog().getListSchemaName();
+			
+			for(String nameS : schemaNames){
+				
+				MSchema mSchema = this.database.getMetaSchema(nameS);
+				
+				if ( null == mSchema ) log.error("come fa a essere null un campo che ho interno io?? nameS : "+nameS);
+				
+				if ( null == tableNamePattern ) {
+					LinkedList<String> tablesName = mSchema.getListTableName();
+					
+					for(String tableName : tablesName) {
+					
+						MTable tSchema = mSchema.getMetaTableInfo(tableName);
+						
+						if ( null != tSchema ){
+							
+							try {
+								Term[] affectedRows = new Term[10];
+								affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
+								affectedRows[1] = Term.createTerm(nameS);
+								affectedRows[2] = Term.createTerm(tableNamePattern);
+								affectedRows[3] = Term.createTerm("'TABLE'");
+								affectedRows[4] = null;
+								affectedRows[5] = null;
+								affectedRows[6] = null;
+								affectedRows[7] = null;
+								affectedRows[8] = null;
+								affectedRows[9] = null;
+								rows.add(affectedRows);
+							} catch (InvalidTermException e) {
+								throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+							}
+						}
+					
+					}
+					
+				} else {
+					
+					MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern.toLowerCase());
+					
+					if ( null != tSchema ){
+						
+						try {
+							Term[] affectedRows = new Term[10];
+							affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
+							affectedRows[1] = Term.createTerm(nameS);
+							affectedRows[2] = Term.createTerm(tableNamePattern);
+							affectedRows[3] = Term.createTerm("'TABLE'");
+							affectedRows[4] = null;
+							affectedRows[5] = null;
+							affectedRows[6] = null;
+							affectedRows[7] = null;
+							affectedRows[8] = null;
+							affectedRows[9] = null;
+							rows.add(affectedRows);
+						} catch (InvalidTermException e) {
+							throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+						}
+					}
+					
+				}
+				
+				
+			} //for
+			
+			
+		} else {
+			
+			MSchema mSchema = this.database.getMetaSchema(schemaPattern.toLowerCase());
+			
+			if (  null == mSchema  ) throw new PSQLException("schema non valido: "+schemaPattern, PSQLState.INVALID_SCHEMA);
+			
+			if ( null == tableNamePattern ) {
+				LinkedList<String> tablesName = mSchema.getListTableName();
+				
+				for(String tableName : tablesName) {
+				
+					MTable tSchema = mSchema.getMetaTableInfo(tableName);
+					
+					if ( null != tSchema ){
+						
+						try {
+							Term[] affectedRows = new Term[10];
+							affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
+							affectedRows[1] = Term.createTerm(schemaPattern);
+							affectedRows[2] = Term.createTerm(tableNamePattern);
+							affectedRows[3] = Term.createTerm("'TABLE'");
+							affectedRows[4] = null;
+							affectedRows[5] = null;
+							affectedRows[6] = null;
+							affectedRows[7] = null;
+							affectedRows[8] = null;
+							affectedRows[9] = null;
+							rows.add(affectedRows);
+						} catch (InvalidTermException e) {
+							throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+						}
+					}
+				
+				}
+				
+			} else {
+				
+				MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern.toLowerCase());
+				
+				if ( null != tSchema ){
+					
+					try {
+						Term[] affectedRows = new Term[10];
+						affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
+						affectedRows[1] = Term.createTerm(schemaPattern);
+						affectedRows[2] = Term.createTerm(tableNamePattern);
+						affectedRows[3] = Term.createTerm("'TABLE'");
+						affectedRows[4] = null;
+						affectedRows[5] = null;
+						affectedRows[6] = null;
+						affectedRows[7] = null;
+						affectedRows[8] = null;
+						affectedRows[9] = null;
+						rows.add(affectedRows);
+					} catch (InvalidTermException e) {
+						throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+					}
+				}
+				
+			}	
 			
 		}
+		 
 		
-		return new PrologResultSet("", null, this.database, null);
+		PResultSet res = new PResultSet(fields, rows);		
+		return new PrologResultSet("", res, this.database, null);
 
 	}
 
@@ -565,11 +774,91 @@ public class PrologMetaData implements DatabaseMetaData {
 			tf.setAlias("DATA_TYPE");
 			fields.add(tf);
 			
+			tf = new TableField();
+			tf.setAlias("PRECISION");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("LITERAL_PREFIX");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("LITERAL_SUFFIX");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("CREATE_PARAMS");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("NULLABLE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("CASE_SENSITIVE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("SEARCHABLE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("UNSIGNED_ATTRIBUTE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("FIXED_PREC_SCALE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("AUTO_INCREMENT");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("LOCAL_TYPE_NAME");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("MINIMUM_SCALE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("MAXIMUM_SCALE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("SQL_DATA_TYPE");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("SQL_DATETIME_SUB");
+			fields.add(tf);
+			
+			tf = new TableField();
+			tf.setAlias("NUM_PREC_RADIX");
+			fields.add(tf);
+			
 			for ( PTypes type : PTypes.values() ){
 				
-				Term[] affectedRows = new Term[2];
+				Term[] affectedRows = new Term[18];
 				affectedRows[0] = Term.createTerm(type.name());
 				affectedRows[1] = Term.createTerm(""+type.getSqlType());
+				affectedRows[2] = Term.createTerm(""+1);
+				affectedRows[3] = null;
+				affectedRows[4] = null;
+				affectedRows[5] = null;
+				affectedRows[6] = Term.createTerm("typeNullable");
+				affectedRows[7] = Term.createTerm("true");
+				affectedRows[8] = Term.createTerm("typePredNone");
+				affectedRows[9] = Term.createTerm("false"); 
+				affectedRows[10] = Term.createTerm("false");
+				affectedRows[11] = Term.createTerm("false");
+				affectedRows[12] = null;
+				affectedRows[13] = Term.createTerm("0");
+				affectedRows[14] = Term.createTerm("0");
+				affectedRows[15] = Term.createTerm("0");
+				affectedRows[16] = Term.createTerm("0");
+				affectedRows[17] = Term.createTerm("2");
 				rows.add(affectedRows);
 				
 			}
@@ -591,8 +880,7 @@ public class PrologMetaData implements DatabaseMetaData {
 	}
 
 	public String getURL() throws SQLException {
-		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		return null;
 	}
 
 	public String getUserName() throws SQLException {
