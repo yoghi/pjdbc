@@ -965,12 +965,26 @@ public class PrologResultSet implements ResultSet {
 
 	public Object getObject(int columnIndex) throws SQLException {
 
-		return null;
+		Term value = this.pResult.getValue(columnIndex);
+		if ( null == value ) return null;
+		try {
+			return value.toString();	
+		} catch (IllegalArgumentException e) {
+			throw new SQLException(e.getLocalizedMessage(), "SQLSTATE");
+		}
+		
 	}
 
 	public Object getObject(String columnLabel) throws SQLException {
 
-		return null;
+		Term value = this.pResult.getValue(columnLabel);
+		if ( null == value ) return null;
+		try {
+			return value.toString();	
+		} catch (IllegalArgumentException e) {
+			throw new SQLException(e.getLocalizedMessage(), "SQLSTATE");
+		}
+		
 	}
 
 	public Object getObject(int columnIndex, Map<String, Class<?>> map) throws SQLException {

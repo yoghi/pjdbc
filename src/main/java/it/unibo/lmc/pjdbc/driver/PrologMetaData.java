@@ -642,7 +642,7 @@ public class PrologMetaData implements DatabaseMetaData {
 								Term[] affectedRows = new Term[10];
 								affectedRows[0] = Term.createTerm(this.database.getCatalog().getName());
 								affectedRows[1] = Term.createTerm(nameS);
-								affectedRows[2] = Term.createTerm(tableNamePattern);
+								affectedRows[2] = Term.createTerm(tableName);
 								affectedRows[3] = Term.createTerm("'TABLE'");
 								affectedRows[4] = null;
 								affectedRows[5] = null;
@@ -652,7 +652,7 @@ public class PrologMetaData implements DatabaseMetaData {
 								affectedRows[9] = null;
 								rows.add(affectedRows);
 							} catch (InvalidTermException e) {
-								throw new PSQLException("errore nella creazione di un term",PSQLState.SYNTAX_ERROR);
+								throw new PSQLException("errore nella creazione di un term "+e.getLocalizedMessage(),PSQLState.SYNTAX_ERROR);
 							}
 						}
 					
