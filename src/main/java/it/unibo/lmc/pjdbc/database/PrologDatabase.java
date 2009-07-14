@@ -423,6 +423,10 @@ public class PrologDatabase {
 			
 			String nameTable = toCreate.getName();
 			
+			//check exist
+			PResultSet result = this.executeQuery("select * from metabase.mtable WHERE tableName = '"+nameTable+"'");
+			if (  result.getFetchSize() > 0 ) throw new PSQLException("table already exist", PSQLState.INVALID_NAME);
+			
 			String schemaName;
 			if ( toCreate.getSchemaName() == null ) schemaName = this.getCurrentSchema();
 			else schemaName = toCreate.getSchemaName();

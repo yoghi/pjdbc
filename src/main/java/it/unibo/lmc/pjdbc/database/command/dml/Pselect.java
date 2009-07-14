@@ -255,7 +255,11 @@ public class Pselect extends PRequest {
 				if ( tf.getTableName() == null ) {
 					varSql = this.alias2nameVar(tf.getColumnName());
 					if ( null == varSql ){
-						throw new PSQLException("Colonna non trovata : "+tf.getColumnName(), PSQLState.UNDEFINED_COLUMN);
+						tf.setTableName(this.primaryTable);
+						varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+						if ( null == varSql ){
+							throw new PSQLException("Colonna non trovata : "+tf.getColumnName(), PSQLState.UNDEFINED_COLUMN);
+						}
 					}
 				} else {
 					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
@@ -288,6 +292,7 @@ public class Pselect extends PRequest {
 				
 				if ( tf.getTableName() == null ) {
 					varSql = this.alias2nameVar(tf.getColumnName());
+					tf.setTableName(this.primaryTable);
 				} else {
 					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
 				}

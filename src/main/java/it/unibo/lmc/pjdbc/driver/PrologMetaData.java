@@ -173,7 +173,7 @@ public class PrologMetaData implements DatabaseMetaData {
 				affectedRows[2] = Term.createTerm(tableNamePattern);
 				affectedRows[3] = Term.createTerm(column.getColumnName());
 				affectedRows[4] = Term.createTerm(""+column.getColumnType().ordinal());
-				affectedRows[5] = Term.createTerm(column.getColumnType().toString().toLowerCase());
+				affectedRows[5] = Term.createTerm(column.getColumnType().toString());
 				affectedRows[6] = Term.createTerm("255");
 				rows.add(affectedRows);
 				
@@ -472,7 +472,7 @@ public class PrologMetaData implements DatabaseMetaData {
 			
 			Term[] affectedRows;  
 			for (String name : nameSchemas) {
-				log.debug("add "+name);
+				log.debug("add "+catalogName+" => "+name);
 				affectedRows = new Term[2];
 				affectedRows[0] = Term.createTerm(name);
 				affectedRows[1] = Term.createTerm(catalogName);
@@ -618,8 +618,6 @@ public class PrologMetaData implements DatabaseMetaData {
 		
 		if (  null == schemaPattern  ) {
 			
-			log.debug("cerco su tutti gli schema il pattern "+tableNamePattern);
-			
 			List<String> schemaNames =  this.database.getCatalog().getListSchemaName();
 			
 			for(String nameS : schemaNames){
@@ -629,6 +627,9 @@ public class PrologMetaData implements DatabaseMetaData {
 				if ( null == mSchema ) log.error("come fa a essere null un campo che ho interno io?? nameS : "+nameS);
 				
 				if ( null == tableNamePattern ) {
+					
+					log.debug("cerco su tutti gli schema tutte le tabelle ");
+					
 					LinkedList<String> tablesName = mSchema.getListTableName();
 					
 					for(String tableName : tablesName) {
@@ -659,7 +660,9 @@ public class PrologMetaData implements DatabaseMetaData {
 					
 				} else {
 					
-					MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern.toLowerCase());
+					log.debug("cerco su tutti gli schema il pattern "+tableNamePattern);
+					
+					MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern);
 					
 					if ( null != tSchema ){
 						
@@ -689,7 +692,7 @@ public class PrologMetaData implements DatabaseMetaData {
 			
 		} else {
 			
-			MSchema mSchema = this.database.getMetaSchema(schemaPattern.toLowerCase());
+			MSchema mSchema = this.database.getMetaSchema(schemaPattern);
 			
 			if (  null == mSchema  ) throw new PSQLException("schema non valido: "+schemaPattern, PSQLState.INVALID_SCHEMA);
 			
@@ -724,7 +727,7 @@ public class PrologMetaData implements DatabaseMetaData {
 				
 			} else {
 				
-				MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern.toLowerCase());
+				MTable tSchema = mSchema.getMetaTableInfo(tableNamePattern);
 				
 				if ( null != tSchema ){
 					
@@ -873,10 +876,44 @@ public class PrologMetaData implements DatabaseMetaData {
 		
 	}
 
-	public ResultSet getUDTs(String catalog, String schemaPattern,
-			String typeNamePattern, int[] types) throws SQLException {
+	public ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern, int[] types) throws SQLException {
 		
-		throw new PSQLException("", PSQLState.NOT_IMPLEMENTED);
+		LinkedList<Term[]> rows = new LinkedList<Term[]>();
+		LinkedList<TableField> fields = new LinkedList<TableField>();
+		
+		TableField tf = new TableField();
+		tf.setAlias("TYPE_CAT");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TYPE_SCHEM");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("TYPE_NAME");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("CLASS_NAME");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("DATA_TYPE");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("REMARKS");
+		fields.add(tf);
+		
+		tf = new TableField();
+		tf.setAlias("BASE_TYPE");
+		fields.add(tf);
+		
+		PResultSet res = new PResultSet(fields, rows);
+		
+		return new PrologResultSet("", res, this.database, null);
+		
+		
 	}
 
 	public String getURL() throws SQLException {

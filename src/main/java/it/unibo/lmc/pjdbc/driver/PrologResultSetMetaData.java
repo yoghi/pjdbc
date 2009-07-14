@@ -88,7 +88,7 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public int getColumnDisplaySize(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return 255;
 	}
 
 	public String getColumnLabel(int column) throws SQLException {
@@ -116,11 +116,11 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public int getPrecision(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return 1;
 	}
 
 	public int getScale(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return 1;
 	}
 
 	public String getSchemaName(int column) throws SQLException {
@@ -145,36 +145,35 @@ public class PrologResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public boolean isCaseSensitive(int column) throws SQLException {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	public boolean isCurrency(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean isDefinitelyWritable(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public int isNullable(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return ResultSetMetaData.columnNullable;
 	}
 
 	public boolean isReadOnly(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean isSearchable(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean isSigned(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 	public boolean isWritable(int column) throws SQLException {
-		throw new PSQLException("non implemented", PSQLState.NOT_IMPLEMENTED);
+		return false;
 	}
 
 }
