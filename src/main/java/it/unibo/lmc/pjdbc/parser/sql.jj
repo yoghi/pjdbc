@@ -4,6 +4,8 @@ options {
   STATIC = false;
   OUTPUT_DIRECTORY = ".";
   IGNORE_CASE=true ;
+  CACHE_TOKENS=true;
+  JAVA_UNICODE_ESCAPE=true;
 }
 
 PARSER_BEGIN(Psql)
@@ -72,7 +74,7 @@ SKIP :
 	| "\t"
 	| "\n"
 }
-TOKEN: /* OPERATORS */
+TOKEN: /* OPERATORS */ /* ossia RESERVED WORDS AND LITERALS */
 {
 	<K_AS: "AS">
 	|   <K_BY:"BY">
@@ -143,6 +145,7 @@ TOKEN :
 
 	< S_IDENTIFIER: ( <LETTER>|<SPECIAL_CHARS> )+ ( <DIGIT> | <LETTER> |<SPECIAL_CHARS>)* >
 	| < #LETTER: ["a"-"z","A"-"Z"]>
+	| < #LOWLETTER: ["a"-"z"]>
 	| < #SPECIAL_CHARS: "$" | "_">
 	| < S_BIND: ":" <S_IDENTIFIER> ("." <S_IDENTIFIER>)? >
 	| < S_CHAR_LITERAL: "'" (~["'"])* "'" ("'" (~["'"])* "'")*>
@@ -275,9 +278,8 @@ Insert Insert():
 	
 	( 
 		<K_VALUES>  "(" 
-			
-			exp = GenericValue() 
-			{ insert.setValue(exp); } 
+						
+			exp = GenericValue() { insert.setValue(exp); } 
 			
 			( 
 				"," 
@@ -316,6 +318,8 @@ String GenericValue():
 	tk=TextItem() {return tk.image;}
 	|
 	ts=NumberItem() {return ts;}
+	|
+	ts=NullItem() {return ts;}
 }
 
 Token TextItem():
@@ -323,10 +327,16 @@ Token TextItem():
 	Token tk;
 }
 {
-	tk=<S_CHAR_LITERAL>
-	{
-		return tk;
-	}
+	tk=<S_CHAR_LITERAL> {return tk;}
+}
+
+String NullItem():
+{
+	Token tk;
+}
+{
+	<K_NULL> { return "null"; }
+	
 }
 
 Delete Delete():

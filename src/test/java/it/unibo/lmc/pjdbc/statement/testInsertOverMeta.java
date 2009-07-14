@@ -68,15 +68,13 @@ public class testInsertOverMeta extends TestCase {
 	    
 	    PropertyConfigurator.configure(properties);
 		
-	    //internal.db
-	    
-	    
 		TestSuite ts = new TestSuite();
 		
 		ts.addTest(new testInsertOverMeta("testCreate"));
-//		ts.addTest(new testInsertOverMeta("testBaseInsert"));
-//		ts.addTest(new testInsertOverMeta("testShortInsert"));
-//		ts.addTest(new testInsertOverMeta("testInvalidInsert"));
+		ts.addTest(new testInsertOverMeta("testNullInsert"));
+		ts.addTest(new testInsertOverMeta("testBaseInsert"));
+		ts.addTest(new testInsertOverMeta("testShortInsert"));
+		ts.addTest(new testInsertOverMeta("testInvalidInsert"));
 	
 		return ts;
 	}
@@ -118,6 +116,29 @@ public class testInsertOverMeta extends TestCase {
 		try {
 			
 			int rs = stmt.executeUpdate(" insert into employee values (100,'babo',1000);");
+			
+			assertEquals(1, rs);
+			
+		} catch (Exception e) {
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testNullInsert() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testNullInsert      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			int rs = stmt.executeUpdate(" insert into employee values (101,null,1000);");
 			
 			assertEquals(1, rs);
 			

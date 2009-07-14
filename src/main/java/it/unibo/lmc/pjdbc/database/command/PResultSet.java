@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import alice.tuprolog.PrimitiveInfo;
+import alice.tuprolog.Struct;
 import alice.tuprolog.Term;
 
 public class PResultSet {
@@ -76,6 +78,10 @@ public class PResultSet {
 		Term[] info = this.rowData.get(this.currentPosition);
 		try {
 			Term t = info[columnIndex-1];
+			if ( t instanceof Struct ){
+				Struct termS = (Struct)t;
+				if ( termS.getName().equals("null") ) return null;
+			}
 			return t;
 		} catch (IndexOutOfBoundsException e) {
 			throw new PSQLException("Column " + columnIndex + " not exist", PSQLState.DATA_TYPE_MISMATCH );

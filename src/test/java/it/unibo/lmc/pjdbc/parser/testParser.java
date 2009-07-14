@@ -64,12 +64,12 @@ public class testParser extends TestCase {
 		 
 		ts.addTest(new testParser("testSelectMultiTable"));
 		ts.addTest(new testParser("testInsert"));
-		
 		ts.addTest(new testParser("testAnyClausola"));
 		ts.addTest(new testParser("testCreateTable"));
-		
-		
 		ts.addTest(new testParser("testSelectWhere"));
+		
+		ts.addTest(new testParser("testNullInsert"));
+		
 //		ts.addTest(new testParser("testSelectWhereOR"));
 //		ts.addTest(new testParser("testSelectWhereOR2"));
 		
@@ -310,6 +310,34 @@ public class testParser extends TestCase {
 		try {
 			
 			String query = "create table prova ( id varchar(255) , age int ); ";
+		
+			Psql parse = new Psql(new StringReader(query));
+			
+			ParsedCommand pRequest = parse.parseIt();
+			
+			System.out.println(pRequest);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST Select con in mezzo ANY
+	 */
+	public void testNullInsert() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testNullInsert        ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "insert into prova values (null,1); ";
 		
 			Psql parse = new Psql(new StringReader(query));
 			

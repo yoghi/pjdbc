@@ -12,3 +12,8 @@ age(erika,50).
 age(john,25).
 age(enrico,70).
 
+nullf(null,1).
+nullf(null,2).
+
+
+invalidrow(NULL,3).
