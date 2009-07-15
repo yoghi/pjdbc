@@ -42,7 +42,7 @@ public class Expression {
 		if ( null != this.leftF ) build.append(this.leftF);
 		
 		build.append(" ");
-		build.append(this.condition.toString());
+		if ( null != this.condition ) build.append(this.condition.toString());
 		build.append(" ");
 		
 		if ( null != this.right ) build.append(this.right);

@@ -70,8 +70,8 @@ public class testParser extends TestCase {
 		
 		ts.addTest(new testParser("testNullInsert"));
 		
-//		ts.addTest(new testParser("testSelectWhereOR"));
-//		ts.addTest(new testParser("testSelectWhereOR2"));
+		ts.addTest(new testParser("testSelectWhereOR"));
+		ts.addTest(new testParser("testSelectWhereOR2"));
 		
 		return ts;
 	}
@@ -171,6 +171,7 @@ public class testParser extends TestCase {
 			System.out.println(pRequest);
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail(" Parser error: " + e);
 		}
 		
@@ -195,8 +196,6 @@ public class testParser extends TestCase {
 			
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt();
-			
-			fail();	//TODO: da finire
 			
 			System.out.println(pRequest);
 			
@@ -226,8 +225,6 @@ public class testParser extends TestCase {
 			
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt();
-			
-			fail();	//TODO: da finire
 			
 			System.out.println(pRequest);
 			

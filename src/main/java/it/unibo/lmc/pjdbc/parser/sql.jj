@@ -309,36 +309,6 @@ Insert Insert():
     }
 }
 
-String GenericValue():
-{
-	Token tk;
-	String ts;
-}
-{
-	tk=TextItem() {return tk.image;}
-	|
-	ts=NumberItem() {return ts;}
-	|
-	ts=NullItem() {return ts;}
-}
-
-Token TextItem():
-{
-	Token tk;
-}
-{
-	tk=<S_CHAR_LITERAL> {return tk;}
-}
-
-String NullItem():
-{
-	Token tk;
-}
-{
-	<K_NULL> { return "null"; }
-	
-}
-
 Delete Delete():
 { 
 	Delete delete = new Delete();
@@ -399,6 +369,78 @@ Drop Drop():
 	{
 		return drop;
 	}
+}
+
+Select Select():
+{ 
+	Select select = new Select();
+	TableField field;
+	
+	List<Table> fromList;
+	List group;
+	List order;
+	
+	Expression where;
+	
+	Limit limit;
+}
+{
+	<K_SELECT> field=Column() { select.addField(field); } 
+		[ ( "," field=Column() { select.addField(field); } )+ ] 
+	fromList=FromItemsList() { select.from(fromList); } 
+		[ where=WhereClause() { select.where(where); } ] 
+		[ group=GroupByColumnReferences() { select.groupBy(group); } ] 
+		[ order=OrderByElements() { select.orderBy(order); } ]
+		[ limit=Limit() { select.limit(limit); } ]
+		
+	{ return select; }	
+}
+
+String GenericValue():
+{
+	Token tk;
+	String ts;
+}
+{
+	tk=TextItem() {return tk.image;}
+	|
+	ts=NumberItem() {return ts;}
+	|
+	ts=NullItem() {return ts;}
+}
+
+Token TextItem():
+{
+	Token tk;
+}
+{
+	tk=<S_CHAR_LITERAL> {return tk;}
+}
+
+String NullItem():
+{
+	Token tk;
+}
+{
+	<K_NULL> { return "null"; }
+	
+}
+
+String NumberItem() :
+{ 
+	Token tk;
+	TableField tf;
+}
+{
+	(
+		tk=<S_DOUBLE>
+		|
+		tk=<S_INTEGER> 
+	)
+	{
+		return tk.image;
+	}
+	
 }
 
 TableField Column():
@@ -503,31 +545,6 @@ Table Table():
 	
 }
 
-
-Select Select():
-{ 
-	Select select = new Select();
-	TableField field;
-	
-	List<Table> fromList;
-	List group;
-	List order;
-	
-	Expression where;
-	
-	Limit limit;
-}
-{
-	<K_SELECT> field=Column() { select.addField(field); } 
-		[ ( "," field=Column() { select.addField(field); } )+ ] 
-	fromList=FromItemsList() { select.from(fromList); } 
-		[ where=WhereClause() { select.where(where); } ] 
-		[ group=GroupByColumnReferences() { select.groupBy(group); } ] 
-		[ order=OrderByElements() { select.orderBy(order); } ]
-		[ limit=Limit() { select.limit(limit); } ]
-		
-	{ return select; }	
-}
 
 String Alias():
 { String retval = null; }
@@ -655,22 +672,7 @@ TableField ColumnReference():
 }
 
 
-String NumberItem() :
-{ 
-	Token tk;
-	TableField tf;
-}
-{
-	(
-		tk=<S_DOUBLE>
-		|
-		tk=<S_INTEGER> 
-	)
-	{
-		return tk.image;
-	}
-	
-}
+
 
 Expression Expression():
 {
@@ -678,39 +680,69 @@ Expression Expression():
 }
 {
 	(
-		<S_LPAR> exp = Expression() <S_RPAR>
-		|
-		exp = SimpleExpression()
+		exp = OrExpression()
 	)
 	{ return exp; }
 }
 
-Expression SimpleExpression():
+Expression OrExpression() :
 {
-	Expression exp = new Expression();;
-	String right;
-	TableField rightF;
-	String left;
-	TableField leftF;
+	Expression exp = new Expression();
+}
+{
+	AndExpression()
+	(
+	  	<K_OR> AndExpression()
+		{
+			//exp.setCondition(cond);
+			//exp.setRight(exp);
+			//cond = new OrCondition();
+		}
+	  
+	)*
+	
+	{return exp;}
+}
+
+void AndExpression() :
+{
+}
+{
+	ComparisonExpression()
+	(
+		<K_AND> ComparisonExpression()
+		{
+			//and..
+			//cond = new AndCondition();
+		}
+	   
+	)*
+}
+
+void ComparisonExpression() :
+{
 	ICondition cond;
 }
 {
+	LastExpression()
 	(
-		LOOKAHEAD(2)
-		left = GenericValue()  { exp.setLeft(left); }
-		|
-		leftF = Column()	{ exp.setLeft(leftF); }
-	)
-	cond = ComparisonCondition() { exp.setCondition(cond); }
-	(
-		LOOKAHEAD(2)
-		right = GenericValue()	{ exp.setRight(right); } 
-		|
-		rightF = Column()	{ exp.setRight(rightF); }
-	)
-	{
-		return exp;
-	}
+	  cond = ComparisonCondition() {  }
+	  LastExpression() {  }
+	)*
+}
+
+void LastExpression():
+{
+	String left;
+	TableField leftF;
+}
+{
+	LOOKAHEAD(2)
+	left = GenericValue() 
+	|
+	leftF = Column()
+	|
+	<S_LPAR> Expression() <S_RPAR>
 }
 
 ICondition ComparisonCondition():
