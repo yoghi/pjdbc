@@ -1,6 +1,7 @@
 package it.unibo.lmc.pjdbc.parser;
 
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
+import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
@@ -72,6 +73,8 @@ public class testParser extends TestCase {
 		
 		ts.addTest(new testParser("testSelectWhereOR"));
 		ts.addTest(new testParser("testSelectWhereOR2"));
+		
+		ts.addTest(new testParser("testSelectWhere2"));
 		
 		return ts;
 	}
@@ -190,14 +193,36 @@ public class testParser extends TestCase {
 		
 		try {
 			
-			String query = "select e.$1,d.$0 from employee as e , dept as d , eta as et where (  (e.$0 = d.$1) AND ( e.$1 = et.$0 )  AND  (et.$1 < 40) OR ( e.$2 > 2000 ) ) ;";
+			String query = "select e.$1,d.$0 from employee as e , dept as d , eta as et where  (e.$0 = d.$1) AND ( e.$1 = et.$0 )  AND  (et.$1 < 40) OR ( e.$2 > 2000 ) ;";
+			
+			System.out.println(query);
 			
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt();
 			
-			System.out.println(pRequest);
+			Select sRequest = (Select)pRequest;
+			
+			Expression exp = sRequest.getWhereClausole();
+			
+			// (e.$0 = d.$1) AND ( e.$1 = et.$0 )  AND  (et.$1 < 40) OR ( e.$2 > 2000 )
+			// E1 AND E2 AND E3 OR E4
+			Expression E123 = exp.getLeftExpression();
+			
+			Expression E4 = exp.getRightExpression();
+			System.out.println("E4 : ( e.$2 > 2000 ) "+E4.toString());
+			
+			Expression E3 = E123.getRightExpression();
+			System.out.println("E3 : (et.$1 < 40) "+E3.toString());
+			
+			Expression E12 = E123.getLeftExpression();
+			
+			Expression E2 = E12.getRightExpression();
+			System.out.println("E2 : ( e.$1 = et.$0 )  "+E2.toString());
+			
+			Expression E1 = E12.getLeftExpression();
+			System.out.println("E1 : (e.$0 = d.$1)  "+E1.toString());
 			
 			
 		} catch (Exception e) {
@@ -220,16 +245,51 @@ public class testParser extends TestCase {
 		try {
 			
 			String query = "select e.$1,d.$0 from employee as e , dept as d , eta as et where ( ( (e.$0 = d.$1) AND ( e.$1 = et.$0 ) ) AND ( (et.$1 < 40) OR ( e.$2 > 2000 ) ) ) ;";
+		
+			System.out.println(query);
 			
 			ParsedCommand pRequest = null;
 			
 			Psql parse = new Psql(new StringReader(query));
 			pRequest = parse.parseIt();
 			
-			System.out.println(pRequest);
+			Select sRequest = (Select)pRequest;
 			
 			
 		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" Parser error: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
+	public void testSelectWhere2() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testSelectWhere2      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			String query = "select e.$1,d.$0 from employee as e , dept as d , eta as et where ( e.$1 > 2 ) < 7000 ;";
+		
+			System.out.println(query);
+			
+			ParsedCommand pRequest = null;
+			
+			Psql parse = new Psql(new StringReader(query));
+			pRequest = parse.parseIt();
+			
+			Select sRequest = (Select)pRequest;
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 			fail(" Parser error: " + e);
 		}
 		

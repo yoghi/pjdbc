@@ -90,11 +90,12 @@ public class testSelectOverMeta extends TestCase {
 		
 		ts.addTest(new testSelectOverMeta("testSelectWhere"));
 		ts.addTest(new testSelectOverMeta("testSelectParWhere"));
+		ts.addTest(new testSelectOverMeta("testComplexWhere"));
 		
 //		ts.addTest(new testSelectOverMeta("testSelectWhere2"));
-//		ts.addTest(new testSelectOverMeta("testSelectWhereAND"));
-//		ts.addTest(new testSelectOverMeta("testSelectWhereOR"));
-//		ts.addTest(new testSelectOverMeta("testSelectWhereOR2"));
+		ts.addTest(new testSelectOverMeta("testSelectWhereAND"));
+		ts.addTest(new testSelectOverMeta("testSelectWhereOR"));
+		ts.addTest(new testSelectOverMeta("testSelectWhereOR2"));
 		
 		
 		return ts;
@@ -546,6 +547,30 @@ public class testSelectOverMeta extends TestCase {
 	/**
 	 * TEST: Select di un campo specifico
 	 */
+	public void testComplexWhere() {
+		
+		System.out.println(" ====================== ");
+		System.out.println("  testComplexWhere      ");
+ 		System.out.println(" ====================== ");
+		
+		try {
+			
+			ResultSet rs = stmt_1.executeQuery("select e.$0,e.$1,d.$1 from employee as e, dept as d where (e.$0 = d.$1) OR (d.$0 = 'smith') ;");
+			
+			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(" ExecuteQuery ha ritornato: " + e);
+		}
+		
+		assertTrue(true);
+		
+	}
+	
+	/**
+	 * TEST: Select di un campo specifico
+	 */
 	public void testSelectWhere2() {
 		
 		System.out.println(" ====================== ");
@@ -624,9 +649,13 @@ public class testSelectOverMeta extends TestCase {
 		
 		try {
 			
-			ResultSet rs = stmt_1.executeQuery("select e.$1,d.$0 from employee as e , dept as d , eta as et where ( ( (e.$0 = d.$1) AND ( e.$1 = et.$0 ) ) AND ( (et.$1 < 40) OR ( e.$2 > 2000 ) ) ) ;");
+			ResultSet rs = stmt_1.executeQuery("select e.$1,d.$0 from employee as e , dept as d , age as et where ( ( (e.$0 = d.$1) AND ( e.$1 = et.$0 ) ) AND ( (et.$1 < 40) OR ( e.$2 > 2000 ) ) ) ;");
 			
 			if (rs == null) fail("ExecuteQuery not return valid ResultSet ");
+			
+			while(rs.next()){
+				System.out.println("nome "+rs.getString(1)+" settore "+rs.getString(2));
+			}
 			
 		} catch (Exception e) {
 			fail(" ExecuteQuery ha ritornato: " + e);

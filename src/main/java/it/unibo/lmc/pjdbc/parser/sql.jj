@@ -671,9 +671,6 @@ TableField ColumnReference():
 	}
 }
 
-
-
-
 Expression Expression():
 {
 	Expression exp = null;
@@ -688,15 +685,18 @@ Expression Expression():
 Expression OrExpression() :
 {
 	Expression exp = new Expression();
+	Expression expR,expL;
+	ICondition cond;
 }
 {
-	AndExpression()
+	expL=AndExpression() { exp.setLeftExpression(expL); }
+	
 	(
-	  	<K_OR> AndExpression()
+	  	<K_OR> expR=AndExpression()
 		{
-			//exp.setCondition(cond);
-			//exp.setRight(exp);
-			//cond = new OrCondition();
+			cond = new OrCondition();
+			exp.setCondition(cond);
+			exp.setRightExpression(expR);
 		}
 	  
 	)*
@@ -704,45 +704,84 @@ Expression OrExpression() :
 	{return exp;}
 }
 
-void AndExpression() :
+Expression AndExpression() :
 {
-}
-{
-	ComparisonExpression()
-	(
-		<K_AND> ComparisonExpression()
-		{
-			//and..
-			//cond = new AndCondition();
-		}
-	   
-	)*
-}
-
-void ComparisonExpression() :
-{
+	Expression exp = new Expression();
+	Expression expL,expR;
 	ICondition cond;
 }
 {
-	LastExpression()
+	expL = ComparisonExpression() { exp.setLeftExpression(expL); }
+	
 	(
-	  cond = ComparisonCondition() {  }
-	  LastExpression() {  }
+		<K_AND> expR = ComparisonExpression()
+		{
+			if ( exp.getRightExpression() != null ) {
+				Expression tmpExp = new Expression();
+				tmpExp.setLeftExpression(exp);
+				tmpExp.setRightExpression(expR);
+				tmpExp.setCondition(new AndCondition());
+				exp = tmpExp;
+			} else {
+				cond = new AndCondition();
+				exp.setCondition(cond);
+				exp.setRightExpression(expR);
+			}
+		}
 	)*
+	{
+		if ( exp.getRightExpression() == null ) return exp.getLeftExpression(); 
+		return exp;
+	}
 }
 
-void LastExpression():
+Expression ComparisonExpression() :
+{
+	Expression exp = new Expression();
+	Expression expL,expR;
+	ICondition cond;
+}
+{
+	expL=LastExpression() { exp.setLeftExpression(expL); }
+	(
+	  cond = ComparisonCondition() expR=LastExpression() 
+	  {
+	  	if ( exp.getRightExpression() != null ) {
+				Expression tmpExp = new Expression();
+				tmpExp.setLeftExpression(exp);
+				tmpExp.setRightExpression(expR);
+				tmpExp.setCondition(cond);
+				exp = tmpExp;
+			} else {
+				exp.setCondition(cond);
+				exp.setRightExpression(expR);
+			}
+	  }
+	)*
+	{
+		if ( exp.getRightExpression() == null ) return exp.getLeftExpression(); 
+		return exp;
+	}
+}
+
+Expression LastExpression():
 {
 	String left;
 	TableField leftF;
+	Expression exp = null;
 }
 {
-	LOOKAHEAD(2)
-	left = GenericValue() 
-	|
-	leftF = Column()
-	|
-	<S_LPAR> Expression() <S_RPAR>
+	(
+		LOOKAHEAD(2)
+		left = GenericValue() { exp = new Expression(); exp.setLeft(left); } 
+		|
+		leftF = Column() { exp = new Expression(); exp.setLeft(leftF); }
+		|
+		<S_LPAR> exp=Expression() <S_RPAR>
+	)
+	{
+		return exp;
+	}
 }
 
 ICondition ComparisonCondition():

@@ -1,6 +1,5 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression.condition.comparative;
 
-import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 public class MajorCondition implements IComparativeCondition {
 
@@ -13,27 +12,8 @@ public class MajorCondition implements IComparativeCondition {
 	}
 	
 	public String toString(){
+		if ( this.equals ) return ">=";
 		return ">";
-	}
-
-	public boolean eval(String itemA, String itemB) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public String[] eval(TableField itemA, String itemB) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String[] eval(TableField itemA, TableField itemB) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String[] eval(String itemA, TableField itemB) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

@@ -1,7 +1,6 @@
 package it.unibo.lmc.pjdbc.parser.dml.expression.condition.aritmetic;
 
 import it.unibo.lmc.pjdbc.parser.dml.expression.condition.ICondition;
-import it.unibo.lmc.pjdbc.parser.schema.TableField;
 
 
 public class AritmeticCondition implements ICondition {
@@ -29,9 +28,5 @@ public class AritmeticCondition implements ICondition {
 		return 0;
 		
 	}
-
-//	public string[] eval(TableField A,int B){
-//		
-//	}
 
 }

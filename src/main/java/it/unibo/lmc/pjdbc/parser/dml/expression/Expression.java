@@ -11,8 +11,18 @@ public class Expression {
 	private String left;
 	private TableField rightF;
 	private TableField leftF;
+	private Expression leftExpression;
+	private Expression rightExpression;
 	
 	public Expression(){}
+	
+	public void setLeftExpression(Expression leftExp){
+		this.leftExpression = leftExp;
+	}
+	
+	public void setRightExpression(Expression rightExp){
+		this.rightExpression = rightExp;
+	}
 	
 	public void setCondition(ICondition cond){
 		this.condition = cond;
@@ -40,14 +50,23 @@ public class Expression {
 		
 		if ( null != this.left ) build.append(this.left);
 		if ( null != this.leftF ) build.append(this.leftF);
+		if ( null != this.leftExpression ) {
+			build.append("{");
+			build.append(this.leftExpression.toString());
+			build.append("}");
+		}
 		
-		build.append(" ");
+		//build.append(" ");
 		if ( null != this.condition ) build.append(this.condition.toString());
-		build.append(" ");
+		//build.append(" ");
 		
 		if ( null != this.right ) build.append(this.right);
 		if ( null != this.rightF ) build.append(this.rightF);
-		
+		if ( null != this.rightExpression ) {
+			build.append("{");
+			build.append(this.rightExpression.toString());
+			build.append("}");
+		}
 		
 		return build.toString();
 		
@@ -86,6 +105,14 @@ public class Expression {
 	 */
 	public TableField getLeftF() {
 		return leftF;
+	}
+
+	public Expression getLeftExpression() {
+		return leftExpression;
+	}
+
+	public Expression getRightExpression() {
+		return rightExpression;
 	}
 	
 }

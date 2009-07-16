@@ -238,82 +238,109 @@ public class Pselect extends PRequest {
 	 */
 	protected String generateWhereClausole() throws PSQLException {
 		
+		StringBuilder builder = new StringBuilder();
+	
 		Expression exp = ((Select)this.mcommand).getWhereClausole();
 		
 		if ( exp == null ) return "";
 		
-		StringBuilder build = new StringBuilder();
+		this.analizeExpression(exp,builder);
 		
-		if ( null != exp.getLeft() ) {
-			build.append(exp.getLeft());
-		} else {
-			if ( null != exp.getLeftF() ) {
+		return builder.toString();
+		
+	}
+	
+	protected void analizeExpression(Expression exp, StringBuilder builder) throws PSQLException{
+		
+		if ( exp.getCondition() != null ){ // 1. Left Condition Right
+			
+			builder.append("(");
+			this.analizeExpression(exp.getLeftExpression(),builder);
+			builder.append(exp.getCondition().toString());
+			this.analizeExpression(exp.getRightExpression(),builder);
+			builder.append(")");
+			
+		} else { //2. Left
+			
+			//Expression
+			if ( exp.getLeftExpression() != null ){
 				
-				TableField tf = exp.getLeftF();
-				String varSql = null;
+				this.analizeExpression(exp.getLeftExpression(),builder);
+			
+			} else {
 				
-				if ( tf.getTableName() == null ) {
-					varSql = this.alias2nameVar(tf.getColumnName());
-					if ( null == varSql ){
-						tf.setTableName(this.primaryTable);
-						varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+				if ( exp.getLeft() != null ){
+					
+					builder.append(exp.getLeft());
+					
+				} else {
+					
+					TableField tf = exp.getLeftF();
+					String varSql = null;
+					
+					if ( tf.getTableName() == null ) {
+						varSql = this.alias2nameVar(tf.getColumnName());
 						if ( null == varSql ){
-							throw new PSQLException("Colonna non trovata : "+tf.getColumnName(), PSQLState.UNDEFINED_COLUMN);
+							tf.setTableName(this.primaryTable);
+							varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+							if ( null == varSql ){
+								
+								PClausola prolog_clausola = this.clausole.get(tf.getTableName());
+								
+								if ( tf.getColumnName().startsWith("$")  ) {
+									int pos = Integer.parseInt(tf.getColumnName().substring(1));
+									prolog_clausola.setTerm( this.generateNewVar(tf.getQualifiedName())  , pos, false);
+								} else {
+									prolog_clausola.setTerm( this.generateNewVar(tf.getQualifiedName()) , tf.getColumnName(), false);
+								}
+								
+								varSql = tf.getQualifiedName();
+								
+							}
+						}
+					} else {
+						varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
+						
+						if ( null == varSql ){
+							
+							String tableName = this.alias2nameTable(tf.getTableName());
+							
+							if ( null != tableName ) tf.setTableName(tableName); 
+								
+							varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
+							
+							if ( null == varSql ){
+								
+								PClausola prolog_clausola = this.clausole.get(tf.getTableName());
+								
+								if ( null == tf.getSchema() ) tf.setSchema(this.mschema.getSchemaName());
+								
+								if ( tf.getColumnName().startsWith("$")  ) {
+									int pos = Integer.parseInt(tf.getColumnName().substring(1));
+									prolog_clausola.setTerm( this.generateNewVar(tf.getQualifiedName())  , pos, false);
+								} else {
+									prolog_clausola.setTerm( this.generateNewVar(tf.getQualifiedName()) , tf.getColumnName(), false);
+								}
+								
+								varSql = tf.getQualifiedName();
+								
+							}
 						}
 					}
-				} else {
-					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
-					if ( null == varSql ){
-						varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
+					
+					String varPsql = null;
+					for(String key : this.mapVariables.keySet() ){
+						if ( this.mapVariables.get(key).equalsIgnoreCase(varSql) ){
+							varPsql = key;
+						}
 					}
+					
+					builder.append(varPsql);
 				}
-				
-				String varPsql = null;
-				for(String key : this.mapVariables.keySet() ){
-					if ( this.mapVariables.get(key).equalsIgnoreCase(varSql) ){
-						varPsql = key;
-					}
-				}
-				
-				build.append(varPsql);
 				
 			}
+					
 		}
-		
-		build.append(exp.getCondition().toString());
-		
-		if ( null != exp.getRight() ) {
-			build.append(exp.getRight());
-		} else {
-			if ( null != exp.getRightF() ) {
-				
-				TableField tf = exp.getRightF();
-				String varSql = null;
-				
-				if ( tf.getTableName() == null ) {
-					varSql = this.alias2nameVar(tf.getColumnName());
-					tf.setTableName(this.primaryTable);
-				} else {
-					varSql = this.alias2nameVar(tf.getTableName()+"."+tf.getColumnName());
-				}
-				
-				if ( null == varSql ){
-					varSql = this.alias2nameVar(this.alias2nameTable(tf.getTableName())+"."+tf.getColumnName());
-				}
-				
-				String varPsql = null;
-				for(String key : this.mapVariables.keySet() ){
-					if ( this.mapVariables.get(key).equalsIgnoreCase(varSql) ){
-						varPsql = key;
-					}
-				}
-				
-				build.append(varPsql);
-				
-			}
-		}
-		
-		return build.toString();
 		
 	}
 }

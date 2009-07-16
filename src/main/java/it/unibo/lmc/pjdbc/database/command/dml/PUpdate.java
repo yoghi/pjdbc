@@ -9,6 +9,7 @@ import it.unibo.lmc.pjdbc.database.utils.PSQLException;
 import it.unibo.lmc.pjdbc.database.utils.PSQLState;
 import it.unibo.lmc.pjdbc.parser.dml.ParsedCommand;
 import it.unibo.lmc.pjdbc.parser.dml.expression.Expression;
+import it.unibo.lmc.pjdbc.parser.dml.imp.Select;
 import it.unibo.lmc.pjdbc.parser.dml.imp.Update;
 import it.unibo.lmc.pjdbc.parser.schema.Table;
 import it.unibo.lmc.pjdbc.parser.schema.TableField;
@@ -89,71 +90,79 @@ public class PUpdate extends PRequest {
 	
 	/**
 	 * Genero le clausole riguardanti il campo WHERE
+	 * @throws PSQLException 
 	 */
-	protected String generateWhereClausole() {
+	protected String generateWhereClausole() throws PSQLException {
+		
+		StringBuilder builder = new StringBuilder();
 		
 		Expression exp = ((Update)this.mcommand).getWhereClausole();
 		
 		if ( exp == null ) return "";
 		
-		StringBuilder build = new StringBuilder();
+		this.analizeExpression(exp,builder);
 		
-		if ( null != exp.getLeft() ) {
-			build.append(exp.getLeft());
-		} else {
-			if ( null != exp.getLeftF() ) {
-				
-				TableField tf = exp.getLeftF();
-				if ( tf.getSchema() == null ) tf.setSchema(this.mschema.getSchemaName());
-				if ( tf.getTableName() == null ) tf.setTableName(this.updateTable.getName());
-				
-				String varPsql = null;
-				
-				if ( tf.getColumnName().startsWith("$") ){
-					MTable info = this.mschema.getMetaTableInfo(tf.getTableName());
-					MColumn[] columns = info.getColumns();
-					int pos = Integer.parseInt(tf.getColumnName().replace("$", ""));
-					for(String key : this.mapVariables.keySet() ){
-						if ( this.mapVariables.get(key).equalsIgnoreCase(columns[pos].getQualifiedName()) ){
-							varPsql = key;
-						}
-					}
-				} else {
+		return builder.toString();
+		
+	}
+	
+	protected void analizeExpression(Expression exp, StringBuilder builder) throws PSQLException{
+		
+		if ( exp.getCondition() != null ){ // 1. Left Condition Right
 			
-					for(String key : this.mapVariables.keySet() ){
-						if ( this.mapVariables.get(key).equalsIgnoreCase(tf.getQualifiedName()) ){
-							varPsql = key;
+			builder.append("(");
+			this.analizeExpression(exp.getLeftExpression(),builder);
+			builder.append(exp.getCondition().toString());
+			this.analizeExpression(exp.getRightExpression(),builder);
+			builder.append(")");
+			
+		} else { //2. Left
+			
+			//Expression
+			if ( exp.getLeftExpression() != null ){
+				
+				this.analizeExpression(exp.getLeftExpression(),builder);
+			
+			} else {
+				
+				if ( exp.getLeft() != null ){
+					
+					builder.append(exp.getLeft());
+					
+				} else {
+					
+					TableField tf = exp.getLeftF();
+					
+					if ( tf.getSchema() == null ) tf.setSchema(this.mschema.getSchemaName());
+					if ( tf.getTableName() == null ) tf.setTableName(this.updateTable.getName());
+					
+					String varPsql = null;
+					
+					if ( tf.getColumnName().startsWith("$") ){
+						MTable info = this.mschema.getMetaTableInfo(tf.getTableName());
+						MColumn[] columns = info.getColumns();
+						int pos = Integer.parseInt(tf.getColumnName().replace("$", ""));
+						for(String key : this.mapVariables.keySet() ){
+							if ( this.mapVariables.get(key).equalsIgnoreCase(columns[pos].getQualifiedName()) ){
+								varPsql = key;
+							}
+						}
+					} else {
+				
+						for(String key : this.mapVariables.keySet() ){
+							if ( this.mapVariables.get(key).equalsIgnoreCase(tf.getQualifiedName()) ){
+								varPsql = key;
+							}
 						}
 					}
+					
+					builder.append(varPsql);
+					
 				}
 				
-				build.append(varPsql);
-				
 			}
+					
 		}
-		
-		build.append(exp.getCondition().toString());
-		
-		if ( null != exp.getRight() ) {
-			build.append(exp.getRight());
-		} else {
-			if ( null != exp.getRightF() ) {
-				
-				TableField tf = exp.getRightF();
-				
-				String varPsql = null;
-				for(String key : this.mapVariables.keySet() ){
-					if ( this.mapVariables.get(key).equalsIgnoreCase(tf.getQualifiedName()) ){
-						varPsql = key;
-					}
-				}
-				
-				build.append(varPsql);
-				
-			}
-		}
-		
-		return build.toString();
 		
 	}
 
