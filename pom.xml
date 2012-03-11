@@ -6,7 +6,7 @@
 	<!-- POM Relationships -->
 	<groupId>it.unibo.lmc.pjdbc</groupId>
 	<artifactId>Pjdbc</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<dependencies>
 	
 		<!-- test unitari -->
@@ -120,6 +120,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -136,6 +137,24 @@
 					<!-- <outputEncoding>UTF-8</outputEncoding> -->
 					<!--  <outputEncoding>ISO-8859-1</outputEncoding> -->
 					<!-- <templateFile>${basedir}/default-site.vm</templateFile>  -->
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<!-- http://mojo.codehaus.org/javacc-maven-plugin/javacc-mojo.html -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>javacc-maven-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>javacc</id>
+						<goals>
+							<goal>javacc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<sourceDirectory>${basedir}/src/main/java/it/unibo/lmc/pjdbc/parser</sourceDirectory>
 				</configuration>
 			</plugin>
 
