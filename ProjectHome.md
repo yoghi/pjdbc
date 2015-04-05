@@ -1,0 +1,1 @@
+Il prolog si presta perfettamente come database relazionale, da qui l'idea di sviluppare un  driver JDBC per comunicare con esso. Basato attualmente su Java 1.5, verra portato alla 1.6 non appena ci sarà un versione di base stabile.
